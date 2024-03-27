@@ -171,6 +171,7 @@ void mmHTMLBuilder::init(bool simple, const wxString& extra_style)
             , wxString::Format("%d", Option::instance().getHtmlFontSize())
             , extra_style);
     }
+    formatHTML(html_);
 }
 
 void mmHTMLBuilder::showUserName()

@@ -377,7 +377,7 @@ if(CURL_FOUND)
     get_target_property(LIBCURL_TYPE CURL::libcurl TYPE)
     # CURL_STATICLIB is missing for curl versions <7.61.1
     if(CURL_VERSION VERSION_LESS 7.61.1 AND LIBCURL_TYPE STREQUAL STATIC_LIBRARY)
-        set_target_properties(CURL::libcurl PROPERTIES
+    set_target_properties(CURL::libcurl PROPERTIES
             INTERFACE_COMPILE_DEFINITIONS CURL_STATICLIB)
     endif()
 else()
@@ -602,7 +602,7 @@ if(WIN32)
         # check custom build name vs original one
         foreach(m_dll ${MMEX_WXDLLS})
             set(m_dll "${wxWidgets_LIB_DIR}/${m_dll}")
-            foreach(m_ext vc_mmex.dll vc_custom.dll vc_x64_custom.dll "${WXDLLSUFF}" NOTFOUND)
+            foreach(m_ext vc_mmex.dll vc_custom.dll vc_x64_mmex.dll vc_x64_custom.dll "${WXDLLSUFF}" NOTFOUND)
                 if(EXISTS "${m_dll}_${m_ext}")
                     list(APPEND CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS "${m_dll}_${m_ext}")
                     break()
@@ -615,6 +615,11 @@ if(WIN32)
         unset(m_ext)
         unset(MMEX_WXDLLS)
         unset(WXDLLSUFF)
+    endif()
+
+    # Copy WebView2Loader.dll from wxWidgets library directory
+    if(EXISTS "${wxWidgets_LIB_DIR}/WebView2Loader.dll")
+        list(APPEND CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS "${wxWidgets_LIB_DIR}/WebView2Loader.dll")
     endif()
 
     # This may be required to run on old Windows version

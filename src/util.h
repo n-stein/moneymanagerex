@@ -149,6 +149,7 @@ void correctEmptyFileExt(const wxString& ext, wxString & fileName );
 
 void mmLoadColorsFromDatabase(const bool def = false);
 wxColour getUDColour(const int c);
+void formatHTML(wxString& html);
 
 class mmColors
 {

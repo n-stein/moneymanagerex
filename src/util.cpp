@@ -37,6 +37,7 @@
 #include "model/Model_CurrencyHistory.h"
 #include <wx/display.h>
 #include <wx/sstream.h>
+#include <wx/webview.h>
 #include <wx/xml/xml.h>
 #include <map>
 #include <lua.hpp>
@@ -230,7 +231,15 @@ bool getNewsRSS(std::vector<WebsiteNews>& WebsiteNewsList)
     return true;
 }
 
-/*--- CSV specific ---------*/
+void formatHTML(wxString& html)
+{
+#if defined(__WXMSW__)
+    if (wxWebView::IsBackendAvailable(wxWebViewBackendEdge))
+        html.Replace("memory:", "");
+#endif
+}
+
+    /*--- CSV specific ---------*/
 void csv2tab_separated_values(wxString& line, const wxString& delimit)
 {
     //csv line example:
