@@ -141,7 +141,7 @@ jobs:
             
       - name: Download wxWidgets
         run: |
-          cd ..
+          cd ${env:GITHUB_WORKSPACE}
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_Dev.7z"
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" 
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxWidgets-${env:WXVER}-headers.7z" 
@@ -153,16 +153,16 @@ jobs:
         id: restore-cache-curl
         uses: actions/cache/restore@v4
         with:
-          path: ./curl
-          key: curl-${env:CURLVER}-${{ matrix.platform }}
+          path: ${{ github.workspace }}/curl
+          key: curl-${{ env.CURLVER }}-${{ matrix.platform }}
           
       - name: Build CURL
         if: steps.restore-cache-curl.outputs.cache-hit != 'true'
         id: curl-build
         run: |
-          git clone -q --depth=1 -b curl-$env:CURLVER --single-branch https://github.com/curl/curl.git curl-src
+          git clone -q --depth=1 -b curl-${env:CURLVER} --single-branch https://github.com/curl/curl.git curl-src
           mkdir curl-src\build && cd curl-src\build
-          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=..\curl-${env:CURLVER} ..
+          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${env:GITHUB_WORKSPACE}\curl-${env:CURLVER} ..
           cmake --build . --target install --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           
       - name: Save CURL Cache
@@ -170,8 +170,8 @@ jobs:
         id: save-cache-curl
         uses: actions/cache/save@v4
         with:
-          path: ../curl
-          key: curl-${env:CURLVER}-${{ matrix.platform }}    
+          path: ${{ github.workspace }}/curl
+          key: curl-${{ env.CURLVER }}-${{ matrix.platform }}    
         
       - name: Checkout latest release
         uses: actions/checkout@v4
@@ -182,7 +182,7 @@ jobs:
         id: restore-cache-build
         uses: actions/cache/restore@v4
         with:
-          path: $env:GITHUB_WORKSPACE/build
+          path: ${{ github.workspace }}/build
           key: build_cache-${{ matrix.platform }}
           
       - name: Regenerate db headers
@@ -190,7 +190,8 @@ jobs:
           cd ${env:GITHUB_WORKSPACE}\src\db
           python ..\..\util\sqlite2cpp.py ..\..\database\tables.sql
           python ..\..\util\sqliteupgrade2cpp.py ..\..\database\incremental_upgrade
-          del *.mmdbg sql*.sql 
+          del *.mmdbg
+          del sql*.sql
       
       - name: Build MoneyManagerEx
         id: mmex-build
@@ -198,7 +199,7 @@ jobs:
           cd ${env:GITHUB_WORKSPACE}
           if not exist "build" mkdir build
           cd build
-          cmake --graphviz=mmex.dot -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=$HOME\curl-$CURLVER -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\build\install -DwxWidgets_ROOT_DIR=$HOME\wxWidgets ..
+          cmake --graphviz=mmex.dot -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=${env:GITHUB_WORKSPACE}\curl-${env:CURLVER} -DCMAKE_INSTALL_PREFIX=${env:GITHUB_WORKSPACE}\build\install -DwxWidgets_ROOT_DIR=${env:GITHUB_WORKSPACE}\wxWidgets ..
           cmake --build . --target package --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           for %f in (*.zip) do (mkdir "%~nf" && fsutil file createnew "%~nf\mmexini.db3" 0 && 7z a "%f" "%~nf\mmexini.db3" && move "%f" "..\%~nf-portable.zip" && echo "artifact_name_zip=%~nf-portable.zip" >> $env:GITHUB_OUTPUT)
           for %f in (*.exe) do (move "%f" "..\%f" && echo "artifact_name_exe=%f" >> $env:GITHUB_OUTPUT)
@@ -207,7 +208,7 @@ jobs:
         id: save-cache-build
         uses: actions/cache/save@v4
         with:
-          path: $env:GITHUB_WORKSPACE/build
+          path: ${{ github.workspace }}/build
           key: build_cache-${{ matrix.platform }}
           
       - name: Upload installer
