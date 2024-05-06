@@ -128,7 +128,7 @@ jobs:
   build-windows:
     strategy:
       matrix:
-        platform: [Win32, x64]
+        platform: [Win32]
     runs-on: windows-2019
     permissions:
       id-token: write
@@ -146,7 +146,7 @@ jobs:
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" 
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxWidgets-${env:WXVER}-headers.7z" 
           7z x "wxMSW-${env:WXVER}_vc14x_Dev.7z" -owxWidgets
-          7z x "wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" -owxWidgets
+          7z x "wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" -owxWidgets -ao
           7z x "wxWidgets-${env:WXVER}-headers.7z" -owxWidgets
 
       - name: Restore CURL cache
@@ -182,7 +182,7 @@ jobs:
         id: restore-cache-build
         uses: actions/cache/restore@v4
         with:
-          path: ${{ github.workspace }}\build-${{ matrix.platform }}
+          path: ${{ github.workspace }}\build
           key: build_cache-${{ matrix.platform }}
           
       - name: Regenerate db headers
@@ -197,8 +197,8 @@ jobs:
         id: mmex-build
         run: |
           cd ${env:GITHUB_WORKSPACE}
-          mkdir build-${{ matrix.platform }} && cd build-${{ matrix.platform }}
-          cmake --graphviz=mmex.dot -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=${env:GITHUB_WORKSPACE}\curl-${env:CURLVER} -DCMAKE_INSTALL_PREFIX=${env:GITHUB_WORKSPACE}\build-${{ matrix.platform }}\install -DwxWidgets_ROOT_DIR=${env:GITHUB_WORKSPACE}\wxWidgets ..
+          mkdir build && cd build
+          cmake --graphviz=mmex.dot -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=${env:GITHUB_WORKSPACE}\curl-${env:CURLVER} -DCMAKE_INSTALL_PREFIX=${env:GITHUB_WORKSPACE}\build\install -DwxWidgets_ROOT_DIR=${env:GITHUB_WORKSPACE}\wxWidgets ..
           cmake --build . --target package --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           for (%f in (*.zip)) {mkdir "%~nf" && fsutil file createnew "%~nf\mmexini.db3" 0 && 7z a "%f" "%~nf\mmexini.db3" && move "%f" "..\%~nf-portable.zip" && echo "artifact_name_zip=%~nf-portable.zip" >> $env:GITHUB_OUTPUT}
           for (%f in (*.exe)) {move "%f" "..\%f" && echo "artifact_name_exe=%f" >> $env:GITHUB_OUTPUT}
@@ -207,7 +207,7 @@ jobs:
         id: save-cache-build
         uses: actions/cache/save@v4
         with:
-          path: ${{ github.workspace }}\build-${{ matrix.platform }}
+          path: ${{ github.workspace }}\build
           key: build_cache-${{ matrix.platform }}
           
       - name: Upload installer
