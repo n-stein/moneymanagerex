@@ -201,8 +201,8 @@ jobs:
           cd build
           cmake --graphviz=mmex.dot -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=${env:GITHUB_WORKSPACE}\curl-${env:CURLVER} -DCMAKE_INSTALL_PREFIX=${env:GITHUB_WORKSPACE}\build\install -DwxWidgets_ROOT_DIR=${env:GITHUB_WORKSPACE}\wxWidgets ..
           cmake --build . --target package --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
-          foreach (%f in (*.zip)) {mkdir "%~nf" && fsutil file createnew "%~nf\mmexini.db3" 0 && 7z a "%f" "%~nf\mmexini.db3" && move "%f" "..\%~nf-portable.zip" && echo "artifact_name_zip=%~nf-portable.zip" >> $env:GITHUB_OUTPUT}
-          foreach (%f in (*.exe)) {move "%f" "..\%f" && echo "artifact_name_exe=%f" >> $env:GITHUB_OUTPUT}
+          for (%f in (*.zip)) {mkdir "%~nf" && fsutil file createnew "%~nf\mmexini.db3" 0 && 7z a "%f" "%~nf\mmexini.db3" && move "%f" "..\%~nf-portable.zip" && echo "artifact_name_zip=%~nf-portable.zip" >> $env:GITHUB_OUTPUT}
+          for (%f in (*.exe)) {move "%f" "..\%f" && echo "artifact_name_exe=%f" >> $env:GITHUB_OUTPUT}
 
       - name: Save build cache
         id: save-cache-build
