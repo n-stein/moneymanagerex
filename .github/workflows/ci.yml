@@ -161,8 +161,9 @@ jobs:
         id: curl-build
         run: |
           git clone -q --depth=1 -b curl-${env:CURLVER} --single-branch https://github.com/curl/curl.git curl-${env:CURLVER}
-          mkdir curl-${env:CURLVER}\build && cd curl-${env:CURLVER}\build
-          cmake -G "Visual Studio 16 2019" -A Win32 -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=.. ..
+          mkdir curl-${env:CURLVER}\build
+          cd curl-${env:CURLVER}\build
+          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=.. ..
           cmake --build . --target install --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           
       - name: Save CURL Cache
@@ -197,8 +198,9 @@ jobs:
         id: mmex-build
         run: |
           cd ${env:GITHUB_WORKSPACE}
-          mkdir build && cd build
-          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=${env:GITHUB_WORKSPACE}\curl-${env:CURLVER} -DCMAKE_INSTALL_PREFIX=${env:GITHUB_WORKSPACE}\build\install -DwxWidgets_ROOT_DIR=${env:GITHUB_WORKSPACE}\wxWidgets ..
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=${env:GITHUB_WORKSPACE}\curl-${env:CURLVER} -DCMAKE_INSTALL_PREFIX=${env:GITHUB_WORKSPACE}\build\install -DwxWidgets_ROOT_DIR=${env:GITHUB_WORKSPACE}\wxWidgets --graphviz=mmex.dot ..
           cmake --build . --target package --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           for (%f in (*.zip)) {mkdir "%~nf" && fsutil file createnew "%~nf\mmexini.db3" 0 && 7z a "%f" "%~nf\mmexini.db3" && move "%f" "..\%~nf-portable.zip" && echo "artifact_name_zip=%~nf-portable.zip" >> $env:GITHUB_OUTPUT}
           for (%f in (*.exe)) {move "%f" "..\%f" && echo "artifact_name_exe=%f" >> $env:GITHUB_OUTPUT}
