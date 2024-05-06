@@ -163,7 +163,7 @@ jobs:
           git clone -q --depth=1 -b curl-${env:CURLVER} --single-branch https://github.com/curl/curl.git curl-${env:CURLVER}
           mkdir curl-${env:CURLVER}\build
           cd curl-${env:CURLVER}\build
-          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=.. ..
+          cmake -G "Visual Studio 16 2019" -A "${{ matrix.platform }}" -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=.. ..
           cmake --build . --target install --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           
       - name: Save CURL Cache
