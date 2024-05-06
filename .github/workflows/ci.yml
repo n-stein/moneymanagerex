@@ -141,7 +141,7 @@ jobs:
             
       - name: Download wxWidgets
         run: |
-          cd $HOME
+          cd $env:HOME
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_Dev.7z"
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" 
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxWidgets-${env:WXVER}-headers.7z" 
@@ -154,7 +154,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: $HOME/curl
-          key: curl-$env:CURLVER
+          key: curl-$env:CURLVER-${{ matrix.platform }}
           
       - name: Build CURL
         if: steps.restore-cache-curl.outputs.cache-hit != 'true'
@@ -171,7 +171,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: $HOME/curl
-          key: curl-$env:CURLVER    
+          key: curl-$env:CURLVER-${{ matrix.platform }}    
         
       - name: Checkout latest release
         uses: actions/checkout@v4
@@ -183,7 +183,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: $env:GITHUB_WORKSPACE/build
-          key: build_cache
+          key: build_cache-${{ matrix.platform }}
           
       - name: Regenerate db headers
         run: |
@@ -208,7 +208,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: $env:GITHUB_WORKSPACE/build
-          key: build_cache
+          key: build_cache-${{ matrix.platform }}
           
       - name: Upload installer
         if: ${{ github.event_name == 'pull_request' }}
