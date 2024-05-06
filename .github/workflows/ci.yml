@@ -153,7 +153,7 @@ jobs:
         id: restore-cache-curl
         uses: actions/cache/restore@v4
         with:
-          path: ${{ github.workspace }}/curl
+          path: ${{ github.workspace }}\curl-${{ env.CURLVER }}
           key: curl-${{ env.CURLVER }}-${{ matrix.platform }}
           
       - name: Build CURL
@@ -170,7 +170,7 @@ jobs:
         id: save-cache-curl
         uses: actions/cache/save@v4
         with:
-          path: ${{ github.workspace }}/curl
+          path: ${{ github.workspace }}\curl-${{ env.CURLVER }}
           key: curl-${{ env.CURLVER }}-${{ matrix.platform }}    
         
       - name: Checkout latest release
@@ -182,7 +182,7 @@ jobs:
         id: restore-cache-build
         uses: actions/cache/restore@v4
         with:
-          path: ${{ github.workspace }}/build
+          path: ${{ github.workspace }}\build
           key: build_cache-${{ matrix.platform }}
           
       - name: Regenerate db headers
@@ -197,7 +197,7 @@ jobs:
         id: mmex-build
         run: |
           cd ${env:GITHUB_WORKSPACE}
-          if not exist "build" mkdir build
+          if (not exist "build") {mkdir build}
           cd build
           cmake --graphviz=mmex.dot -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=${env:GITHUB_WORKSPACE}\curl-${env:CURLVER} -DCMAKE_INSTALL_PREFIX=${env:GITHUB_WORKSPACE}\build\install -DwxWidgets_ROOT_DIR=${env:GITHUB_WORKSPACE}\wxWidgets ..
           cmake --build . --target package --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
@@ -208,7 +208,7 @@ jobs:
         id: save-cache-build
         uses: actions/cache/save@v4
         with:
-          path: ${{ github.workspace }}/build
+          path: ${{ github.workspace }}\build
           key: build_cache-${{ matrix.platform }}
           
       - name: Upload installer
@@ -233,6 +233,6 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         uses: sigstore/gh-action-sigstore-python@v2.1.1
         with:
-          inputs: ${{ github.workspace }}/mmex*.exe ${{ github.workspace }}/mmex*.zip 
+          inputs: ${{ github.workspace }}\mmex*.exe ${{ github.workspace }}\mmex*.zip 
           upload-signing-artifacts: true
           
