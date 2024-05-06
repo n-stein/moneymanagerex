@@ -141,7 +141,9 @@ jobs:
             
       - name: Download wxWidgets
         run: |
-          cd $env:HOME
+          cd ${env:HOME}
+          echo ${env:HOME}
+          echo ${env:GITHUB_WORKSPACE}
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_Dev.7z"
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" 
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxWidgets-${env:WXVER}-headers.7z" 
@@ -154,7 +156,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: $HOME/curl
-          key: curl-$env:CURLVER-${{ matrix.platform }}
+          key: curl-${{ env.CURLVER }}-${{ matrix.platform }}
           
       - name: Build CURL
         if: steps.restore-cache-curl.outputs.cache-hit != 'true'
@@ -170,8 +172,8 @@ jobs:
         id: save-cache-curl
         uses: actions/cache/save@v4
         with:
-          path: $HOME/curl
-          key: curl-$env:CURLVER-${{ matrix.platform }}    
+          path: $/curl
+          key: curl-${{ env.CURLVER }}-${{ matrix.platform }}    
         
       - name: Checkout latest release
         uses: actions/checkout@v4
@@ -187,7 +189,7 @@ jobs:
           
       - name: Regenerate db headers
         run: |
-          cd $env:GITHUB_WORKSPACE\src\db
+          cd ${env:GITHUB_WORKSPACE}\src\db
           python ..\..\util\sqlite2cpp.py ..\..\database\tables.sql
           python ..\..\util\sqliteupgrade2cpp.py ..\..\database\incremental_upgrade
           del *.mmdbg sql*.sql 
