@@ -142,19 +142,19 @@ jobs:
       - name: Download wxWidgets
         run: |
           cd $HOME
-          C:\msys64\usr\bin\wget.exe https://github.com/wxWidgets/wxWidgets/releases/download/v$ENV:WXVER/wxMSW-$ENV:WXVER_vc14x_Dev.7z
-          C:\msys64\usr\bin\wget.exe https://github.com/wxWidgets/wxWidgets/releases/download/v$ENV:WXVER/wxMSW-$ENV:WXVER_vc14x_ReleaseDLL.7z 
-          C:\msys64\usr\bin\wget.exe https://github.com/wxWidgets/wxWidgets/releases/download/v$ENV:WXVER/wxWidgets-$ENV:WXVER-headers.7z 
-          7z x wxMSW-$ENV:WXVER_vc14x_Dev.7z -owxWidgets
-          7z x wxMSW-$ENV:WXVER_vc14x_ReleaseDLL.7z -owxWidgets
-          7z x wxWidgets-$ENV:WXVER-headers.7z -owxWidgets
+          C:\msys64\usr\bin\wget.exe https://github.com/wxWidgets/wxWidgets/releases/download/v$env:WXVER/wxMSW-$env:WXVER_vc14x_Dev.7z
+          C:\msys64\usr\bin\wget.exe https://github.com/wxWidgets/wxWidgets/releases/download/v$env:WXVER/wxMSW-$env:WXVER_vc14x_ReleaseDLL.7z 
+          C:\msys64\usr\bin\wget.exe https://github.com/wxWidgets/wxWidgets/releases/download/v$env:WXVER/wxWidgets-$env:WXVER-headers.7z 
+          7z x wxMSW-$env:WXVER_vc14x_Dev.7z -owxWidgets
+          7z x wxMSW-$env:WXVER_vc14x_ReleaseDLL.7z -owxWidgets
+          7z x wxWidgets-$env:WXVER-headers.7z -owxWidgets
 
       - name: Restore CURL cache
         id: restore-cache-curl
         uses: actions/cache/restore@v4
         with:
           path: $HOME/curl
-          key: curl-$ENV:CURLVER
+          key: curl-$env:CURLVER
           
       - name: Build CURL
         if: steps.restore-cache-curl.outputs.cache-hit != 'true'
@@ -162,7 +162,7 @@ jobs:
         run: |
           git clone -q --depth=1 -b curl-$CURLVER --single-branch https://github.com/curl/curl.git curl-src
           mkdir curl-src\build && cd curl-src\build
-          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$HOME\curl-$ENV:CURLVER ..
+          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$HOME\curl-$env:CURLVER ..
           cmake --build . --target install --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           
       - name: Save CURL Cache
@@ -171,7 +171,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: $HOME/curl
-          key: curl-$ENV:CURLVER    
+          key: curl-$env:CURLVER    
         
       - name: Checkout latest release
         uses: actions/checkout@v4
@@ -182,12 +182,12 @@ jobs:
         id: restore-cache-build
         uses: actions/cache/restore@v4
         with:
-          path: $ENV:GITHUB_WORKSPACE/build
+          path: $env:GITHUB_WORKSPACE/build
           key: build_cache
           
       - name: Regenerate db headers
         run: |
-          cd $ENV:GITHUB_WORKSPACE\src\db
+          cd $env:GITHUB_WORKSPACE\src\db
           python ..\..\util\sqlite2cpp.py ..\..\database\tables.sql
           python ..\..\util\sqliteupgrade2cpp.py ..\..\database\incremental_upgrade
           del *.mmdbg sql*.sql 
@@ -198,16 +198,16 @@ jobs:
           cd $GITHUB_WORKSPACE
           if not exist "build" mkdir build
           cd build
-          cmake --graphviz=mmex.dot -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=$HOME\curl-$CURLVER -DCMAKE_INSTALL_PREFIX=$ENV:GITHUB_WORKSPACE\build\install -DwxWidgets_ROOT_DIR=$HOME\wxWidgets ..
+          cmake --graphviz=mmex.dot -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=$HOME\curl-$CURLVER -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\build\install -DwxWidgets_ROOT_DIR=$HOME\wxWidgets ..
           cmake --build . --target package --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
-          for %f in (*.zip) do (mkdir "%~nf" && fsutil file createnew "%~nf\mmexini.db3" 0 && 7z a "%f" "%~nf\mmexini.db3" && move "%f" "..\%~nf-portable.zip" && echo "artifact_name_zip=%~nf-portable.zip" >> $ENV:GITHUB_OUTPUT)
-          for %f in (*.exe) do (move "%f" "..\%f" && echo "artifact_name_exe=%f" >> $ENV:GITHUB_OUTPUT)
+          for %f in (*.zip) do (mkdir "%~nf" && fsutil file createnew "%~nf\mmexini.db3" 0 && 7z a "%f" "%~nf\mmexini.db3" && move "%f" "..\%~nf-portable.zip" && echo "artifact_name_zip=%~nf-portable.zip" >> $env:GITHUB_OUTPUT)
+          for %f in (*.exe) do (move "%f" "..\%f" && echo "artifact_name_exe=%f" >> $env:GITHUB_OUTPUT)
 
       - name: Save build cache
         id: save-cache-build
         uses: actions/cache/save@v4
         with:
-          path: $ENV:GITHUB_WORKSPACE/build
+          path: $env:GITHUB_WORKSPACE/build
           key: build_cache
           
       - name: Upload installer
