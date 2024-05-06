@@ -145,9 +145,9 @@ jobs:
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_Dev.7z"
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" 
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxWidgets-${env:WXVER}-headers.7z" 
-          7z x "wxMSW-${env:WXVER}_vc14x_Dev.7z" -o${env:GITHUB_WORKSPACE}\wxWidgets
-          7z x "wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" -o${env:GITHUB_WORKSPACE}\wxWidgets -ao
-          7z x "wxWidgets-${env:WXVER}-headers.7z" -o${env:GITHUB_WORKSPACE}\wxWidgets
+          7z x "wxMSW-${env:WXVER}_vc14x_Dev.7z" -o ${env:GITHUB_WORKSPACE}\wxWidgets
+          7z x "wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" -o ${env:GITHUB_WORKSPACE}\wxWidgets -ao
+          7z x "wxWidgets-${env:WXVER}-headers.7z" -o ${env:GITHUB_WORKSPACE}\wxWidgets
 
       - name: Restore CURL cache
         id: restore-cache-curl
