@@ -141,9 +141,7 @@ jobs:
             
       - name: Download wxWidgets
         run: |
-          cd ${env:HOME}
-          echo ${env:HOME}
-          echo ${env:GITHUB_WORKSPACE}
+          cd ..
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_Dev.7z"
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" 
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxWidgets-${env:WXVER}-headers.7z" 
@@ -155,8 +153,8 @@ jobs:
         id: restore-cache-curl
         uses: actions/cache/restore@v4
         with:
-          path: $HOME/curl
-          key: curl-${{ env.CURLVER }}-${{ matrix.platform }}
+          path: ./curl
+          key: curl-${env:CURLVER}-${{ matrix.platform }}
           
       - name: Build CURL
         if: steps.restore-cache-curl.outputs.cache-hit != 'true'
@@ -164,7 +162,7 @@ jobs:
         run: |
           git clone -q --depth=1 -b curl-$env:CURLVER --single-branch https://github.com/curl/curl.git curl-src
           mkdir curl-src\build && cd curl-src\build
-          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$HOME\curl-$env:CURLVER ..
+          cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=..\curl-${env:CURLVER} ..
           cmake --build . --target install --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           
       - name: Save CURL Cache
@@ -172,8 +170,8 @@ jobs:
         id: save-cache-curl
         uses: actions/cache/save@v4
         with:
-          path: $/curl
-          key: curl-${{ env.CURLVER }}-${{ matrix.platform }}    
+          path: ../curl
+          key: curl-${env:CURLVER}-${{ matrix.platform }}    
         
       - name: Checkout latest release
         uses: actions/checkout@v4
@@ -197,7 +195,7 @@ jobs:
       - name: Build MoneyManagerEx
         id: mmex-build
         run: |
-          cd $GITHUB_WORKSPACE
+          cd ${env:GITHUB_WORKSPACE}
           if not exist "build" mkdir build
           cd build
           cmake --graphviz=mmex.dot -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -DCMAKE_PREFIX_PATH=$HOME\curl-$CURLVER -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\build\install -DwxWidgets_ROOT_DIR=$HOME\wxWidgets ..
