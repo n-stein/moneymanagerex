@@ -41,7 +41,7 @@ jobs:
         if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
         run: |
           cd /home/runner/work
-          wget https://github.com/wxWidgets/wxWidgets/releases/download/v${WXVER}/wxWidgets-$WXVER.tar.bz2
+          wget https://github.com/wxWidgets/wxWidgets/releases/download/v${WXVER}/wxWidgets-${WXVER}.tar.bz2
           tar -xjf wxWidgets-${WXVER}.tar.bz2
           mv wxWidgets-${WXVER} wxWidgets
           cd wxWidgets
