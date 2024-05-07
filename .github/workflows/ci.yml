@@ -221,12 +221,12 @@ jobs:
           $folderPath = "${env:GITHUB_WORKSPACE}\build\$fileName"
           New-Item -ItemType Directory -Path $folderPath -Force
           fsutil file createnew "$folderPath\mmexini.db3" 0
-          7z a "$zipFile.FullName" "$folderPath\mmexini.db3"
-          Move-Item -Path $zipFile.FullName -Destination "${env:GITHUB_WORKSPACE}\$fileName-portable.zip" -Force
+          7z a "$zipFile" "$folderPath\mmexini.db3"
+          Move-Item -Path $zipFile -Destination "${env:GITHUB_WORKSPACE}\$fileName-portable.zip" -Force
           "artifact_name_zip=$fileName-portable.zip" >> $env:GITHUB_OUTPUT
           $exeFile = Get-ChildItem -Filter "*.exe"
-          Move-Item -Path $exeFile.FullName -Destination "${env:GITHUB_WORKSPACE}\$exeFile" -Force
-          "artifact_name_exe=$exeFile.BaseName-portable.zip" >> $env:GITHUB_OUTPUT
+          Move-Item -Path $exeFile -Destination "${env:GITHUB_WORKSPACE}\$exeFile" -Force
+          "artifact_name_exe=$exeFile" >> $env:GITHUB_OUTPUT
 
       - name: Save build cache
         id: save-cache-build
