@@ -225,9 +225,9 @@ jobs:
           Move-Item -Path $zipFile -Destination "${env:GITHUB_WORKSPACE}\$fileName-portable.zip" -Force
           "artifact_name_zip=$fileName-portable.zip" >> $env:GITHUB_OUTPUT
           $exeFile = Get-ChildItem -Filter "*.exe"
-          echo found $exeFile
-          Move-Item -Path $exeFile -Destination "${env:GITHUB_WORKSPACE}\$exeFile" -Force
-          "artifact_name_exe=$exeFile" >> $env:GITHUB_OUTPUT
+          $fileName = $exeFile.BaseName
+          Move-Item -Path $exeFile -Destination "${env:GITHUB_WORKSPACE}\$fileName.exe" -Force
+          "artifact_name_exe=$fileName.exe" >> $env:GITHUB_OUTPUT
 
       - name: Save build cache
         id: save-cache-build
