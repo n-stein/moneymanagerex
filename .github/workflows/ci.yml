@@ -146,9 +146,11 @@ jobs:
 
       - name: Install gettext
         run: |
+          cd ${env:GITHUB_WORKSPACE}
           C:\msys64\usr\bin\wget.exe "https://github.com/vslavik/gettext-tools-windows/releases/download/v0.22.5/gettext-tools-windows-0.22.5.zip"
-          7z x "gettext-tools-windows-0.22.5.zip" -o"C:\Program Files\gettext"
-          $env:PATH += ";C:\Program Files\gettext\bin"
+          7z x "gettext-tools-windows-0.22.5.zip" -ogettext
+          echo "${env:GITHUB_WORKSPACE}\gettext\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
      
       - name: Download wxWidgets
         run: |
