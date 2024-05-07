@@ -212,7 +212,7 @@ jobs:
           $zipFile = Get-ChildItem -Filter "*.zip"
           $fileName = $zipFile.BaseName
           7z x $zipFile -o"$fileName"
-          fsutil file createnew "$fileName\mmexini.db3" 0
+          fsutil file createnew ".\$fileName\mmexini.db3" 0
           Move-Item -Path $fileName -Destination "${env:GITHUB_WORKSPACE}\$fileName-portable" -Force
           "artifact_name_zip=$fileName-portable" >> $env:GITHUB_OUTPUT
           $exeFile = Get-ChildItem -Filter "*.exe"
@@ -232,7 +232,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.mmex-build.outputs.artifact_name_zip }}
-          path: ${{ github.workspace }}\mmex*-portable
+          path: ${{ github.workspace }}\${{ steps.mmex-build.outputs.artifact_name_zip }}\*
           
       - name: Install Sigstore Python dependencies
         if: ${{ github.event_name == 'push' }}
