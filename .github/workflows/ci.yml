@@ -153,13 +153,21 @@ jobs:
       - name: Download wxWidgets
         run: |
           cd ${env:GITHUB_WORKSPACE}
-          C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_Dev.7z"
-          C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" 
           C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxWidgets-${env:WXVER}-headers.7z" 
-          7z x "wxMSW-${env:WXVER}_vc14x_Dev.7z" -owxWidgets
-          7z x "wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" -owxWidgets -aos
           7z x "wxWidgets-${env:WXVER}-headers.7z" -owxWidgets
-
+          if (${{ matrix.platform }} == "x64"){
+            C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_x64_Dev.7z"
+            C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_x64_ReleaseDLL.7z" 
+            7z x "wxMSW-${env:WXVER}_vc14x_x64_Dev.7z" -owxWidgets 
+            7z x "wxMSW-${env:WXVER}_vc14x_x64_ReleaseDLL.7z" -owxWidgets -aos
+          }
+          else{
+            C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_Dev.7z"
+            C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" 
+            7z x "wxMSW-${env:WXVER}_vc14x_Dev.7z" -owxWidgets 
+            7z x "wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" -owxWidgets -aos
+          }
+          
       - name: Restore CURL cache
         id: restore-cache-curl
         uses: actions/cache/restore@v4
