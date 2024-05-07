@@ -41,9 +41,9 @@ jobs:
         if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
         run: |
           cd /home/runner/work
-          wget https://github.com/wxWidgets/wxWidgets/releases/download/v$WXVER/wxWidgets-$WXVER.tar.bz2
-          tar -xjf wxWidgets-$WXVER.tar.bz2
-          mv wxWidgets-$WXVER wxWidgets
+          wget https://github.com/wxWidgets/wxWidgets/releases/download/v${WXVER}/wxWidgets-$WXVER.tar.bz2
+          tar -xjf wxWidgets-${WXVER}.tar.bz2
+          mv wxWidgets-${WXVER} wxWidgets
           cd wxWidgets
           mkdir build-linux && cd build-linux
           ../configure --disable-shared --enable-cxx11 --with-cxx=11 --enable-webview --with-gtk=3 --enable-unicode --enable-intl
@@ -167,10 +167,9 @@ jobs:
         run: |
           cd ${env:GITHUB_WORKSPACE}
           git clone -q --depth=1 -b curl-${env:CURLVER} --single-branch https://github.com/curl/curl.git curl-${env:CURLVER}
-          mkdir curl-${env:CURLVER}\build
-          cd curl-${env:CURLVER}\build
-          cmake -G "Visual Studio 16 2019" -A "${{ matrix.platform }}" -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=.. ..
-          cmake --build . --target install --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
+          cd curl-${env:CURLVER}
+          cmake -B build -G "Visual Studio 16 2019" -A "${{ matrix.platform }}" -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX="${env:GITHUB_WORKSPACE}\curl-${env:CURLVER}" .
+          cmake --build build --target install --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           
       - name: Save CURL Cache
         if: steps.restore-cache-curl.outputs.cache-hit != 'true'
