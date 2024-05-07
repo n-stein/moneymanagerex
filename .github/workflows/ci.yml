@@ -217,8 +217,8 @@ jobs:
           "artifact_name_zip=$fileName-portable" >> $env:GITHUB_OUTPUT
           $exeFile = Get-ChildItem -Filter "*.exe"
           $fileName = $exeFile.BaseName
-          Move-Item -Path $exeFile -Destination "${env:GITHUB_WORKSPACE}\$fileName" -Force
-          "artifact_name_exe=$fileName" >> $env:GITHUB_OUTPUT
+          Move-Item -Path $exeFile -Destination "${env:GITHUB_WORKSPACE}\$fileName.exe" -Force
+          "artifact_name_exe=$fileName.exe" >> $env:GITHUB_OUTPUT
           
       - name: Upload installer
         if: ${{ github.event_name == 'pull_request' }}
@@ -232,7 +232,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.mmex-build.outputs.artifact_name_zip }}
-          path: ${{ github.workspace }}\mmex*.zip
+          path: ${{ github.workspace }}\mmex*-portable
           
       - name: Install Sigstore Python dependencies
         if: ${{ github.event_name == 'push' }}
