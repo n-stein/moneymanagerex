@@ -145,7 +145,10 @@ jobs:
           submodules: recursive
 
       - name: Install gettext
-        run: choco install gettext -y
+        run: |
+          C:\msys64\usr\bin\wget.exe "https://github.com/vslavik/gettext-tools-windows/releases/download/v0.22.5/gettext-tools-windows-0.22.5.zip"
+          7z x "gettext-tools-windows-0.22.5.zip" -o"C:\Program Files\gettext"
+          $env:PATH += ";C:\Program Files\gettext\bin"
      
       - name: Download wxWidgets
         run: |
