@@ -1,8 +1,8 @@
 name: CI Build
 
 env:
-  WXVER: 3.2.4
-  CURLVER: 8_5_0
+  wxVer: 3.2.4
+  curlVer: 8_5_0
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: /home/runner/work/wxWidgets
-          key: wxWidgets-$WXVER-${{ matrix.os }}
+          key: wxWidgets-${{ env.wxver }}-${{ matrix.os }}
             
       - name: Build wxWidgets
         if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
@@ -55,7 +55,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /home/runner/work/wxWidgets
-          key: wxWidgets-$WXVER-${{ matrix.os }}
+          key: wxWidgets-${{ env.wxver }}-${{ matrix.os }}
           
       - name: Install wxWidgets
         run: |
@@ -165,6 +165,7 @@ jobs:
         if: steps.restore-cache-curl.outputs.cache-hit != 'true'
         id: curl-build
         run: |
+          cd ${env:GITHUB_WORKSPACE}
           git clone -q --depth=1 -b curl-${env:CURLVER} --single-branch https://github.com/curl/curl.git curl-${env:CURLVER}
           mkdir curl-${env:CURLVER}\build
           cd curl-${env:CURLVER}\build
