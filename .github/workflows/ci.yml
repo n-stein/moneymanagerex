@@ -138,7 +138,12 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.platform }}
-            
+          
+      - name: Checkout latest release
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+     
       - name: Download wxWidgets
         run: |
           cd ${env:GITHUB_WORKSPACE}
@@ -173,12 +178,7 @@ jobs:
         with:
           path: ${{ github.workspace }}\curl-${{ env.CURLVER }}
           key: curl-${{ env.CURLVER }}-${{ matrix.platform }}    
-        
-      - name: Checkout latest release
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
+      
       - name: Restore build cache
         id: restore-cache-build
         uses: actions/cache/restore@v4
@@ -198,7 +198,7 @@ jobs:
         id: mmex-build
         run: |
           cd ${env:GITHUB_WORKSPACE}
-          cmake -B build -G "Visual Studio 16 2019" -A "${{matrix.platform}}" -DCMAKE_PREFIX_PATH="${env:GITHUB_WORKSPACE}\curl-${env:CURLVER}" -DCMAKE_INSTALL_PREFIX="${env:GITHUB_WORKSPACE}\build\install" -DwxWidgets_ROOT_DIR="${env:GITHUB_WORKSPACE}\wxWidgets" -DwxWidgets_LIB_DIR="${env:GITHUB_WORKSPACE}\wxWidgets\lib\vc14x_dll" .
+          cmake -B build -G "Visual Studio 16 2019" -A "${{matrix.platform}}" -DCMAKE_PREFIX_PATH="${env:GITHUB_WORKSPACE}\curl-${env:CURLVER}" -DCMAKE_INSTALL_PREFIX="${env:GITHUB_WORKSPACE}\build\install" -DwxWidgets_ROOT_DIR="${env:GITHUB_WORKSPACE}\wxWidgets" .
           cmake --build build --target package --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
           cd build
           $zipFile = Get-ChildItem -Filter "*.zip"
