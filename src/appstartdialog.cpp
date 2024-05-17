@@ -102,11 +102,11 @@ void mmAppStartDialog::CreateControls()
     itemBoxSizer5->Add(itemButton61, 0, wxGROW | wxALL, 5);
 
     wxButton* itemButton6 = new wxButton(this, wxID_NEW, _("&New Database"));
-    mmToolTip(itemButton6, _("Create a new database file to get started"));
+    mmToolTip(itemButton6, _("Create new MMEX database file"));
     itemBoxSizer5->Add(itemButton6, 0, wxGROW | wxALL, 5);
 
     wxButton* itemButton7 = new wxButton(this, wxID_OPEN, _("Open &Existing Database"));
-    mmToolTip(itemButton7, _("Open an already created database file with extension (*.mmb)"));
+    mmToolTip(itemButton7, _("Open MMEX database file"));
     itemBoxSizer5->Add(itemButton7, 0, wxGROW | wxALL, 5);
 
     wxButton* itemButton8 = new wxButton(this, wxID_SETUP , _("User Interface &Language"));
@@ -114,17 +114,16 @@ void mmAppStartDialog::CreateControls()
     itemBoxSizer5->Add(itemButton8, 0, wxGROW | wxALL, 5);
 
     wxButton* itemButton9 = new wxButton(this, wxID_HELP, _("&User Manual"));
-    mmToolTip(itemButton9, _("Read the user manual"));
+    mmToolTip(itemButton9, _("Read MMEX user manual"));
     itemBoxSizer5->Add(itemButton9, 0, wxGROW | wxALL, 5);
 
     wxButton* itemButton10 = new wxButton(this, wxID_INDEX, _("&Website"));
-    const wxString s = wxString::Format(_("Visit the %s website")
-        , mmex::getProgramName());
+    const wxString s = wxString::Format(_("Visit MMEX website for the latest news and updates"));
     mmToolTip(itemButton10, s);
     itemBoxSizer5->Add(itemButton10, 0, wxGROW | wxALL, 5);
 
-    wxButton* itemButton11 = new wxButton(this, wxID_FORWARD, _("&Support Forums"));
-    mmToolTip(itemButton11, _("Visit the Support Forums"));
+    wxButton* itemButton11 = new wxButton(this, wxID_FORWARD, _("&Forum"));
+    mmToolTip(itemButton11, _("Visit MMEX forum to read and post comments and for support"));
     itemBoxSizer5->Add(itemButton11, 0, wxGROW | wxALL, 5);
 
     wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxHORIZONTAL);
@@ -157,7 +156,7 @@ void mmAppStartDialog::CreateControls()
     }
     else
     {
-        mmToolTip(itemButton61, wxString::Format(_("Open the previously opened database : %s"), val));
+        mmToolTip(itemButton61, wxString::Format(_("Open the previously opened database: %s"), val));
     }
 }
 

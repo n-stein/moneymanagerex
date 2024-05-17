@@ -552,6 +552,7 @@ void mmGUIFrame::OnAutoRepeatTransactionsTimer(wxTimerEvent& /*event*/)
                 int transID = Model_Checking::instance().save(tran);
 
                 Model_Splittransaction::Cache checking_splits;
+                std::vector<wxArrayInt> splitTags;
                 for (const auto &item : Model_Billsdeposits::splittransaction(q1))
                 {
                     Model_Splittransaction::Data *split = Model_Splittransaction::instance().create();
@@ -560,8 +561,31 @@ void mmGUIFrame::OnAutoRepeatTransactionsTimer(wxTimerEvent& /*event*/)
                     split->SPLITTRANSAMOUNT = item.SPLITTRANSAMOUNT;
                     split->NOTES = item.NOTES;
                     checking_splits.push_back(split);
+                    wxArrayInt tags;
+                    for (const auto& tag :
+                         Model_Taglink::instance().find(Model_Taglink::REFTYPE(Model_Attachment::reftype_desc(Model_Attachment::BILLSDEPOSITSPLIT)),
+                                                        Model_Taglink::REFID(item.SPLITTRANSID)))
+                        tags.Add(tag.TAGID);
+                    splitTags.push_back(tags);
                 }
                 Model_Splittransaction::instance().save(checking_splits);
+
+                // Save split tags
+                const wxString& splitRefType = Model_Attachment::reftype_desc(Model_Attachment::TRANSACTIONSPLIT);
+
+                for (size_t i = 0; i < checking_splits.size(); i++)
+                {
+                    Model_Taglink::Data_Set splitTaglinks;
+                    for (const auto& tagId : splitTags.at(i))
+                    {
+                        Model_Taglink::Data* t = Model_Taglink::instance().create();
+                        t->REFTYPE = splitRefType;
+                        t->REFID = checking_splits[i]->SPLITTRANSID;
+                        t->TAGID = tagId;
+                        splitTaglinks.push_back(*t);
+                    }
+                    Model_Taglink::instance().update(splitTaglinks, splitRefType, checking_splits.at(i)->SPLITTRANSID);
+                }
 
                 // Copy the custom fields to the newly created transaction
                 const auto& customDataSet = Model_CustomFieldData::instance().find(Model_CustomFieldData::REFID(-q1.BDID));
@@ -575,6 +599,20 @@ void mmGUIFrame::OnAutoRepeatTransactionsTimer(wxTimerEvent& /*event*/)
                     Model_CustomFieldData::instance().save(fieldData);
                 }
                 Model_CustomFieldData::instance().ReleaseSavepoint();
+                
+                // Save base transaction tags
+                Model_Taglink::Data_Set taglinks;
+                const wxString& txnRefType = Model_Attachment::reftype_desc(Model_Attachment::TRANSACTION);
+                for (const auto& tag : Model_Taglink::instance().find(Model_Taglink::REFTYPE(Model_Attachment::reftype_desc(Model_Attachment::BILLSDEPOSIT)),
+                                                                      Model_Taglink::REFID(q1.BDID)))
+                {
+                    Model_Taglink::Data* t = Model_Taglink::instance().create();
+                    t->REFTYPE = txnRefType;
+                    t->REFID = transID;
+                    t->TAGID = tag.TAGID;
+                    taglinks.push_back(*t);
+                }
+                Model_Taglink::instance().update(taglinks, txnRefType, transID);
             }
             Model_Billsdeposits::instance().completeBDInSeries(q1.BDID);
         }
@@ -1434,9 +1472,9 @@ void mmGUIFrame::showTreePopupMenu(const wxTreeItemId& id, const wxPoint& pt)
     {
         const wxString data = iData->getString();
         wxLogDebug("MENU FILTER: %s", data);
-        menu.Append(MENU_TREEPOPUP_FILTER_EDIT, _("&Edit Filter..."));
-        menu.Append(MENU_TREEPOPUP_FILTER_RENAME, _("&Rename Filter..."));
-        menu.Append(MENU_TREEPOPUP_FILTER_DELETE, _("&Delete Filter..."));
+        menu.Append(MENU_TREEPOPUP_FILTER_EDIT, _("&Customize Report..."));
+        menu.Append(MENU_TREEPOPUP_FILTER_RENAME, _("&Rename Report..."));
+        menu.Append(MENU_TREEPOPUP_FILTER_DELETE, _("&Delete Report..."));
         PopupMenu(&menu, pt);
         break;
     }
@@ -1634,7 +1672,7 @@ void mmGUIFrame::createMenu()
     menuView->Append(menuItemToggleFullscreen);
 #endif
 wxMenuItem* menuItemResetView = new wxMenuItem(menuView, MENU_VIEW_RESET
-        , _("Reset View")
+        , _("&Reset View")
         , _("Reset view and dock tools"));
     menuView->Append(menuItemResetView);   
 
@@ -1754,7 +1792,7 @@ wxMenuItem* menuItemResetView = new wxMenuItem(menuView, MENU_VIEW_RESET
     menuTools->AppendSeparator();
 
     wxMenuItem* menuItemTransactions = new wxMenuItem(menuTools, MENU_TRANSACTIONREPORT
-        , _("Transaction Report &Filter..."), _("Transaction Report Filter"));
+        , _("Tra&nsaction Report..."), _("Transaction Report"));
     menuTools->Append(menuItemTransactions);
 
     menuTools->AppendSeparator();
@@ -1813,7 +1851,7 @@ wxMenuItem* menuItemResetView = new wxMenuItem(menuView, MENU_VIEW_RESET
         , _("&Website")
         , _("Visit MMEX website for the latest news and updates"));
     wxMenuItem* menuItemFacebook = new wxMenuItem(menuHelp, MENU_FACEBOOK
-        , _("&Facebook"), _("Visit MMEX Facebook page"));
+        , _("Face&book"), _("Visit MMEX Facebook page"));
     wxMenuItem* menuItemCrowdin = new wxMenuItem(menuHelp, MENU_CROWDIN
         , _("&Crowdin"), _("Help translate MMEX on Crowdin"));
     wxMenuItem* menuItemTwitter = new wxMenuItem(menuHelp, MENU_TWITTER
@@ -1825,10 +1863,10 @@ wxMenuItem* menuItemResetView = new wxMenuItem(menuView, MENU_VIEW_RESET
     wxMenuItem* menuItemGitHub = new wxMenuItem(menuHelp, MENU_GITHUB
         , _("&GitHub"), _("Access open source code repository and track reported bug statuses"));
     wxMenuItem* menuItemWiki = new wxMenuItem(menuHelp, MENU_WIKI
-        , _("W&iki pages"), _("Read and update wiki pages"));
+        , _("W&iki"), _("Read and update MMEX wiki"));
     wxMenuItem* menuItemReportIssues = new wxMenuItem(menuHelp, MENU_REPORTISSUES
-        , _("F&orum")
-        , _("Visit MMEX forum to read and post comments"));
+        , _("&Forum")
+        , _("Visit MMEX forum to read and post comments and for support"));
     wxMenuItem* menuItemGooglePlay = new wxMenuItem(menuHelp, MENU_GOOGLEPLAY
         , _("MMEX for &Android")
         , _("Install MMEX for Android based smartphones and tablets"));
@@ -1931,7 +1969,7 @@ void mmGUIFrame::CreateToolBar()
     toolBar_->AddTool(MENU_ORGTAGS, _("Tag Manager"), mmBitmapBundle(png::TAG, toolbar_icon_size), _("Tag Manager"));
     toolBar_->AddTool(MENU_CURRENCY, _("Currency Manager"), mmBitmapBundle(png::CURR, toolbar_icon_size), _("Currency Manager"));
     toolBar_->AddSeparator();
-    toolBar_->AddTool(MENU_TRANSACTIONREPORT, _("Transaction Report Filter"), mmBitmapBundle(png::FILTER, toolbar_icon_size), _("Transaction Report Filter"));
+    toolBar_->AddTool(MENU_TRANSACTIONREPORT, _("Transaction Report"), mmBitmapBundle(png::FILTER, toolbar_icon_size), _("Transaction Report"));
     toolBar_->AddSeparator();
     toolBar_->AddTool(wxID_VIEW_LIST, _("General Report Manager"), mmBitmapBundle(png::GRM, toolbar_icon_size), _("General Report Manager"));
     toolBar_->AddSeparator();
@@ -2330,8 +2368,12 @@ void mmGUIFrame::OnConvertEncryptedDB(wxCommandEvent& /*event*/)
     wxCopyFile(encFileName, fileName);
 
     wxSQLite3Database db;
-    db.Open(fileName, password);
-    db.ReKey(wxEmptyString);
+    wxSQLite3CipherSQLCipher cipher;
+    cipher.InitializeVersionDefault(4);
+    cipher.SetLegacy(true);
+
+    db.Open(fileName, cipher, password);
+    db.ReKey(cipher, wxEmptyString);
     db.Close();
 
     mmErrorDialogs::MessageError(this, _("Converted database!"), _("MMEX message"));
@@ -2359,7 +2401,11 @@ void mmGUIFrame::OnChangeEncryptPassword(wxCommandEvent& /*event*/)
                 wxString confirm_password = confirm_dlg.GetValue();
                 if (!confirm_password.IsEmpty() && (new_password == confirm_password))
                 {
-                    m_db->ReKey(confirm_password);
+                    wxSQLite3CipherSQLCipher cipher;
+                    cipher.InitializeVersionDefault(4);
+                    cipher.SetLegacy(true);
+
+                    m_db->ReKey(cipher, confirm_password);
                     wxMessageBox(_("Password change completed"), password_change_heading);
                 }
                 else
@@ -2440,7 +2486,7 @@ void mmGUIFrame::OnDebugDB(wxCommandEvent& /*event*/)
         , wxString::Format("%s\n\n%s", _("Please use this function only if requested by MMEX support and you have been supplied with a .mmdbg debug file"), _("Do you want to proceed?"))
         , _("Database Debug"), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
-    msgDlg.SetYesNoLabels(_("Yes"), _("No"));
+    msgDlg.SetYesNoLabels(_("&Yes"), _("&No"));
 
     if (msgDlg.ShowModal() == wxID_YES)
     {
@@ -2513,8 +2559,13 @@ void mmGUIFrame::OnSaveAs(wxCommandEvent& /*event*/)
     if (rekey) // encrypt or reset encryption
     {
         wxSQLite3Database dbx;
-        dbx.Open(newFileName.GetFullPath(), m_password);
-        dbx.ReKey(new_password); // empty password resets encryption
+
+        wxSQLite3CipherSQLCipher cipher;
+        cipher.InitializeVersionDefault(4);
+        cipher.SetLegacy(true);
+
+        dbx.Open(newFileName.GetFullPath(), cipher, m_password);
+        dbx.ReKey(cipher, new_password); // empty password resets encryption
         dbx.Close();
     }
 
@@ -2862,6 +2913,11 @@ void mmGUIFrame::OnOptions(wxCommandEvent& /*event*/)
         menuBar_->Update();
         refreshPanelData();
         RefreshNavigationTree();
+
+        // Reset columns of the checking panel in case the time columns was added/removed
+        int id = panelCurrent_->GetId();
+        if (id == mmID_CHECKING || id == mmID_ALLTRANSACTIONS || id == mmID_DELETEDTRANSACTIONS)
+            wxDynamicCast(panelCurrent_, mmCheckingPanel)->ResetColumnView();
 
         const wxString& sysMsg = _("MMEX Options have been updated.") + "\n\n"
             + _("Some settings take effect only after an application restart.");
@@ -3235,7 +3291,7 @@ void mmGUIFrame::createAllTransactionsPage()
     if (panelCurrent_->GetId() == mmID_ALLTRANSACTIONS)
     {
         mmCheckingPanel* checkingAccountPage = wxDynamicCast(panelCurrent_, mmCheckingPanel);
-        checkingAccountPage->ResetColumnView();
+        checkingAccountPage->RefreshList();
     }
     else
     {
@@ -3274,7 +3330,7 @@ void mmGUIFrame::createDeletedTransactionsPage()
     if (panelCurrent_->GetId() == mmID_DELETEDTRANSACTIONS)
     {
         mmCheckingPanel* checkingAccountPage = wxDynamicCast(panelCurrent_, mmCheckingPanel);
-        checkingAccountPage->ResetColumnView();
+        checkingAccountPage->RefreshList();
     }
     else
     {
@@ -3319,7 +3375,7 @@ void mmGUIFrame::createCheckingAccountPage(int accountID)
     if (panelCurrent_->GetId() == mmID_CHECKING && (newCreditDisplayed == creditDisplayed_))
     {
         mmCheckingPanel* checkingAccountPage = wxDynamicCast(panelCurrent_, mmCheckingPanel);
-        checkingAccountPage->ResetColumnView();
+        checkingAccountPage->RefreshList();
         checkingAccountPage->DisplayAccountDetails(accountID);
     }
     else
