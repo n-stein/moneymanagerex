@@ -1,0 +1,247 @@
+name: CI Build
+
+env:
+  WXVER: 3.2.4
+  CURLVER: 8_5_0
+
+on:
+  push:
+    branches:
+      - "master"
+  pull_request:
+    branches:
+      - "master"
+    types: [opened, reopened, synchronize]
+
+jobs:
+  build-linux:
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      id-token: write
+    steps:
+      - name: Install Dependencies
+        id: init
+        run: |
+          sudo apt update
+          sudo apt install -y --no-install-recommends \
+          cmake build-essential libssl-dev gettext git pkg-config lsb-release file ccache \
+          libgtk-3-dev liblua5.3-dev libcurl4-openssl-dev libwebkit2gtk-4.0-dev wget appstream fuse
+          
+      - name: Restore wxWidgets Cache
+        id: restore-cache-wxWidgets
+        uses: actions/cache/restore@v4
+        with:
+          path: /home/runner/work/wxWidgets
+          key: wxWidgets-${{ env.WXVER }}-${{ matrix.os }}
+            
+      - name: Build wxWidgets
+        if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
+        run: |
+          cd /home/runner/work
+          wget "https://github.com/wxWidgets/wxWidgets/releases/download/v$WXVER/wxWidgets-$WXVER.tar.bz2"
+          tar -xjf "wxWidgets-$WXVER.tar.bz2"
+          mv "wxWidgets-$WXVER" wxWidgets
+          cd wxWidgets
+          mkdir build-linux && cd build-linux
+          ../configure --disable-shared --enable-cxx11 --with-cxx=11 --enable-webview --with-gtk=3 --enable-unicode --enable-intl
+          make -j$(nproc)
+
+      - name: Save wxWidgets Cache
+        if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
+        id: save-cache-wxWidgets
+        uses: actions/cache/save@v4
+        with:
+          path: /home/runner/work/wxWidgets
+          key: wxWidgets-${{ env.WXVER }}-${{ matrix.os }}
+          
+      - name: Install wxWidgets
+        run: |
+          cd  /home/runner/work/wxWidgets/build-linux
+          sudo make install
+          sudo ldconfig
+        
+      - name: Checkout latest release
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+        
+      - name: Build MoneyManagerEx
+        id: mmex-build
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir build
+          cd build
+          cmake ..
+          export MAKEFLAGS=-j$(nproc)
+          cmake --build . --target package
+          mkdir /home/runner/work/moneymanagerex/moneymanagerex/build/AppDir
+          make install DESTDIR=/home/runner/work/moneymanagerex/moneymanagerex/build/AppDir
+          echo "artifact_name=$(ls mmex*.deb)" >> $GITHUB_OUTPUT
+          
+      - name: Upload DEB Package
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.mmex-build.outputs.artifact_name }}
+          path: ${{ github.workspace }}/build/mmex*.deb
+          
+      - name: Install Sigstore Python dependencies
+        if: ${{ github.event_name == 'push' }}
+        run: python -m pip install email-validator
+
+      - name: Sign and Upload DEB
+        if: ${{ github.event_name == 'push' }}
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: ${{ github.workspace }}/build/mmex*.deb
+          upload-signing-artifacts: true
+
+      - name: Generate AppImage
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        id: appimage-build
+        run: |
+          cd /home/runner/work/moneymanagerex/moneymanagerex/build
+          wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
+          chmod +x appimage-builder
+          cp ../.appimage-builder.yml .
+          sed -i "s/version: latest/version: $(grep '^Version ' ../NEWS | head -n 1 | sed 's/Version //;s/ /-/;s/ /./')/" .appimage-builder.yml
+          ./appimage-builder --recipe .appimage-builder.yml
+          echo "artifact_name=$(ls MMEX*.AppImage)" >> $GITHUB_OUTPUT
+
+      - name: Upload AppImage
+        if: ${{ matrix.os == 'ubuntu-20.04' && github.event_name == 'pull_request'}}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.appimage-build.outputs.artifact_name }}
+          path: ${{ github.workspace }}/build/MMEX*.AppImage
+      
+      - name: Sign and Upload AppImage
+        if: ${{ matrix.os == 'ubuntu-20.04' && github.event_name == 'push'}}
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: ${{ github.workspace }}/build/MMEX*.AppImage
+          upload-signing-artifacts: true
+          
+  build-windows:
+    strategy:
+      matrix:
+        platform: [Win32, x64]
+    runs-on: windows-2019
+    permissions:
+      id-token: write
+    steps:
+
+      - name: Configure build environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.platform }}
+          
+      - name: Checkout latest release
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install gettext
+        run: |
+          cd ${env:GITHUB_WORKSPACE}
+          C:\msys64\usr\bin\wget.exe "https://github.com/vslavik/gettext-tools-windows/releases/download/v0.22.5/gettext-tools-windows-0.22.5.zip"
+          7z x "gettext-tools-windows-0.22.5.zip" -ogettext
+          echo "${env:GITHUB_WORKSPACE}\gettext\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+     
+      - name: Download wxWidgets
+        run: |
+          cd ${env:GITHUB_WORKSPACE}
+          C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxWidgets-${env:WXVER}-headers.7z" 
+          7z x "wxWidgets-${env:WXVER}-headers.7z" -owxWidgets
+           if ("${{matrix.platform}}" -eq "x64") {
+             C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_x64_Dev.7z"
+             C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_x64_ReleaseDLL.7z" 
+             7z x "wxMSW-${env:WXVER}_vc14x_x64_Dev.7z" -owxWidgets 
+             7z x "wxMSW-${env:WXVER}_vc14x_x64_ReleaseDLL.7z" -owxWidgets -aos
+           } else {
+             C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_Dev.7z"
+             C:\msys64\usr\bin\wget.exe "https://github.com/wxWidgets/wxWidgets/releases/download/v${env:WXVER}/wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" 
+             7z x "wxMSW-${env:WXVER}_vc14x_Dev.7z" -owxWidgets 
+             7z x "wxMSW-${env:WXVER}_vc14x_ReleaseDLL.7z" -owxWidgets -aos
+           }
+          
+      - name: Restore CURL cache
+        id: restore-cache-curl
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ github.workspace }}\curl-${{ env.CURLVER }}
+          key: curl-${{ env.CURLVER }}-${{ matrix.platform }}
+          
+      - name: Build CURL
+        if: steps.restore-cache-curl.outputs.cache-hit != 'true'
+        id: curl-build
+        run: |
+          cd ${env:GITHUB_WORKSPACE}
+          git clone -q --depth=1 -b curl-${env:CURLVER} --single-branch https://github.com/curl/curl.git curl-${env:CURLVER}
+          cd curl-${env:CURLVER}
+          cmake -B build -G "Visual Studio 16 2019" -A "${{ matrix.platform }}" -DBUILD_CURL_EXE=OFF -DHTTP_ONLY=ON -DENABLE_MANUAL=OFF -DCURL_USE_SCHANNEL=ON -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX="${env:GITHUB_WORKSPACE}\curl-${env:CURLVER}" .
+          cmake --build build --target install --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
+          
+      - name: Save CURL Cache
+        if: steps.restore-cache-curl.outputs.cache-hit != 'true'
+        id: save-cache-curl
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}\curl-${{ env.CURLVER }}
+          key: curl-${{ env.CURLVER }}-${{ matrix.platform }}    
+          
+      - name: Regenerate db headers
+        run: |
+          cd ${env:GITHUB_WORKSPACE}\src\db
+          python ..\..\util\sqlite2cpp.py ..\..\database\tables.sql
+          python ..\..\util\sqliteupgrade2cpp.py ..\..\database\incremental_upgrade
+          del *.mmdbg
+          del sql*.sql
+      
+      - name: Build MoneyManagerEx
+        id: mmex-build
+        run: |
+          cd ${env:GITHUB_WORKSPACE}
+          cmake -B build -G "Visual Studio 16 2019" -A "${{matrix.platform}}" -DCMAKE_PREFIX_PATH="${env:GITHUB_WORKSPACE}\curl-${env:CURLVER}" -DCMAKE_INSTALL_PREFIX="${env:GITHUB_WORKSPACE}\build\install" -DwxWidgets_ROOT_DIR="${env:GITHUB_WORKSPACE}\wxWidgets" .
+          cmake --build build --target package --config Release -- /maxcpucount /verbosity:minimal /nologo /p:PreferredToolArchitecture=x64
+          cd build
+          $zipFile = Get-ChildItem -Filter "*.zip"
+          $fileName = $zipFile.BaseName
+          7z x $zipFile -o"$fileName"
+          fsutil file createnew ".\$fileName\$fileName\mmexini.db3" 0
+          Move-Item -Path $fileName -Destination "${env:GITHUB_WORKSPACE}\$fileName-portable" -Force
+          "artifact_name_zip=$fileName-portable" >> $env:GITHUB_OUTPUT
+          $exeFile = Get-ChildItem -Filter "*.exe"
+          $fileName = $exeFile.BaseName
+          Move-Item -Path $exeFile -Destination "${env:GITHUB_WORKSPACE}\$fileName.exe" -Force
+          "artifact_name_exe=$fileName.exe" >> $env:GITHUB_OUTPUT
+          
+      - name: Upload installer
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.mmex-build.outputs.artifact_name_exe }}
+          path: ${{ github.workspace }}\mmex*.exe
+          
+      - name: Upload portable
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.mmex-build.outputs.artifact_name_zip }}
+          path: ${{ github.workspace }}\${{ steps.mmex-build.outputs.artifact_name_zip }}\*
+          
+      - name: Install Sigstore Python dependencies
+        if: ${{ github.event_name == 'push' }}
+        run: python -m pip install email-validator
+
+      - name: Sign and Upload
+        if: ${{ github.event_name == 'push' }}
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: ${{ github.workspace }}\mmex*.exe ${{ github.workspace }}\mmex*.zip 
+          upload-signing-artifacts: true
+          
