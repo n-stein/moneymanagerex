@@ -21,6 +21,7 @@
 #include "assetdialog.h"
 #include "attachmentdialog.h"
 #include "billsdepositsdialog.h"
+#include "columnorder.h"
 #include "constants.h"
 #include "filtertransdialog.h"
 #include "images_list.h"
@@ -353,6 +354,33 @@ void TransactionListCtrl::resetColumns()
     }
     m_columns.push_back(PANEL_COLUMN(_("Last Updated"), wxLIST_AUTOSIZE, wxLIST_FORMAT_LEFT, true));
     m_real_columns.push_back(COL_UPDATEDTIME);
+
+    wxArrayString columnList, sortedColumnList;
+    for (const auto& c : m_columns)
+        columnList.Add(c.HEADER.c_str());
+    mmColumnsDialog dialog;
+    sortedColumnList = dialog.updateColumnsOrder(columnList);
+
+    // sort m_columns according to sortedColumnsList
+    std::vector<PANEL_COLUMN> sortedColumns = {};
+    std::vector<int> sortedRealColumns = {};
+    for (const auto& c : sortedColumnList)
+    {
+        for (long unsigned int j = 0; j < m_columns.size(); j++)
+        {
+            auto k = m_columns[j];
+            auto l = m_real_columns[j];
+            if (k.HEADER == c)
+            {
+                sortedColumns.push_back(k);
+                sortedRealColumns.push_back(l);
+                break;
+            }
+        }
+    }
+
+    m_columns = sortedColumns;
+    m_real_columns = sortedRealColumns;
 }
 
 TransactionListCtrl::~TransactionListCtrl()

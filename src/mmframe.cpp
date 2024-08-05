@@ -2953,6 +2953,9 @@ void mmGUIFrame::OnColumnOrderManager(wxCommandEvent& /*event*/)
 {
     mmColumnsDialog dlg(this);
     dlg.ShowModal();
+    int id = panelCurrent_->GetId();
+    if (id == mmID_CHECKING || id == mmID_ALLTRANSACTIONS || id == mmID_DELETEDTRANSACTIONS)
+        wxDynamicCast(panelCurrent_, mmCheckingPanel)->ResetColumnView();
 }
 
 bool mmGUIFrame::OnRefreshWebApp(bool is_silent)
