@@ -199,9 +199,9 @@ private:
 
     void OnMouseRightClick(wxMouseEvent& event);
     void OnListLeftClick(wxMouseEvent& event);
-    void OnListItemSelected(wxListEvent&);
+    void OnListItemSelected(wxGridEvent&);
     void OnListItemDeSelected(wxListEvent&);
-    void OnListItemActivated(wxListEvent& event);
+    void OnListItemActivated(wxGridEvent& event);
     void OnMarkTransaction(wxCommandEvent& event);
     void OnListKeyDown(wxListEvent& event);
     void OnChar(wxKeyEvent& event);

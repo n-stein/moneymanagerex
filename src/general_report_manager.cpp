@@ -535,7 +535,7 @@ void mmGeneralReportManager::OnSqlTest(wxCommandEvent& WXUNUSED(event))
     wxLongLong interval = wxGetUTCTimeMillis();
     if (this->getSqlQuery(sql, m_sqlQueryData, SqlError))
     {
-        m_sqlListBox->DeleteAllColumns();
+        m_sqlListBox->DeleteCols();
         interval = wxGetUTCTimeMillis() - interval;
         info->SetLabelText(wxString::Format(wxPLURAL("%zu row returned, duration: %lld ms",
                                                      "%zu rows returned, duration: %lld ms",
@@ -550,17 +550,16 @@ void mmGeneralReportManager::OnSqlTest(wxCommandEvent& WXUNUSED(event))
         int pos = 0;
         for (const auto& col : colHeaders)
         {
-            m_sqlListBox->InsertColumn(pos++, col.first
-                , (col.second == WXSQLITE_INTEGER || col.second == WXSQLITE_FLOAT)
-                ? wxLIST_FORMAT_RIGHT : wxLIST_FORMAT_LEFT
-                , col.first.length() * 10 + 20);
+            m_sqlListBox->InsertCols(pos++, 1);
+            m_sqlListBox->SetColLabelValue(pos, col.first);
+            m_sqlListBox->SetColSize(pos, col.first.length() * 10 + 20);
         }
-
-        m_sqlListBox->SetItemCount(m_sqlQueryData.size());
+        m_sqlListBox->SetColLabelAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
+        m_sqlListBox->InsertRows(0, m_sqlQueryData.size());
         m_sqlListBox->Refresh();
         m_sqlListBox->Update();
         if (m_sqlQueryData.size() > 0)
-            m_sqlListBox->EnsureVisible(0);
+            m_sqlListBox->MakeCellVisible(0,0);
     }
     else
     {
@@ -824,8 +823,8 @@ void mmGeneralReportManager::OnSelChanged(wxTreeEvent& event)
 
         browser_->SetPage(description, "");
 
-        if (m_sqlListBox) m_sqlListBox->DeleteAllItems();
-        if (m_sqlListBox) m_sqlListBox->DeleteAllColumns();
+        if (m_sqlListBox) m_sqlListBox->DeleteRows();
+        if (m_sqlListBox) m_sqlListBox->DeleteCols();
         wxButton* createTemplate = static_cast<wxButton*>(FindWindow(wxID_NEW));
         if (createTemplate) createTemplate->Enable(false);
         wxStaticText *info = static_cast<wxStaticText*>(FindWindow(wxID_INFO));

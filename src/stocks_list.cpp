@@ -76,7 +76,7 @@ StocksListCtrl::StocksListCtrl(mmStocksPanel* cp, wxWindow *parent, wxWindowID w
     images.push_back(mmBitmapBundle(png::DOWNARROW));
     images.push_back(mmBitmapBundle(png::UPARROW));
 
-    SetSmallImages(images);
+    //SetSmallImages(images);
     mmThemeMetaColour(this, meta::COLOR_LISTPANEL);
 
     // load the global variables
@@ -105,30 +105,27 @@ StocksListCtrl::StocksListCtrl(mmStocksPanel* cp, wxWindow *parent, wxWindowID w
 
     for (const auto& entry : m_columns)
     {
-        int count = GetColumnCount();
-        InsertColumn(count
-            , entry.HEADER
-            , entry.FORMAT
-            , Model_Setting::instance().GetIntSetting(wxString::Format(m_col_width, count), entry.WIDTH));
+        int count = GetNumberCols();
+        InsertCols(count, 1);
+        SetColLabelValue(count, entry.HEADER);
+        SetColSize(count, Model_Setting::instance().GetIntSetting(wxString::Format(m_col_width, count), entry.WIDTH));
     }
 
     initVirtualListControl(-1, m_selected_col, m_asc);
     if (!m_stocks.empty())
-        EnsureVisible(m_stocks.size() - 1);
+        MakeCellVisible(m_stocks.size() - 1,0);
 
 }
 
 void StocksListCtrl::OnMouseRightClick(wxMouseEvent& event)
 {
     if (m_selected_row > -1)
-        SetItemState(m_selected_row, 0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
-    int Flags = wxLIST_HITTEST_ONITEM;
-    m_selected_row = HitTest(wxPoint(event.m_x, event.m_y), Flags);
+        ClearSelection();
+    m_selected_row = YToRow(event.m_y);
 
     if (m_selected_row >= 0)
     {
-        SetItemState(m_selected_row, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-        SetItemState(m_selected_row, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
+        SelectRow(m_selected_row);
     }
     m_stock_panel->OnListItemSelected(m_selected_row);
 
@@ -224,8 +221,7 @@ void mmStocksPanel::OnListItemSelected(int selectedIndex)
 
 void StocksListCtrl::OnListLeftClick(wxMouseEvent& event)
 {
-    int Flags = wxLIST_HITTEST_ONITEM;
-    long index = HitTest(wxPoint(event.m_x, event.m_y), Flags);
+    long index = YToRow(event.m_y);
     if (index == -1)
     {
         m_selected_row = -1;
@@ -283,7 +279,7 @@ void StocksListCtrl::OnDeleteStocks(wxCommandEvent& /*event*/)
         Model_Stock::instance().remove(m_stocks[m_selected_row].STOCKID);
         mmAttachmentManage::DeleteAllAttachments(Model_Attachment::reftype_desc(Model_Attachment::STOCK), m_stocks[m_selected_row].STOCKID);
         Model_Translink::RemoveTransLinkRecords(Model_Attachment::STOCK, m_stocks[m_selected_row].STOCKID);
-        DeleteItem(m_selected_row);
+        DeleteRows(m_selected_row,1);
         doRefreshItems(-1);
         m_stock_panel->m_frame->RefreshNavigationTree();
     }
@@ -316,7 +312,7 @@ void StocksListCtrl::OnMoveStocks(wxCommandEvent& /*event*/)
         stock->HELDAT = toAccountID;
         Model_Stock::instance().save(stock);
 
-        DeleteItem(m_selected_row);
+        DeleteRows(m_selected_row,1);
         m_stock_panel->m_frame->RefreshNavigationTree();
     }
 
@@ -397,10 +393,7 @@ void StocksListCtrl::OnColClick(wxListEvent& event)
 
     if (m_selected_col == ColumnNr && event.GetId() != MENU_HEADER_SORT) m_asc = !m_asc;
 
-    wxListItem item;
-    item.SetMask(wxLIST_MASK_IMAGE);
-    item.SetImage(-1);
-    SetColumn(m_selected_col, item);
+    SetSortingColumn(m_selected_col, m_asc);
 
     m_selected_col = ColumnNr;
 
@@ -423,16 +416,15 @@ void StocksListCtrl::doRefreshItems(int trx_id)
 
     if (cnt>0)
     {
-        RefreshItems(0, cnt > 0 ? cnt - 1 : 0);
+        //RefreshItems(0, cnt > 0 ? cnt - 1 : 0);
     }
     else
         selectedIndex = -1;
 
     if (selectedIndex >= 0 && cnt>0)
     {
-        SetItemState(selectedIndex, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-        SetItemState(selectedIndex, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
-        EnsureVisible(selectedIndex);
+        SelectRow(selectedIndex, false);
+        MakeCellVisible(selectedIndex, 0);
     }
 }
 
@@ -440,14 +432,11 @@ int StocksListCtrl::initVirtualListControl(int id, int col, bool asc)
 {
     m_stock_panel->updateHeader();
     /* Clear all the records */
-    DeleteAllItems();
+    DeleteRows();
 
     if (col > 0)
     {
-        wxListItem item;
-        item.SetMask(wxLIST_MASK_IMAGE);
-        item.SetImage(asc ? static_cast<int>(ico::ARROW_DOWN) : static_cast<int>(ico::ARROW_UP));
-        SetColumn(col, item);
+        SetSortingColumn(col, asc);
     }
 
     m_stocks = Model_Stock::instance().find(Model_Stock::HELDAT(m_stock_panel->m_account_id));
@@ -467,7 +456,7 @@ int StocksListCtrl::initVirtualListControl(int id, int col, bool asc)
         ++cnt;
     }
 
-    SetItemCount(m_stocks.size());
+    InsertRows(0, m_stocks.size());
     return selected_item;
 }
 

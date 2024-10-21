@@ -68,11 +68,10 @@ mmAssetsListCtrl::mmAssetsListCtrl(mmAssetsPanel* cp, wxWindow *parent, wxWindow
     m_col_idstr = "ASSETS";
     for (const auto& entry : m_columns)
     {
-        int count = GetColumnCount();
-        InsertColumn(count
-            , entry.HEADER
-            , entry.FORMAT
-            , Model_Setting::instance().GetIntSetting(wxString::Format(m_col_width, count), entry.WIDTH));
+        int count = GetNumberCols();
+        InsertCols(count, 1);
+        SetColLabelValue(count, entry.HEADER);
+        SetColSize(count,Model_Setting::instance().GetIntSetting(wxString::Format(m_col_width, count), entry.WIDTH));
     }
 
     // load the global variables
@@ -84,14 +83,12 @@ mmAssetsListCtrl::mmAssetsListCtrl(mmAssetsPanel* cp, wxWindow *parent, wxWindow
 void mmAssetsListCtrl::OnMouseRightClick(wxMouseEvent& event)
 {
     if (m_selected_row > -1)
-        SetItemState(m_selected_row, 0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
-    int Flags = wxLIST_HITTEST_ONITEM;
-    m_selected_row = HitTest(wxPoint(event.m_x, event.m_y), Flags);
+        SelectRow(m_selected_row);
+    m_selected_row = YToRow(event.m_y);
 
     if (m_selected_row >= 0)
     {
-        SetItemState(m_selected_row, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-        SetItemState(m_selected_row, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
+        SelectRow(m_selected_row);
     }
     m_panel->updateExtraAssetData(m_selected_row);
     wxMenu menu;
@@ -127,8 +124,7 @@ void mmAssetsListCtrl::OnMouseRightClick(wxMouseEvent& event)
 
 void mmAssetsListCtrl::OnListLeftClick(wxMouseEvent& event)
 {
-    int Flags = wxLIST_HITTEST_ONITEM;
-    long index = HitTest(wxPoint(event.m_x, event.m_y), Flags);
+    long index = YToRow(event.m_y);
     if (index == -1)
     {
         m_selected_row = -1;
@@ -185,16 +181,15 @@ void mmAssetsListCtrl::doRefreshItems(int trx_id)
     if (selectedIndex >= cnt || selectedIndex < 0)
         selectedIndex = m_asc ? cnt - 1 : 0;
 
-    if (cnt>0)
-        RefreshItems(0, cnt > 0 ? --cnt : 0);
-    else
+    //if (cnt>0)
+    //    RefreshItems(0, cnt > 0 ? --cnt : 0);
+    if (cnt <= 0)
         selectedIndex = -1;
 
     if (selectedIndex >= 0 && cnt>0)
     {
-        SetItemState(selectedIndex, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-        SetItemState(selectedIndex, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
-        EnsureVisible(selectedIndex);
+        SelectRow(selectedIndex);
+        MakeCellVisible(selectedIndex,0);
     }
     m_selected_row = selectedIndex;
 }
@@ -325,12 +320,12 @@ void mmAssetsListCtrl::OnColClick(wxListEvent& event)
     wxListItem item;
     item.SetMask(wxLIST_MASK_IMAGE);
     item.SetImage(-1);
-    SetColumn(m_selected_col, item);
+    //SetColLabelValue(m_selected_col, item.);
 
     m_selected_col = ColumnNr;
 
     item.SetImage(m_asc ? mmAssetsPanel::ICON_UPARROW : mmAssetsPanel::ICON_DOWNARROW);
-    SetColumn(m_selected_col, item);
+    //SetColumn(m_selected_col, item);
 
     Model_Setting::instance().Set("ASSETS_ASC", m_asc);
     Model_Setting::instance().Set("ASSETS_SORT_COL", m_selected_col);
@@ -347,7 +342,7 @@ void mmAssetsListCtrl::OnEndLabelEdit(wxListEvent& event)
     Model_Asset::Data* asset = &m_panel->m_assets[event.GetIndex()];
     asset->ASSETNAME = event.m_item.m_text;
     Model_Asset::instance().save(asset);
-    RefreshItems(event.GetIndex(), event.GetIndex());
+    //RefreshItems(event.GetIndex(), event.GetIndex());
 }
 
 /*******************************************************/
@@ -394,7 +389,7 @@ bool mmAssetsPanel::Create(wxWindow *parent
 
     initVirtualListControl(-1, m_listCtrlAssets->m_selected_col, m_listCtrlAssets->m_asc);
     if (!this->m_assets.empty())
-        m_listCtrlAssets->EnsureVisible(this->m_assets.size() - 1);
+        m_listCtrlAssets->MakeCellVisible(this->m_assets.size() - 1,0);
 
     this->windowsFreezeThaw();
     GetSizer()->Fit(this);
@@ -451,7 +446,7 @@ void mmAssetsPanel::CreateControls()
     images.push_back(mmBitmapBundle(png::UPARROW));
     images.push_back(mmBitmapBundle(png::DOWNARROW));
 
-    m_listCtrlAssets->SetSmallImages(images);
+    //m_listCtrlAssets->SetSmallImages(images);
 
     wxPanel* assets_panel = new wxPanel(itemSplitterWindow10, wxID_ANY
         , wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxTAB_TRAVERSAL);
@@ -564,12 +559,12 @@ void mmAssetsPanel::sortTable()
 int mmAssetsPanel::initVirtualListControl(int id, int col, bool asc)
 {
     /* Clear all the records */
-    m_listCtrlAssets->DeleteAllItems();
+    m_listCtrlAssets->DeleteRows();
 
     wxListItem item;
     item.SetMask(wxLIST_MASK_IMAGE);
     item.SetImage(asc ? ICON_UPARROW : ICON_DOWNARROW);
-    m_listCtrlAssets->SetColumn(col, item);
+    m_listCtrlAssets->SetSortingColumn(col, asc);
 
     if (this->m_filter_type == Model_Asset::TYPE_ID(-1)) // ALL
         this->m_assets = Model_Asset::instance().all();
@@ -577,7 +572,7 @@ int mmAssetsPanel::initVirtualListControl(int id, int col, bool asc)
         this->m_assets = Model_Asset::instance().find(Model_Asset::ASSETTYPE(m_filter_type));
     this->sortTable();
 
-    m_listCtrlAssets->SetItemCount(this->m_assets.size());
+    m_listCtrlAssets->InsertRows(0, this->m_assets.size());
 
     double balance = 0.0;
     for (const auto& asset: this->m_assets) balance += Model_Asset::value(asset); 
@@ -741,8 +736,8 @@ void mmAssetsPanel::OnSearchTxtEntered(wxCommandEvent& event)
     const wxString search_string = event.GetString().Lower();
     if (search_string.IsEmpty()) return;
 
-    long last = m_listCtrlAssets->GetItemCount();
-    long selectedItem = m_listCtrlAssets->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+    long last = m_listCtrlAssets->GetNumberRows();
+    long selectedItem = m_listCtrlAssets->GetSelectedRows()[0];
     if (selectedItem < 0) //nothing selected
         selectedItem = m_listCtrlAssets->m_asc ? last - 1 : 0;
 
@@ -752,14 +747,9 @@ void mmAssetsPanel::OnSearchTxtEntered(wxCommandEvent& event)
         const wxString t = getItem(selectedItem, COL_NOTES).Lower();
         if (t.Matches(search_string + "*"))
         {
-            //First of all any items should be unselected
-            long cursel = m_listCtrlAssets->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-            if (cursel != wxNOT_FOUND)
-                m_listCtrlAssets->SetItemState(cursel, 0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
-
             //Then finded item will be selected
-            m_listCtrlAssets->SetItemState(selectedItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-            m_listCtrlAssets->EnsureVisible(selectedItem);
+            m_listCtrlAssets->SelectRow(selectedItem);
+            m_listCtrlAssets->MakeCellVisible(selectedItem,0);
             break;
         }
     }

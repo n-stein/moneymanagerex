@@ -41,8 +41,8 @@
 //----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(TransactionListCtrl, mmListCtrl)
-    EVT_LIST_ITEM_ACTIVATED(wxID_ANY, TransactionListCtrl::OnListItemActivated)
-    EVT_LIST_ITEM_SELECTED(wxID_ANY, TransactionListCtrl::OnListItemSelected)
+    //EVT_GRID_CELL_LEFT_DCLICK(TransactionListCtrl::OnListItemActivated)
+    //EVT_GRID_CELL_LEFT_CLICK(TransactionListCtrl::OnListItemSelected)
     EVT_LIST_ITEM_DESELECTED(wxID_ANY, TransactionListCtrl::OnListItemDeSelected)
     EVT_LIST_ITEM_FOCUSED(wxID_ANY, TransactionListCtrl::OnListItemFocused)
     EVT_RIGHT_DOWN(TransactionListCtrl::OnMouseRightClick)
@@ -221,7 +221,7 @@ void TransactionListCtrl::sortTable()
                         , m_columns[prev_g_sortcol].HEADER, prev_g_asc ? L"\u25B2" : L"\u25BC");
     m_cp->m_header_sortOrder->SetLabelText(sortText);
     
-    RefreshItems(0, m_trans.size() - 1);
+    //RefreshItems(0, m_trans.size() - 1);
 }
 
 TransactionListCtrl::TransactionListCtrl(
@@ -276,7 +276,7 @@ TransactionListCtrl::TransactionListCtrl(
     m_default_sort_column = COL_DEF_SORT;
     m_today = Option::instance().UseTransDateTime() ? wxDateTime::Now().FormatISOCombined() : wxDateTime(23, 59, 59, 999).FormatISOCombined();
 
-    SetSingleStyle(wxLC_SINGLE_SEL, false);
+    //SetSingleStyle(wxLC_SINGLE_SEL, false);
 }
 
 void TransactionListCtrl::resetColumns()
@@ -365,11 +365,10 @@ void TransactionListCtrl::createColumns(mmListCtrl &lst)
 
     for (const auto& entry : m_columns)
     {
-        int count = lst.GetColumnCount();
-        lst.InsertColumn(count
-            , entry.HEADER
-            , entry.FORMAT
-            , Model_Setting::instance().GetIntSetting(wxString::Format(m_col_width, GetRealColumn(count)), entry.WIDTH));
+        int count = lst.GetNumberCols();
+        lst.InsertCols(count, 1);
+        lst.SetColLabelValue(count, entry.HEADER);
+        lst.SetColSize(count, Model_Setting::instance().GetIntSetting(wxString::Format(m_col_width, GetRealColumn(count)), entry.WIDTH));
     }
 }
 
@@ -388,36 +387,40 @@ void TransactionListCtrl::setExtraTransactionData(const bool single)
 
 //----------------------------------------------------------------------------
 
-void TransactionListCtrl::OnListItemSelected(wxListEvent&)
+void TransactionListCtrl::OnListItemSelected(wxGridEvent& event)
 {
-    wxLogDebug("OnListItemSelected: %i selected", GetSelectedItemCount());
-    FindSelectedTransactions();
-    setExtraTransactionData(GetSelectedItemCount() == 1);
+    if (event.GetRow() < m_trans.size())
+    {
+        SelectRow(event.GetRow(), event.ControlDown() || event.ShiftDown());
+        // wxLogDebug("OnListItemSelected: %u selected", GetSelectedRows().size());
+        FindSelectedTransactions();
+        setExtraTransactionData(GetSelectedRows().size() == 1);
+    }
 }
 
 void TransactionListCtrl::OnListItemDeSelected(wxListEvent&)
 {
-    wxLogDebug("OnListItemDeSelected: %i selected", GetSelectedItemCount());
+    //wxLogDebug("OnListItemDeSelected: %i selected", GetSelectedRows().size());
     FindSelectedTransactions();
-    setExtraTransactionData(GetSelectedItemCount() == 1);
+    setExtraTransactionData(GetSelectedRows().size() == 1);
 }
 
 void TransactionListCtrl::OnListItemFocused(wxListEvent& WXUNUSED(event))
 {
-    wxLogDebug("OnListItemFocused: %i selected", GetSelectedItemCount());
+    //wxLogDebug("OnListItemFocused: %i selected", GetSelectedRows().size());
     FindSelectedTransactions();
-    setExtraTransactionData(GetSelectedItemCount() == 1);
+    setExtraTransactionData(GetSelectedRows().size() == 1);
 }
 
 void TransactionListCtrl::OnListLeftClick(wxMouseEvent& event)
 {
-    wxLogDebug("OnListLeftClick: %i selected", GetSelectedItemCount());
+    //wxLogDebug("OnListLeftClick: %i selected", GetSelectedRows().size());
     event.Skip();
 }
 
-void TransactionListCtrl::OnListItemActivated(wxListEvent& /*event*/)
+void TransactionListCtrl::OnListItemActivated(wxGridEvent& /*event*/)
 {
-    wxLogDebug("OnListItemActivated: %i selected", GetSelectedItemCount());
+    //wxLogDebug("OnListItemActivated: %i selected", GetSelectedRows().size());
     wxCommandEvent evt(wxEVT_COMMAND_MENU_SELECTED, MENU_TREEPOPUP_EDIT2);
     AddPendingEvent(evt);
 }
@@ -426,11 +429,11 @@ int TransactionListCtrl::getColumnFromPosition(int xPos)
 {
     int column = 0;
     int x = -GetScrollPos(wxHORIZONTAL);
-    for (column = 0; column < GetColumnCount(); column++) {
-        x += GetColumnWidth(column);
+    for (column = 0; column < GetNumberCols(); column++) {
+        x += GetColSize(column);
         if (x >= xPos) break;
     }
-    if (!(column < GetColumnCount())) return -1;
+    if (!(column < GetNumberCols())) return -1;
     return column;
 }
 
@@ -438,8 +441,8 @@ void TransactionListCtrl::OnMouseRightClick(wxMouseEvent& event)
 {
     rightClickFilter_ = "";
     copyText_ = "";
-    wxLogDebug("OnMouseRightClick: %i selected", GetSelectedItemCount());
-    int selected = GetSelectedItemCount();
+    wxLogDebug("OnMouseRightClick: %i selected", GetSelectedRows().size());
+    int selected = GetSelectedRows().size();
 
     bool is_nothing_selected = (selected < 1);
     bool multiselect = (selected > 1);
@@ -515,12 +518,11 @@ void TransactionListCtrl::OnMouseRightClick(wxMouseEvent& event)
         menu.Append(MENU_TREEPOPUP_RESTORE_VIEWED, _("Restore &all transactions in current view..."));
     }
     bool columnIsAmount = false;
-    unsigned long column = getColumnFromPosition(event.GetX());
-    int flags;
-    unsigned long row = HitTest(event.GetPosition(), flags);
-    if (flags & wxLIST_HITTEST_ONITEM)
+    long column = XToCol(event.GetX());
+    long row = YToRow(event.GetY());
+    if (row >= 0 && column >= 0)
     {
-        if (column < m_columns.size())
+        if (column >= 0 && column < m_columns.size())
         {
             wxString menuItemText;
             wxString refType = Model_Attachment::reftype_desc(Model_Attachment::TRANSACTION);
@@ -750,9 +752,9 @@ void TransactionListCtrl::OnMarkTransaction(wxCommandEvent& event)
 
     Model_Checking::instance().Savepoint();
 
-    for (int row = 0; row < GetItemCount(); row++)
+    for (int row = 0; row < GetNumberRows(); row++)
     {
-        if (GetItemState(row, wxLIST_STATE_SELECTED) == wxLIST_STATE_SELECTED)
+        if (IsInSelection(row, 0))
         {
             Model_Account::Data* account = Model_Account::instance().get(m_trans[row].ACCOUNTID);
             const auto statement_date = Model_Account::DateOf(account->STATEMENTDATE).FormatISODate();
@@ -821,7 +823,7 @@ void TransactionListCtrl::setColumnImage(EColumn col, int image)
     item.SetMask(wxLIST_MASK_IMAGE);
     item.SetImage(image);
 
-    SetColumn(col, item);
+    //SetColumn(col, item);
 }
 //----------------------------------------------------------------------------
 
@@ -947,8 +949,8 @@ void TransactionListCtrl::OnSelectAll(wxCommandEvent& WXUNUSED(event))
     m_selected_id.clear();
     SetEvtHandlerEnabled(false);
     std::set<int> unique_ids;
-    for (int row = 0; row < GetItemCount(); row++) {
-        SetItemState(row, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    for (int row = 0; row < GetNumberRows(); row++) {
+        SelectRow(row, false);
         if (unique_ids.find(m_trans[row].TRANSID) == unique_ids.end())
         {
             m_selected_id.push_back(m_trans[row].TRANSID);
@@ -956,13 +958,14 @@ void TransactionListCtrl::OnSelectAll(wxCommandEvent& WXUNUSED(event))
         }
     }
     SetEvtHandlerEnabled(true);
-    setExtraTransactionData(GetSelectedItemCount() == 1);
+    setExtraTransactionData(GetSelectedRows().size() == 1);
 }
 
 void TransactionListCtrl::OnCopy(wxCommandEvent& WXUNUSED(event))
 {
     // we can't copy deleted items or there is nothing to copy
-    if (m_cp->isTrash_ || GetSelectedItemCount() < 1) return;
+    if (m_cp->isTrash_ || GetSelectedRows().size() < 1)
+        return;
 
     // collect the selected transactions for copy
     FindSelectedTransactions();
@@ -972,13 +975,13 @@ void TransactionListCtrl::OnCopy(wxCommandEvent& WXUNUSED(event))
     {
         const wxString seperator = "\t";
         wxString data = "";
-        for (int row = 0; row < GetItemCount(); row++)
+        for (int row = 0; row < GetNumberRows(); row++)
         {
-            if (GetItemState(row, wxLIST_STATE_SELECTED) == wxLIST_STATE_SELECTED)
+            if (IsInSelection(row,0))
             {
                 for (int column = 0; column < static_cast<int>(m_columns.size()); column++)
                 {
-                    if (GetColumnWidth(column) > 0) {
+                    if (GetColSize(column) > 0) {
                         data += inQuotes(OnGetItemText(row, column), seperator);
                         data += seperator;
                     }
@@ -994,7 +997,8 @@ void TransactionListCtrl::OnCopy(wxCommandEvent& WXUNUSED(event))
 void TransactionListCtrl::OnDuplicateTransaction(wxCommandEvent& WXUNUSED(event))
 {
     // we can only duplicate a single transaction
-    if (GetSelectedItemCount() != 1) return;
+    if (GetSelectedRows().size() != 1)
+        return;
 
     FindSelectedTransactions();
 
@@ -1007,7 +1011,7 @@ void TransactionListCtrl::OnDuplicateTransaction(wxCommandEvent& WXUNUSED(event)
         m_cp->mmPlayTransactionSound();
         refreshVisualList();
     }
-    m_topItemIndex = GetTopItem() + GetCountPerPage() - 1;
+    m_topItemIndex = GetFirstFullyVisibleRow();
 }
 
 void TransactionListCtrl::OnPaste(wxCommandEvent& WXUNUSED(event))
@@ -1100,7 +1104,8 @@ int TransactionListCtrl::OnPaste(Model_Checking::Data* tran)
 void TransactionListCtrl::OnOpenAttachment(wxCommandEvent& WXUNUSED(event))
 {
     // we can only open a single transaction
-    if (GetSelectedItemCount() != 1) return;
+    if (GetSelectedRows().size() != 1)
+        return;
 
     FindSelectedTransactions();
 
@@ -1119,7 +1124,7 @@ void TransactionListCtrl::OnListKeyDown(wxListEvent& event)
         return event.Skip();
 
     int key = event.GetKeyCode();
-    m_topItemIndex = GetTopItem() + GetCountPerPage() - 1;
+    m_topItemIndex = GetFirstFullyVisibleRow();
 
     if (!m_cp->isTrash_) {
         if (key == wxKeyCode('R')) {
@@ -1210,7 +1215,7 @@ void TransactionListCtrl::OnRestoreViewedTransaction(wxCommandEvent&)
 void TransactionListCtrl::OnRestoreTransaction(wxCommandEvent& WXUNUSED(event))
 {
     // check if any transactions selected
-    int sel = GetSelectedItemCount();
+    int sel = GetSelectedRows().size();
     if (sel < 1) return;
 
     FindSelectedTransactions();
@@ -1349,7 +1354,7 @@ void TransactionListCtrl::DeleteTransactionsByStatus(const wxString& status)
 void TransactionListCtrl::OnDeleteTransaction(wxCommandEvent& WXUNUSED(event))
 {
     // check if any transactions selected
-    int sel = GetSelectedItemCount();
+    int sel = GetSelectedRows().size();
     if (sel < 1) return;
 
     FindSelectedTransactions();
@@ -1469,8 +1474,8 @@ bool TransactionListCtrl::CheckForClosedAccounts()
     else
     {
         const wxString text = wxString::Format(
-            wxPLURAL("You are about to edit a transaction involving an account that is closed."
-            , "The edit will affect %i transactions involving an account that is closed.", GetSelectedItemCount())
+            wxPLURAL("You are about to edit a transaction involving an account that is closed.",
+                                                        "The edit will affect %i transactions involving an account that is closed.", GetSelectedRows().size())
             , closedTrx) + _("\n\nDo you still want to perform the edit?");
         if (wxMessageBox(text, _("Closed Account Check"), wxYES_NO | wxICON_WARNING) == wxYES)
             return true;
@@ -1481,7 +1486,8 @@ bool TransactionListCtrl::CheckForClosedAccounts()
 void TransactionListCtrl::OnEditTransaction(wxCommandEvent& /*event*/)
 {
     // check if anything to edit
-    if (GetSelectedItemCount() < 1) return;
+    if (GetSelectedRows().size() < 1)
+        return;
 
     FindSelectedTransactions();
 
@@ -1534,7 +1540,7 @@ void TransactionListCtrl::OnEditTransaction(wxCommandEvent& /*event*/)
             refreshVisualList(transaction_id);
         }
     }
-    m_topItemIndex = GetTopItem() + GetCountPerPage() - 1;
+    m_topItemIndex = GetFirstFullyVisibleRow();
 }
 
 void TransactionListCtrl::OnNewTransaction(wxCommandEvent& event)
@@ -1596,7 +1602,7 @@ void TransactionListCtrl::OnSetUserColour(wxCommandEvent& event)
         }
     }
     Model_Checking::instance().ReleaseSavepoint();
-    m_topItemIndex = GetTopItem() + GetCountPerPage() - 1;
+    m_topItemIndex = GetFirstFullyVisibleRow();
 
     refreshVisualList();
 }
@@ -1604,7 +1610,7 @@ void TransactionListCtrl::OnSetUserColour(wxCommandEvent& event)
 
 void TransactionListCtrl::refreshVisualList(bool filter)
 {
-    wxLogDebug("refreshVisualList: %i selected, filter: %d", GetSelectedItemCount(), filter);
+    //wxLogDebug("refreshVisualList: %i selected, filter: %d", GetSelectedRows().size(), filter);
 
     // Grab the selected transactions unless we have freshly pasted transactions in which case use them
     if (m_pasted_id.empty())
@@ -1625,7 +1631,14 @@ void TransactionListCtrl::refreshVisualList(bool filter)
     setColumnImage(g_sortcol, g_asc ? mmCheckingPanel::ICON_DESC : mmCheckingPanel::ICON_ASC);
     if (filter)
         m_cp->filterTable();
-    SetItemCount(m_trans.size());
+    InsertRows(0, m_trans.size());
+    for (int i = 0; i < GetNumberRows(); i++)
+    {
+        for (int j = 0; j < GetNumberCols(); j++)
+        {
+            SetCellValue(i, j, getItem(i,j));
+        }
+    }
     Show();
     sortTable();
     markSelectedTransaction();
@@ -1641,9 +1654,8 @@ void TransactionListCtrl::refreshVisualList(bool filter)
         {
             if (item == entry.TRANSID)
             {
-                SetItemState(i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-                SetItemState(i, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
-                EnsureVisible(i);
+                SelectRow(i, true);
+                MakeCellVisible(i,0);
             }
         }
         i++;
@@ -1651,10 +1663,10 @@ void TransactionListCtrl::refreshVisualList(bool filter)
     FindSelectedTransactions();
 
     if (m_topItemIndex >= 0 && m_topItemIndex < i && m_selected_id.empty())
-        EnsureVisible(m_topItemIndex);
+        MakeCellVisible(m_topItemIndex,0);
 
     m_cp->setAccountSummary();
-    setExtraTransactionData(GetSelectedItemCount() == 1);
+    setExtraTransactionData(GetSelectedRows().size() == 1);
     this->SetEvtHandlerEnabled(true);
     Refresh();
     Update();
@@ -1664,7 +1676,7 @@ void TransactionListCtrl::refreshVisualList(bool filter)
 void TransactionListCtrl::OnMoveTransaction(wxCommandEvent& /*event*/)
 {
     FindSelectedTransactions();
-    int sel = GetSelectedItemCount();
+    int sel = GetSelectedRows().size();
 
     //ask if they really want to move
     const wxString text = wxString::Format(
@@ -1751,7 +1763,7 @@ void TransactionListCtrl::OnViewOtherAccount(wxCommandEvent& /*event*/)
 void TransactionListCtrl::OnViewSplitTransaction(wxCommandEvent& /*event*/)
 {
     // we can only view a single transaction
-    if (GetSelectedItemCount() != 1) return;
+    if (GetSelectedRows().size() != 1) return;
 
     FindSelectedTransactions();
     m_cp->DisplaySplitCategories(m_selected_id[0]);
@@ -1761,7 +1773,8 @@ void TransactionListCtrl::OnViewSplitTransaction(wxCommandEvent& /*event*/)
 void TransactionListCtrl::OnOrganizeAttachments(wxCommandEvent& /*event*/)
 {
     // we only support a single transaction
-    if (GetSelectedItemCount() != 1) return;
+    if (GetSelectedRows().size() != 1)
+        return;
 
     FindSelectedTransactions();
 
@@ -1778,7 +1791,8 @@ void TransactionListCtrl::OnOrganizeAttachments(wxCommandEvent& /*event*/)
 void TransactionListCtrl::OnCreateReoccurance(wxCommandEvent& /*event*/)
 {
      // we only support a single transaction
-    if (GetSelectedItemCount() != 1) return;
+    if (GetSelectedRows().size() != 1)
+        return;
 
     FindSelectedTransactions();
 
@@ -1798,10 +1812,10 @@ void TransactionListCtrl::markSelectedTransaction()
     for (const auto & tran : m_trans)
     {
         //reset any selected items in the list
-        if (GetItemState(i, wxLIST_STATE_SELECTED) == wxLIST_STATE_SELECTED)
-        {
-            SetItemState(i, 0, wxLIST_STATE_SELECTED);
-        }
+        //if (GetItemState(i, wxLIST_STATE_SELECTED) == wxLIST_STATE_SELECTED)
+        //{
+        //    SetItemState(i, 0, wxLIST_STATE_SELECTED);
+        //}
         if (!m_selected_id.empty())
         {
             // discover where the transaction has ended up in the list
@@ -1825,20 +1839,15 @@ void TransactionListCtrl::markSelectedTransaction()
         i = static_cast<long>(m_trans.size()) - 1;
         if (!g_asc)
             i = 0;
-        EnsureVisible(i);
+        MakeCellVisible(i,0);
     }
 }
 
 void TransactionListCtrl::markItem(long selectedItem)
 {
     //First of all any items should be unselected
-    long cursel = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    if (cursel != wxNOT_FOUND)
-        SetItemState(cursel, 0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
-
-    //Then finded item will be selected
-    SetItemState(selectedItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-    EnsureVisible(selectedItem);
+    SelectRow(selectedItem);
+    MakeCellVisible(selectedItem, 0);
     return;
 }
 
@@ -1846,28 +1855,27 @@ void TransactionListCtrl::doSearchText(const wxString& value)
 {
     const wxString pattern = value.Lower().Append("*");
 
-    long last = static_cast<long>(GetItemCount() - 1);
-    if (m_selected_id.size() > 1) {
-        SetEvtHandlerEnabled(false);
-        for (long i = 0; i < last; i++)
+    long last = static_cast<long>(GetNumberRows() - 1);
+    wxArrayInt selectedRows;
+
+    if (!GetSelectedRows().IsEmpty())
+        selectedRows = GetSelectedRows();
+    else
+    {
+        for (int i = 0; i < last; ++i)
         {
-            long cursel = GetNextItem(-1
-                , wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-            if (cursel != wxNOT_FOUND)
-                SetItemState(cursel, 0
-                    , wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
+            selectedRows.Add(i);
         }
-        SetEvtHandlerEnabled(true);
     }
 
-    long selectedItem = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-
+    long selectedItem = selectedRows[0];
+    int index;
     if (selectedItem < 0 || selectedItem > last) //nothing selected
-        selectedItem = g_asc ? last + 1  : -1;
+        index = g_asc ? last : 0;
 
     while (true)
     {
-        g_asc ? selectedItem-- : selectedItem++;
+        g_asc ? selectedItem = selectedRows[index--] : selectedRows[index++];
         if (selectedItem < 0 || selectedItem >= static_cast<int>(m_trans.size()))
             break;
 
@@ -1912,11 +1920,9 @@ void TransactionListCtrl::doSearchText(const wxString& value)
 
     wxLogDebug("Searching finished");
     selectedItem = g_asc ? last : 0;
-    long cursel = GetNextItem(-1
-        , wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    SetItemState(cursel, 0
-        , wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
-    EnsureVisible(selectedItem);
+    long cursel = selectedRows[index];
+    DeselectRow(cursel);
+    MakeCellVisible(selectedItem, 0);
 }
 
 wxString UDFCFormatHelper(Model_CustomField::TYPE_ID type, wxString data)
@@ -2068,7 +2074,7 @@ void TransactionListCtrl::FindSelectedTransactions()
     m_selected_id.clear();
     std::set<int> unique_ids;
     for (const auto& i : m_trans)
-        if (GetItemState(x++, wxLIST_STATE_SELECTED) == wxLIST_STATE_SELECTED
+        if (IsInSelection(x++, 0)
             && unique_ids.find(i.TRANSID) == unique_ids.end())
         {
             m_selected_id.push_back(i.TRANSID);
@@ -2083,8 +2089,7 @@ void TransactionListCtrl::setSelectedID(int v)
     {
         if (v == entry.TRANSID)
         {
-            SetItemState(i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-            SetItemState(i, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
+            SelectRow(i, true);
             m_topItemIndex = i;
             break;
         }

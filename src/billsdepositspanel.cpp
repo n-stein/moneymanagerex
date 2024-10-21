@@ -151,11 +151,10 @@ billsDepositsListCtrl::billsDepositsListCtrl(mmBillsDepositsPanel* bdp, wxWindow
 
     for (const auto& entry : m_columns)
     {
-        int count = GetColumnCount();
-        InsertColumn(count
-            , entry.HEADER
-            , entry.FORMAT
-            , Model_Setting::instance().GetIntSetting(wxString::Format(m_col_width, count), entry.WIDTH));
+        int count = GetNumberCols();
+        InsertCols(count, 1);
+        SetColLabelValue(count, entry.HEADER);
+        SetColSize(count, Model_Setting::instance().GetIntSetting(wxString::Format(m_col_width, count), entry.WIDTH));
     }
 }
 
@@ -178,7 +177,7 @@ void billsDepositsListCtrl::OnColClick(wxListEvent& event)
     wxListItem item;
     item.SetMask(wxLIST_MASK_IMAGE);
     item.SetImage(-1);
-    SetColumn(m_selected_col, item);
+    SetSortingColumn(m_selected_col, m_asc);
 
     m_selected_col = ColumnNr;
 
@@ -275,7 +274,7 @@ void mmBillsDepositsPanel::CreateControls()
 
     listCtrlAccount_ = new billsDepositsListCtrl(this, itemSplitterWindowBillsDeposit);
 
-    listCtrlAccount_->SetSmallImages(images);
+    //listCtrlAccount_->SetSmallImages(images);
 
     wxPanel* bdPanel = new wxPanel(itemSplitterWindowBillsDeposit, wxID_ANY
         , wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxTAB_TRAVERSAL);
@@ -342,12 +341,9 @@ void mmBillsDepositsPanel::CreateControls()
 
 int mmBillsDepositsPanel::initVirtualListControl(int id)
 {
-    listCtrlAccount_->DeleteAllItems();
+    listCtrlAccount_->DeleteRows();
 
-    wxListItem item;
-    item.SetMask(wxLIST_MASK_IMAGE);
-    item.SetImage(listCtrlAccount_->m_asc ? ICON_UPARROW : ICON_DOWNARROW);
-    listCtrlAccount_->SetColumn(listCtrlAccount_->m_selected_col, item);
+    listCtrlAccount_->SetSortingColumn(listCtrlAccount_->m_selected_col, listCtrlAccount_->m_asc);
 
     bills_.clear();
     const auto split = Model_Budgetsplittransaction::instance().get_all();
@@ -374,7 +370,7 @@ int mmBillsDepositsPanel::initVirtualListControl(int id)
         ++cnt;
     }
 
-    listCtrlAccount_->SetItemCount(static_cast<long>(bills_.size()));
+    listCtrlAccount_->InsertRows(0, static_cast<long>(bills_.size()));
     return selected_item;
 }
 
@@ -419,14 +415,13 @@ void mmBillsDepositsPanel::OnOpenAttachment(wxCommandEvent& event)
 void billsDepositsListCtrl::OnItemRightClick(wxMouseEvent& event)
 {
     if (m_selected_row > -1)
-        SetItemState(m_selected_row, 0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
-    int Flags = wxLIST_HITTEST_ONITEM;
-    m_selected_row = HitTest(wxPoint(event.m_x, event.m_y), Flags);
+        SelectRow(m_selected_row);
+
+    m_selected_row = YToRow(event.m_y);
 
     if (m_selected_row >= 0)
     {
-        SetItemState(m_selected_row, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-        SetItemState(m_selected_row, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
+        SelectRow(m_selected_row);
     }
     m_bdp->updateBottomPanelData(m_selected_row);
     bool item_active = (m_selected_row >= 0);
@@ -581,8 +576,7 @@ void billsDepositsListCtrl::OnListItemSelected(wxListEvent& event)
 
 void billsDepositsListCtrl::OnListLeftClick(wxMouseEvent& event)
 {
-    int Flags = wxLIST_HITTEST_ONITEM;
-    long index = HitTest(wxPoint(event.m_x, event.m_y), Flags);
+    long index = YToRow(event.m_y);
     if (index == -1)
     {
         m_selected_row = -1;
@@ -868,16 +862,15 @@ void billsDepositsListCtrl::refreshVisualList(int selected_index)
     if (selected_index >= static_cast<long>(m_bdp->bills_.size()) || selected_index < 0)
         selected_index = - 1;
     if (!m_bdp->bills_.empty()) {
-        RefreshItems(0, m_bdp->bills_.size() - 1);
+        //RefreshItems(0, m_bdp->bills_.size() - 1);
     }
     else
         selected_index = -1;
 
     if (selected_index >= 0 && !m_bdp->bills_.empty())
     {
-        SetItemState(selected_index, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-        SetItemState(selected_index, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
-        EnsureVisible(selected_index);
+        SelectRow(selected_index);
+        MakeCellVisible(selected_index,0);
     }
     m_selected_row = selected_index;
     m_bdp->updateBottomPanelData(selected_index);

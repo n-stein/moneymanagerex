@@ -23,6 +23,7 @@
 #include "util.h"
 #include "wx/event.h"
 #include <wx/webview.h>
+#include <wx/grid.h>
 #include <wx/webviewfshandler.h>
 //----------------------------------------------------------------------------
 
@@ -37,7 +38,7 @@ struct PANEL_COLUMN
     bool SORTABLE;
 };
 
-class mmListCtrl : public wxListCtrl
+class mmListCtrl : public wxGrid
 {
     wxDECLARE_EVENT_TABLE();
 
@@ -64,9 +65,9 @@ public:
     wxArrayString GetColumnsOrder();
 
 protected:
-    void OnItemResize(wxListEvent& event);
-    virtual void OnColClick(wxListEvent& event);
-    void OnColRightClick(wxListEvent& event);
+    void OnItemResize(wxGridEvent& event);
+    virtual void OnColClick(wxGridEvent& event);
+    void OnColRightClick(wxGridEvent& event);
     /* Headers Right Click*/
     void PopupSelected(wxCommandEvent& event);
     void OnHeaderColumn(wxCommandEvent& event);

@@ -23,19 +23,20 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "model/Model_Setting.h"
 #include "mmreportspanel.h"
 
-wxBEGIN_EVENT_TABLE(mmListCtrl, wxListCtrl)
-EVT_LIST_COL_END_DRAG(wxID_ANY, mmListCtrl::OnItemResize)
-EVT_LIST_COL_CLICK(wxID_ANY, mmListCtrl::OnColClick)
-EVT_LIST_COL_RIGHT_CLICK(wxID_ANY, mmListCtrl::OnColRightClick)
+wxBEGIN_EVENT_TABLE(mmListCtrl, wxGrid)
+//EVT_LIST_COL_END_DRAG(mmListCtrl::OnItemResize)
+EVT_GRID_LABEL_LEFT_CLICK(mmListCtrl::OnColClick)
+EVT_GRID_LABEL_RIGHT_CLICK(mmListCtrl::OnColRightClick)
 EVT_MENU(wxID_ANY, mmListCtrl::PopupSelected)
 wxEND_EVENT_TABLE()
 
 mmListCtrl::mmListCtrl(wxWindow *parent, wxWindowID winid)
-    : wxListCtrl(parent, winid, wxDefaultPosition, wxDefaultSize
-        , wxLC_REPORT | wxLC_HRULES | wxLC_VRULES | wxLC_VIRTUAL | wxLC_SINGLE_SEL | wxLC_AUTOARRANGE)
+    : wxGrid(parent, winid, wxDefaultPosition, wxDefaultSize)
     , attr1_(new wxListItemAttr(*bestFontColour(mmThemeMetaColour(meta::COLOR_LISTALT0)), mmThemeMetaColour(meta::COLOR_LISTALT0), wxNullFont))
     , attr2_(new wxListItemAttr(*bestFontColour(mmThemeMetaColour(meta::COLOR_LIST)), mmThemeMetaColour(meta::COLOR_LIST), wxNullFont))
 {
+    CreateGrid(0,0);
+    SetRowLabelSize(0);
 }
 
 mmListCtrl::~mmListCtrl()
@@ -44,9 +45,9 @@ mmListCtrl::~mmListCtrl()
       Save the column widths of the list control. This will ensure that the
       column widths get set incase the OnItemResize does not work on some systems.
     */
-    for (int column_number = 0; column_number < GetColumnCount(); ++column_number)
+    for (int column_number = 0; column_number < GetNumberCols(); ++column_number)
     {
-        int column_width = GetColumnWidth(column_number);
+        int column_width = GetColWidth(column_number);
         if (GetColumnWidthSetting(column_number) != column_width)
         {
             SetColumnWidthSetting(column_number, column_width);
@@ -75,21 +76,18 @@ wxString mmListCtrl::BuildPage(const wxString &title) const
         , (GetWindowStyle() & wxLC_HRULES) || (GetWindowStyle() & wxLC_VRULES) ? "1" : "0") + eol;
 
     text << "<tr>" << eol;
-    for (int c = 0; c < GetColumnCount(); c++)
+    for (int c = 0; c < GetNumberCols(); c++)
     {
-        wxListItem col;
-        col.SetMask(wxLIST_MASK_TEXT);
-        GetColumn(c, col);
-        text << "<th><i>" << col.GetText() << "</i></th>" << eol;
+        text << "<th><i>" << GetColLabelValue(c) << "</i></th>" << eol;
     }
     text << "</tr>" << eol;
 
-    for (int i = 0; i < GetItemCount(); i++)
+    for (int i = 0; i < GetNumberRows(); i++)
     {
         text << "<tr>" << eol;
-        for (int col = 0; col < GetColumnCount(); col++)
+        for (int col = 0; col < GetNumberCols(); col++)
         {
-            text << "<td>" << wxListCtrl::GetItemText(i, col) << "</td>" << eol;
+            text << "<td>" << GetCellValue(i, col) << "</td>" << eol;
         }
         text << eol << "</tr>" << eol;
     }
@@ -100,24 +98,24 @@ wxString mmListCtrl::BuildPage(const wxString &title) const
     return text;
 }
 
-void mmListCtrl::OnItemResize(wxListEvent& event)
+void mmListCtrl::OnItemResize(wxGridEvent& event)
 {
-    int i = event.GetColumn();
-    int width = GetColumnWidth(i);
+    int i = event.GetCol();
+    int width = GetColWidth(i);
     if (!m_col_width.IsEmpty())
         Model_Setting::instance().Set(wxString::Format(m_col_width, GetRealColumn(i)), width);
 }
 
-void mmListCtrl::OnColClick(wxListEvent& WXUNUSED(event))
+void mmListCtrl::OnColClick(wxGridEvent& WXUNUSED(event))
 {
     // Default to do nothing and implement in derived class
 }
 
-void mmListCtrl::OnColRightClick(wxListEvent& event)
+void mmListCtrl::OnColRightClick(wxGridEvent& event)
 {
     if (m_columns.size() > 0 && !m_col_width.IsEmpty())
     {
-        m_ColumnHeaderNbr = event.GetColumn();
+        m_ColumnHeaderNbr = event.GetCol();
         if (0 > m_ColumnHeaderNbr || m_ColumnHeaderNbr >= static_cast<int>(m_columns.size())) return;
         wxMenu menu;
         wxMenu *submenu = new wxMenu;
@@ -171,7 +169,7 @@ void mmListCtrl::OnHeaderHide(wxCommandEvent& WXUNUSED(event))
 {
     if (m_ColumnHeaderNbr >= 0 && !m_col_width.IsEmpty())
     {
-        SetColumnWidth(m_ColumnHeaderNbr, 0);
+        SetColSize(m_ColumnHeaderNbr, 0);
         const wxString parameter_name = wxString::Format(m_col_width, GetRealColumn(m_ColumnHeaderNbr));
         Model_Setting::instance().Set(parameter_name, 0);
     }
@@ -179,7 +177,7 @@ void mmListCtrl::OnHeaderHide(wxCommandEvent& WXUNUSED(event))
 
 void mmListCtrl::OnHeaderSort(wxCommandEvent& WXUNUSED(event))
 {
-    wxListEvent e;
+    wxGridEvent e;
     e.SetId(MENU_HEADER_SORT);
     OnColClick(e);
 }
@@ -219,14 +217,14 @@ void mmListCtrl::OnHeaderReset(wxCommandEvent& WXUNUSED(event))
     wxString parameter_name;
     for (int i = 0; i < static_cast<int>(m_columns.size()); i++)
     {
-        SetColumnWidth(i, m_columns[i].WIDTH);
+        SetColSize(i, m_columns[i].WIDTH);
         if (!m_col_width.IsEmpty())
         {
             parameter_name = wxString::Format(m_col_width, GetRealColumn(i));
-            Model_Setting::instance().Set(parameter_name, GetColumnWidth(i));
+            Model_Setting::instance().Set(parameter_name, GetColWidth(i));
         }
     }
-    wxListEvent e;
+    wxGridEvent e;
     e.SetId(MENU_HEADER_SORT);
     m_ColumnHeaderNbr = m_default_sort_column;
     m_asc = true;
@@ -245,8 +243,8 @@ void mmListCtrl::OnHeaderColumn(wxCommandEvent& event)
         const wxString parameter_name = wxString::Format(m_col_width, GetRealColumn(columnNbr));
         int cur_width = Model_Setting::instance().GetIntSetting(parameter_name, default_width);
         int new_width = (cur_width != 0 ? 0 : default_width);
-        SetColumnWidth(columnNbr, new_width);
-        Model_Setting::instance().Set(parameter_name, GetColumnWidth(columnNbr));
+        SetColSize(columnNbr, new_width);
+        Model_Setting::instance().Set(parameter_name, GetColWidth(columnNbr));
     }
 }
 

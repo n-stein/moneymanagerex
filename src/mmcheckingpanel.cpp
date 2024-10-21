@@ -394,8 +394,8 @@ void mmCheckingPanel::CreateControls()
 
     m_listCtrlAccount = new TransactionListCtrl(this, itemSplitterWindow10);
 
-    m_listCtrlAccount->SetSmallImages(m_images);
-    m_listCtrlAccount->SetNormalImages(m_images);
+    //m_listCtrlAccount->SetSmallImages(m_images);
+    //m_listCtrlAccount->SetNormalImages(m_images);
 
     m_listCtrlAccount->setSortOrder(m_listCtrlAccount->g_asc);
     m_listCtrlAccount->setSortColumn(m_listCtrlAccount->g_sortcol);
@@ -608,8 +608,9 @@ void mmCheckingPanel::updateExtraTransactionData(bool single, bool foreign)
         enableTransactionButtons(true, !foreign, true);
 
         long x = -1;
-        for (x = 0; x < m_listCtrlAccount->GetItemCount(); x++) {
-            if (m_listCtrlAccount->GetItemState(x, wxLIST_STATE_SELECTED) == wxLIST_STATE_SELECTED) {
+        for (x = 0; x < m_listCtrlAccount->GetSelectedRows().size(); x++)
+        {
+            if (m_listCtrlAccount->IsInSelection(x,0)) {
                 break;
             }
         }
@@ -659,9 +660,10 @@ void mmCheckingPanel::updateExtraTransactionData(bool single, bool foreign)
             wxString minDate;
             double balance = 0;
             long item = -1;
+            int index = -1;
             while(true)
             {
-                item = m_listCtrlAccount->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+                item = m_listCtrlAccount->GetSelectedRows()[index++];
                 if (item == -1) break;
                 balance += Model_Checking::balance(m_listCtrlAccount->m_trans[item], m_AccountID);
                 wxString transdate = m_listCtrlAccount->m_trans[item].TRANSDATE;
@@ -934,7 +936,7 @@ void mmCheckingPanel::RefreshList()
 
 void mmCheckingPanel::ResetColumnView()
 {
-    m_listCtrlAccount->DeleteAllColumns();
+    m_listCtrlAccount->DeleteCols();
     m_listCtrlAccount->resetColumns();
     m_listCtrlAccount->createColumns(*m_listCtrlAccount);
     m_listCtrlAccount->refreshVisualList();

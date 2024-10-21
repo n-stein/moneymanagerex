@@ -93,7 +93,7 @@ bool mmBudgetingPanel::Create(wxWindow *parent
 
     initVirtualListControl();
     if (!budget_.empty())
-        listCtrlBudget_->EnsureVisible(0);
+        listCtrlBudget_->MakeCellVisible(0,0);
 
     this->windowsFreezeThaw();
     Model_Usage::instance().pageview(this);
@@ -134,7 +134,7 @@ void mmBudgetingPanel::RefreshList()
     listCtrlBudget_->Refresh();
     listCtrlBudget_->Update();
     if (!budget_.empty())
-        listCtrlBudget_->EnsureVisible(0);
+        listCtrlBudget_->MakeCellVisible(0,0);
 }
 
 void mmBudgetingPanel::OnMouseLeftDown(wxCommandEvent& event)
@@ -261,21 +261,25 @@ void mmBudgetingPanel::CreateControls()
 
     listCtrlBudget_ = new budgetingListCtrl(this, this, wxID_ANY);
 
-    listCtrlBudget_->SetSmallImages(images);
-    listCtrlBudget_->InsertColumn(COL_ICON, (" "));
-    listCtrlBudget_->InsertColumn(COL_CATEGORY, listCtrlBudget_->m_columns[COL_CATEGORY].HEADER);
-    listCtrlBudget_->InsertColumn(COL_FREQUENCY, listCtrlBudget_->m_columns[COL_FREQUENCY].HEADER);
-    listCtrlBudget_->InsertColumn(COL_AMOUNT, listCtrlBudget_->m_columns[COL_AMOUNT].HEADER, wxLIST_FORMAT_RIGHT);
-    listCtrlBudget_->InsertColumn(COL_ESTIMATED, listCtrlBudget_->m_columns[COL_ESTIMATED].HEADER, wxLIST_FORMAT_RIGHT);
-    listCtrlBudget_->InsertColumn(COL_ACTUAL, listCtrlBudget_->m_columns[COL_ACTUAL].HEADER, wxLIST_FORMAT_RIGHT);
-    listCtrlBudget_->InsertColumn(COL_NOTES, listCtrlBudget_->m_columns[COL_NOTES].HEADER, wxLIST_FORMAT_LEFT);
+    //listCtrlBudget_->SetSmallImages(images);
+    listCtrlBudget_->InsertCols(0, 7);
+    listCtrlBudget_->SetColLabelValue(COL_ICON, (" "));
+    listCtrlBudget_->SetColLabelValue(COL_CATEGORY, listCtrlBudget_->m_columns[COL_CATEGORY].HEADER);
+    listCtrlBudget_->SetColLabelValue(COL_FREQUENCY, listCtrlBudget_->m_columns[COL_FREQUENCY].HEADER);
+    listCtrlBudget_->SetColLabelValue(COL_AMOUNT, listCtrlBudget_->m_columns[COL_AMOUNT].HEADER);
+    listCtrlBudget_->SetColFormatNumber(COL_AMOUNT);
+    listCtrlBudget_->SetColLabelValue(COL_ESTIMATED, listCtrlBudget_->m_columns[COL_ESTIMATED].HEADER);
+    listCtrlBudget_->SetColFormatNumber(COL_ESTIMATED);
+    listCtrlBudget_->SetColLabelValue(COL_ACTUAL, listCtrlBudget_->m_columns[COL_ACTUAL].HEADER);
+    listCtrlBudget_->SetColFormatNumber(COL_ACTUAL);
+    listCtrlBudget_->SetColLabelValue(COL_NOTES, listCtrlBudget_->m_columns[COL_NOTES].HEADER);
 
     /* Get data from inidb */
-    for (int i = 0; i < listCtrlBudget_->GetColumnCount(); ++i)
+    for (int i = 0; i < listCtrlBudget_->GetNumberCols(); ++i)
     {
         int col_width = Model_Setting::instance().GetIntSetting(wxString::Format(listCtrlBudget_->m_col_width, i)
             , listCtrlBudget_->m_columns[i].WIDTH);
-        listCtrlBudget_->SetColumnWidth(i, col_width);
+        listCtrlBudget_->SetColSize(i, col_width);
     }
     itemBoxSizer2->Add(listCtrlBudget_.get(), 1, wxGROW | wxALL, 1);
 }
@@ -481,7 +485,7 @@ void mmBudgetingPanel::initVirtualListControl()
                         {
                             budget_.push_back(std::make_pair(-1, subcats[totals_queue.back()].CATEGID));
                             size_t transCatTotalIndex = budget_.size() - 1;
-                            listCtrlBudget_->RefreshItem(transCatTotalIndex);
+                            //listCtrlBudget_->RefreshItem(transCatTotalIndex);
                         }
                         totals_queue.pop_back();
                     }
@@ -494,7 +498,7 @@ void mmBudgetingPanel::initVirtualListControl()
                     {
                         budget_.push_back(std::make_pair(-1, subcats[totals_queue.back()].CATEGID));
                         size_t transCatTotalIndex = budget_.size() - 1;
-                        listCtrlBudget_->RefreshItem(transCatTotalIndex);
+                        //listCtrlBudget_->RefreshItem(transCatTotalIndex);
                     }
                     totals_queue.pop_back();
                 }
@@ -506,11 +510,11 @@ void mmBudgetingPanel::initVirtualListControl()
         {
             budget_.push_back(std::make_pair(-1, category.CATEGID));
             size_t transCatTotalIndex = budget_.size() - 1;
-            listCtrlBudget_->RefreshItem(transCatTotalIndex);
+            //listCtrlBudget_->RefreshItem(transCatTotalIndex);
         }
     }
 
-    listCtrlBudget_->SetItemCount(budget_.size());
+    listCtrlBudget_->InsertRows(0, budget_.size());
 
     wxString est_amount, act_amount, diff_amount;
     est_amount = Model_Currency::toCurrency(estIncome);
@@ -740,6 +744,6 @@ void mmBudgetingPanel::OnListItemActivated(int selectedIndex)
         initVirtualListControl();
         listCtrlBudget_->Refresh();
         listCtrlBudget_->Update();
-        listCtrlBudget_->EnsureVisible(selectedIndex);
+        listCtrlBudget_->MakeCellVisible(selectedIndex,0);
     }
 }
