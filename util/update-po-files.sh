@@ -26,4 +26,6 @@ for p in ../po/*.po ; do
     echo "Merging $p ..."
     msgmerge $MSGMERGE_ARGS $p ../po/$POT
 done
+
+cd ..
 echo "Finished"
