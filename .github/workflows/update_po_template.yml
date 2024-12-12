@@ -24,6 +24,6 @@ jobs:
           git push
           
       - name: Create pull request
-        run: gh pr create -B master -H l10n --title "fix(l10n): update mmex.pot" --body 'Created by GitHub Action'
+        run: gh pr create -B master -H l10n --title "fix(l10n):\ update mmex.pot" --body 'Created by GitHub Action'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
