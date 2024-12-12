@@ -1,0 +1,29 @@
+name: Update mmex.pot translation template
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-po-template:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: l10n
+
+      - name: Execute update script
+        run: bash util/update-po-files.sh
+        
+      - name: Commit changes
+        run: |
+          git config --global user.name 'MMEX'
+          git config --global user.email 'developer@moneymanagerex.org'
+          git add po/mmex.pot
+          git commit -m "fix(l10n): update mmex.pot"
+          git push
+          
+      - name: Create pull request
+        run: gh pr create -B master -H l10n --title "fix(l10n): update mmex.pot" --body 'Created by GitHub Action'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
