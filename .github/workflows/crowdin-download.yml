@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   crowdin-download:
+    if: github.repository_owner == 'moneymanagerex'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
