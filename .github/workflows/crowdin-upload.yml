@@ -2,15 +2,15 @@ name: Crowdin Upload
 
 on:
   workflow_dispatch:
-  : #push:
-  : #  paths:
-  : #    - 'po/mmex.pot'
-  : #  branches: 
-  : #    - master
+  # push:
+  #  paths:
+  #    - 'po/mmex.pot'
+  #  branches: 
+  #    - master
 
 jobs:
   crowdin-upload:
-    : # if: github.repository_owner == 'moneymanagerex'
+    # if: github.repository_owner == 'moneymanagerex'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,7 +18,8 @@ jobs:
 
       - name: Crowdin push
         uses: crowdin/github-action@v2.4.0
-        crowdin_branch_name: master
+        with:
+          crowdin_branch_name: master
         env:
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
