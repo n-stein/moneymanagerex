@@ -14,13 +14,12 @@ jobs:
         
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: l10n
 
       - name: Execute update script
         run: |
           : # merge master
           git fetch origin
+          git checkout origin/l0n
           git merge origin/master
           
           : # run the po update script
