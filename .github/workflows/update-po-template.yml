@@ -21,7 +21,7 @@ jobs:
         run: |
           : # merge master
           git fetch origin
-          git merge origin/master -allow-unrelated-histories
+          git merge origin/master --allow-unrelated-histories
           
           : # run the po update script
           bash util/update-po-files.sh
