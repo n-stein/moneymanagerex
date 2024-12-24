@@ -24,7 +24,8 @@ jobs:
           git config --global user.email 'developer@moneymanagerex.org'
           git config pull.rebase false
           git fetch origin
-          git merge origin master
+          git merge origin/master --allow-unrelated-histories --strategy-option theirs
+          
           
           : # run the po update script
           bash util/update-po-files.sh
