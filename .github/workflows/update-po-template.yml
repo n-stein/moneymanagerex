@@ -7,7 +7,6 @@ on:
       
 jobs:
   update-po-template:
-    if: github.repository_owner == 'moneymanagerex'
     runs-on: ubuntu-latest
     steps:
       - name: Install gettext
