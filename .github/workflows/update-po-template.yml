@@ -19,7 +19,7 @@ jobs:
         run: |
           : # merge master
           git fetch origin
-          git checkout l0n
+          git checkout l10n
           git merge origin/master
           
           : # run the po update script
