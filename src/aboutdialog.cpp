@@ -42,6 +42,8 @@ mmAboutDialog::~mmAboutDialog()
 }
 
 
+
+
 mmAboutDialog::mmAboutDialog(wxWindow* parent, int tabToOpenNo)
 {
     const wxString caption = (tabToOpenNo == 4)
