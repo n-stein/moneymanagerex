@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MMEX\n"
 "Report-Msgid-Bugs-To: developer@moneymanagerex.org\n"
-"POT-Creation-Date: 2024-12-23 22:19+0000\n"
+"POT-Creation-Date: 2024-12-24 03:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,39 +18,39 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: aboutdialog.cpp:48
+#: aboutdialog.cpp:50
 msgid "License agreement"
 msgstr ""
 
-#: aboutdialog.cpp:181 mmframe.cpp:2015
+#: aboutdialog.cpp:183 mmframe.cpp:2015
 msgid "About"
 msgstr ""
 
-#: aboutdialog.cpp:186
+#: aboutdialog.cpp:188
 msgid "Authors"
 msgstr ""
 
-#: aboutdialog.cpp:191
+#: aboutdialog.cpp:193
 msgid "Sponsors"
 msgstr ""
 
-#: aboutdialog.cpp:196
+#: aboutdialog.cpp:198
 msgid "License"
 msgstr ""
 
-#: aboutdialog.cpp:201
+#: aboutdialog.cpp:203
 msgid "Privacy"
 msgstr ""
 
-#: aboutdialog.cpp:239 optionsettingsnet.cpp:125
+#: aboutdialog.cpp:241 optionsettingsnet.cpp:125
 msgid "Send anonymous statistics usage data"
 msgstr ""
 
-#: aboutdialog.cpp:240 optionsettingsnet.cpp:127
+#: aboutdialog.cpp:242 optionsettingsnet.cpp:127
 msgid "Enable to help us sending anonymous data about MMEX usage."
 msgstr ""
 
-#: aboutdialog.cpp:247 accountdialog.cpp:296 appstartdialog.cpp:142
+#: aboutdialog.cpp:249 accountdialog.cpp:296 appstartdialog.cpp:142
 #: assetdialog.cpp:283 attachmentdialog.cpp:146 billsdepositsdialog.cpp:649
 #: budgetentrydialog.cpp:153 budgetyeardialog.cpp:116
 #: budgetyearentrydialog.cpp:128 constants.cpp:86 currencydialog.cpp:259
