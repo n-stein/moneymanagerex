@@ -22,6 +22,7 @@ jobs:
           : # merge master
           git config --global user.name 'MMEX'
           git config --global user.email 'developer@moneymanagerex.org'
+          git config pull.rebase false
           git fetch origin
           git pull -X theirs origin master
           
