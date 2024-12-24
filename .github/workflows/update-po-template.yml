@@ -14,13 +14,14 @@ jobs:
         
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: l10n
 
       - name: Execute update script
         run: |
           : # merge master
           git fetch origin
-          git checkout l10n
-          git merge origin/master
+          git merge origin/master -allow-unrelated-histories
           
           : # run the po update script
           bash util/update-po-files.sh
