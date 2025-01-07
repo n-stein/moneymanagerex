@@ -400,6 +400,15 @@ struct SorterByCONTENT
     }
 };
 
+struct SorterByCOUNTRY
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.COUNTRY) < (y.COUNTRY);
+    }
+};
+
 struct SorterByCREDITLIMIT
 { 
     template<class DATA>
@@ -607,6 +616,15 @@ struct SorterByHISTID
     }
 };
 
+struct SorterByINDUSTRY
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.INDUSTRY) < (y.INDUSTRY);
+    }
+};
+
 struct SorterByINFOID
 { 
     template<class DATA>
@@ -697,12 +715,30 @@ struct SorterByLINKTYPE
     }
 };
 
+struct SorterByLOT
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.LOT) < (y.LOT);
+    }
+};
+
 struct SorterByLUACONTENT
 { 
     template<class DATA>
     bool operator()(const DATA& x, const DATA& y)
     {
         return (x.LUACONTENT) < (y.LUACONTENT);
+    }
+};
+
+struct SorterByMARKET
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.MARKET) < (y.MARKET);
     }
 };
 
@@ -721,6 +757,15 @@ struct SorterByMINIMUMPAYMENT
     bool operator()(const DATA& x, const DATA& y)
     {
         return (x.MINIMUMPAYMENT) < (y.MINIMUMPAYMENT);
+    }
+};
+
+struct SorterByNAME
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.NAME) < (y.NAME);
     }
 };
 
@@ -832,6 +877,15 @@ struct SorterByPFX_SYMBOL
     }
 };
 
+struct SorterByPRECISION
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.PRECISION) < (y.PRECISION);
+    }
+};
+
 struct SorterByPROPERTIES
 { 
     template<class DATA>
@@ -910,6 +964,15 @@ struct SorterBySCALE
     bool operator()(const DATA& x, const DATA& y)
     {
         return (x.SCALE) < (y.SCALE);
+    }
+};
+
+struct SorterBySECTOR
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.SECTOR) < (y.SECTOR);
     }
 };
 
@@ -994,6 +1057,15 @@ struct SorterBySHAREPRICE
     }
 };
 
+struct SorterBySOURCE
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.SOURCE) < (y.SOURCE);
+    }
+};
+
 struct SorterBySPLITTRANSAMOUNT
 { 
     template<class DATA>
@@ -1066,15 +1138,6 @@ struct SorterBySTOCKID
     }
 };
 
-struct SorterBySTOCKNAME
-{ 
-    template<class DATA>
-    bool operator()(const DATA& x, const DATA& y)
-    {
-        return (x.STOCKNAME) < (y.STOCKNAME);
-    }
-};
-
 struct SorterBySYMBOL
 { 
     template<class DATA>
@@ -1117,6 +1180,15 @@ struct SorterByTEMPLATECONTENT
     bool operator()(const DATA& x, const DATA& y)
     {
         return (x.TEMPLATECONTENT) < (y.TEMPLATECONTENT);
+    }
+};
+
+struct SorterByTICKERID
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.TICKERID) < (y.TICKERID);
     }
 };
 
@@ -1270,6 +1342,15 @@ struct SorterByVALUECHANGERATE
     bool operator()(const DATA& x, const DATA& y)
     {
         return (x.VALUECHANGERATE) < (y.VALUECHANGERATE);
+    }
+};
+
+struct SorterByWEBPAGE
+{ 
+    template<class DATA>
+    bool operator()(const DATA& x, const DATA& y)
+    {
+        return (x.WEBPAGE) < (y.WEBPAGE);
     }
 };
 

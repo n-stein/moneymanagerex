@@ -24,10 +24,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class dbUpgrade
 {
-    static int GetCurrentVersion(wxSQLite3Database * db);
     static std::vector<wxString> SplitQueries(const wxString& statement);
     static bool UpgradeToVersion(wxSQLite3Database * db, int version);
 public:
+    static int GetCurrentVersion(wxSQLite3Database* db);
     static bool InitializeVersion(wxSQLite3Database* db, int version = dbLatestVersion);
     static bool isUpgradeDBrequired(wxSQLite3Database* db);
     static bool UpgradeDB(wxSQLite3Database* db, const wxString& DbFileName);

@@ -21,9 +21,8 @@
 
 #include "defs.h"
 #include "model/Model_Stock.h"
-#include "mmSimpleDialogs.h"
 
-class mmDatePickerCtrl;
+class wxDatePickerCtrl;
 class mmTextCtrl;
 class mmGUIFrame;
 
@@ -36,74 +35,77 @@ public:
     mmStockDialog();
     mmStockDialog(wxWindow* parent
         , mmGUIFrame* gui_frame
-        , Model_Stock::Data* stock
+        , int64 ticker_id
         , int64 accountID
         , const wxString& name = "mmStockDialog"
-        );
+    );
 
-    bool Create(wxWindow* parent, wxWindowID id
-        , const wxString& caption
-        , const wxPoint& pos
-        , const wxSize& size
-        , long style
+    bool Create(wxWindow* parent, wxWindowID id = wxID_ANY
+        , const wxString& caption = wxEmptyString
+        , const wxPoint& pos = wxDefaultPosition
+        , const wxSize& size = wxDefaultSize
+        , long style = wxCAPTION | wxRESIZE_BORDER | wxSYSTEM_MENU | wxCLOSE_BOX
         , const wxString& name = "mmStockDialog"
-        );
-
-    int64 m_stock_id = -1;
+    );
+    int64 get_ticker_id() const;
 
 private:
+    struct Data
+    {
+        int64 id;
+        wxString DATE;
+        wxString type;
+        double number;
+        double price;
+        double commission;
+        wxString notes;
+    };
+    std::vector<Data> m_list;
+
     void OnQuit(wxCloseEvent& event);
-    void OnSave(wxCommandEvent &event);
-    void OnCancel(wxCommandEvent& event);
-    void OnAttachments(wxCommandEvent& event);
-    void OnStockPriceButton(wxCommandEvent& event);
-    void OnHistoryImportButton(wxCommandEvent& event);
-    void OnHistoryDownloadButton(wxCommandEvent& event);
-    void OnHistoryAddButton(wxCommandEvent& event);
-    void OnHistoryDeleteButton(wxCommandEvent& event);
+    void OnSave(wxCommandEvent& event);
+    void OnStockWebButton(wxCommandEvent& event);
+    void OnStockEventEditButton(wxCommandEvent& event);
+    void OnStockEventDeleteButton(wxCommandEvent& event);
+    void OnOpenAttachment(wxCommandEvent& event);
+    void OnNewEntry(wxCommandEvent& event);
+    void OnStockSetup(wxCommandEvent& event);
     void OnListItemSelected(wxListEvent& event);
     void OnFocusChange(wxChildFocusEvent& event);
+    void OnListItemActivated(wxListEvent& event);
+    void OnListRightClick(wxListEvent& event);
+    void OnStockItemMenu(wxCommandEvent& event);
 
     void CreateControls();
-    void UpdateControls();
     void DataToControls();
     void ShowStockHistory();
-    void CreateShareAccount(Model_Account::Data* stock_account, const wxString& name
-                                    , const wxString& openingDate);
 
-    wxTextCtrl* m_stock_name_ctrl = nullptr;
-    wxTextCtrl* m_stock_symbol_ctrl = nullptr;
-    mmDatePickerCtrl* m_purchase_date_ctrl = nullptr;
-    mmTextCtrl* m_num_shares_ctrl = nullptr;
-    mmTextCtrl* m_purchase_price_ctrl = nullptr;
-    wxTextCtrl* m_notes_ctrl = nullptr;
-    mmTextCtrl* m_history_price_ctrl = nullptr;
-    mmDatePickerCtrl* m_history_date_ctrl = nullptr;
-    wxStaticText* m_value_investment = nullptr;
-    mmTextCtrl* m_commission_ctrl = nullptr;
-    mmTextCtrl* m_current_price_ctrl = nullptr;
-    wxBitmapButton* m_bAttachments = nullptr;
-    wxListCtrl* m_price_listbox = nullptr;
+    void OnBuy();
+    void OnSell();
+    void OnDividend();
 
-    Model_Stock::Data* m_stock = nullptr;
-    bool m_edit = false;
-    int64 m_account_id = -1;
-    mmGUIFrame* m_gui_frame = nullptr;
+    mmTextCtrl* m_stock_symbol_ctrl;
+    wxStaticText* m_info_txt;
+    wxBitmapButton* m_bAttachments;
+    wxListCtrl* m_stock_event_listbox;
+
+    // Model_Stock::Data* m_stock;
+    int64 m_stock_id;
+    wxString m_symbol;
+    int64 m_ticker_id;
+    bool m_edit;
+    int64 m_account_id;
+    int m_precision;
+    mmGUIFrame* m_gui_frame;
     enum
     {
         ID_DPC_STOCK_PDATE = wxID_HIGHEST + 800,
-        ID_TEXTCTRL_STOCKNAME,
         ID_TEXTCTRL_STOCK_SYMBOL,
-        ID_TEXTCTRL_NUMBER_SHARES,
-        ID_TEXTCTRL_STOCK_PP,
         ID_TEXTCTRL_STOCK_CP,
         ID_STATIC_STOCK_VALUE,
-        ID_TEXTCTRL_STOCK_COMMISSION,
         ID_TEXTCTRL_STOCK_CURR_PRICE,
         ID_DIALOG_STOCKS,
-        ID_DPC_CP_PDATE,
-        ID_BUTTON_IMPORT,
-        ID_BUTTON_DOWNLOAD
+        ID_DPC_CP_PDATE
     };
 };
 

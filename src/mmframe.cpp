@@ -890,22 +890,6 @@ void mmGUIFrame::DoRecreateNavTreeControl(bool home_page)
             {
                 tacct = m_nav_tree_ctrl->AppendItem(stocks, account.ACCOUNTNAME, selectedImage, selectedImage);
                 m_nav_tree_ctrl->SetItemData(tacct, new mmTreeItemData(mmTreeItemData::STOCK, account.ACCOUNTID));
-                // find all the accounts associated with this stock portfolio
-                Model_Stock::Data_Set stock_account_list = Model_Stock::instance().find(Model_Stock::HELDAT(account.ACCOUNTID));
-                std::sort(stock_account_list.begin(), stock_account_list.end(), SorterBySTOCKNAME());
-                // Put the names of the Stock_entry names as children of the stock account.
-                for (const auto& stock_entry : stock_account_list)
-                {
-                    if (Model_Translink::HasShares(stock_entry.STOCKID))
-                    {
-                        wxTreeItemId se = m_nav_tree_ctrl->AppendItem(tacct, stock_entry.STOCKNAME, selectedImage, selectedImage);
-                        int64 account_id = stock_entry.STOCKID;
-                        if (Model_Translink::ShareAccountId(account_id))
-                        {
-                            m_nav_tree_ctrl->SetItemData(se, new mmTreeItemData(mmTreeItemData::ACCOUNT, account_id));
-                        }
-                    }
-                }
                 break;
             }
             case Model_Account::TYPE_ID_CHECKING:
@@ -1059,8 +1043,8 @@ void mmGUIFrame::OnTreeItemExpanded(wxTreeEvent& event)
 
 void mmGUIFrame::OnTreeItemCollapsing(wxTreeEvent& event)
 {
-    mmTreeItemData* iData =
-        dynamic_cast<mmTreeItemData*>(m_nav_tree_ctrl->GetItemData(event.GetItem()));
+    //mmTreeItemData* iData =
+    //    dynamic_cast<mmTreeItemData*>(m_nav_tree_ctrl->GetItemData(event.GetItem()));
 
     // disallow collapsing of HOME item
     //if (mmTreeItemData::HOME_PAGE == iData->getType())
@@ -2043,6 +2027,7 @@ void mmGUIFrame::InitializeModelTables()
     m_all_models.push_back(&Model_CustomField::instance(m_db.get()));
     m_all_models.push_back(&Model_Tag::instance(m_db.get()));
     m_all_models.push_back(&Model_Taglink::instance(m_db.get()));
+    m_all_models.push_back(&Model_Ticker::instance(m_db.get()));
     m_all_models.push_back(&Model_Translink::instance(m_db.get()));
     m_all_models.push_back(&Model_Shareinfo::instance(m_db.get()));
 }
@@ -2098,6 +2083,7 @@ bool mmGUIFrame::createDataStore(const wxString& fileName, const wxString& pwd, 
         //Check if DB upgrade needed
         if (dbUpgrade::isUpgradeDBrequired(m_db.get()))
         {
+            int old_version = dbUpgrade::GetCurrentVersion(m_db.get());
             // close & reopen database in debug mode for upgrade (bypassing SQLITE_CorruptRdOnly flag)
             ShutdownDatabase();
             m_db = mmDBWrapper::Open(fileName, password, true);
@@ -2114,6 +2100,40 @@ bool mmGUIFrame::createDataStore(const wxString& fileName, const wxString& pwd, 
                 }
                 ShutdownDatabase();
                 return false;
+            }
+
+            // need to move stock transaction attachments to new folder for v20   
+            if (old_version <= 19)
+            {
+                Model_Attachment::instance(m_db.get());
+                Model_Infotable::instance(m_db.get());
+                const wxString refTypeTxn = Model_Attachment::reftype_desc(Model_Attachment::TRANSACTION);
+                const wxString refTypeStockTxn = Model_Attachment::reftype_desc(Model_Attachment::STOCKTRANSACTION);
+                const wxString refTypeStock = Model_Attachment::reftype_desc(Model_Attachment::STOCK);
+                const wxString txnFolder =
+                    mmex::getPathAttachment(mmAttachmentManage::InfotablePathSetting()) + refTypeTxn + wxFileName::GetPathSeparator();
+                const wxString stockTxnFolder =
+                    mmex::getPathAttachment(mmAttachmentManage::InfotablePathSetting()) + refTypeStockTxn + wxFileName::GetPathSeparator();
+                const wxString stockFolder =
+                    mmex::getPathAttachment(mmAttachmentManage::InfotablePathSetting()) + refTypeStock + wxFileName::GetPathSeparator();
+
+                if (wxMkdir(stockTxnFolder))
+                    mmAttachmentManage::CreateReadmeFile(stockTxnFolder);
+                
+                Model_Attachment::Data_Set attachments = Model_Attachment::instance().find_or(Model_Attachment::DB_Table_ATTACHMENT_V1::REFTYPE(refTypeStockTxn),
+                                                                                              Model_Attachment::DB_Table_ATTACHMENT_V1::REFTYPE(refTypeStock));
+
+                for (auto& entry : attachments)
+                {
+                    wxString newFileName = entry.FILENAME;
+                    wxString oldRefId = newFileName.SubString(newFileName.Find('_') + 1, newFileName.Find('_', true) - 1);
+                    newFileName.Replace((entry.REFTYPE == refTypeStockTxn ? refTypeTxn : refTypeStock) + "_" + oldRefId,
+                                        (entry.REFTYPE == refTypeStockTxn ? refTypeStockTxn : refTypeStock) + "_" + wxString::Format("%lld", entry.REFID));
+                    wxRenameFile((entry.REFTYPE == refTypeStockTxn ? txnFolder : stockFolder) + entry.FILENAME,
+                                 (entry.REFTYPE == refTypeStockTxn ? stockTxnFolder : stockFolder) + newFileName);
+                    entry.FILENAME = newFileName;
+                }
+                Model_Attachment::instance().save(attachments);
             }
         }
 
@@ -3202,6 +3222,8 @@ void mmGUIFrame::createReportsPage(mmPrintableBase* rs, bool cleanup)
 
 void mmGUIFrame::createHelpPage(int index)
 {
+    if (!homePanel_)
+        return;
     helpFileIndex_ = index;
     m_nav_tree_ctrl->SetEvtHandlerEnabled(false);
     DoWindowsFreezeThaw(homePanel_);
@@ -3540,7 +3562,7 @@ void mmGUIFrame::OnRates(wxCommandEvent& WXUNUSED(event))
     getOnlineCurrencyRates(msg);
     wxLogDebug("%s", msg);
 
-    Model_Stock::Data_Set stock_list = Model_Stock::instance().all();
+    Model_Ticker::Data_Set stock_list = Model_Ticker::instance().all();
     if (!stock_list.empty()) {
 
         std::map<wxString, double> symbols;
@@ -3563,14 +3585,14 @@ void mmGUIFrame::OnRates(wxCommandEvent& WXUNUSED(event))
                     continue;
                 }
 
-                double dPrice = it->second;
+                double dPrice = it->second / Model_CurrencyHistory::getDayRate(s.CURRENCYID);
 
                 if (dPrice != 0)
                 {
                     msg += wxString::Format("%s\t: %0.6f -> %0.6f\n", s.SYMBOL, s.CURRENTPRICE, dPrice);
                     s.CURRENTPRICE = dPrice;
-                    if (s.STOCKNAME.empty()) s.STOCKNAME = s.SYMBOL;
-                    Model_Stock::instance().save(&s);
+                    if (s.NAME.empty()) s.NAME = s.SYMBOL;
+                    Model_Ticker::instance().save(&s);
                     Model_StockHistory::instance().addUpdate(s.SYMBOL
                         , wxDate::Now(), dPrice, Model_StockHistory::ONLINE);
                 }

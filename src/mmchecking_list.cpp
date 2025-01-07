@@ -30,6 +30,7 @@
 #include "mmframe.h"
 #include "mmSimpleDialogs.h"
 #include "sharetransactiondialog.h"
+#include "stockdialog.h"
 #include "transactionsupdatedialog.h"
 #include "transdialog.h"
 #include "util.h"
@@ -605,8 +606,8 @@ void TransactionListCtrl::OnMouseRightClick(wxMouseEvent& event)
             case COL_WITHDRAWAL:
             {
                 columnIsAmount = true;
-                Model_Account::Data* account = Model_Account::instance().get(m_trans[row].ACCOUNTID_W);
-                Model_Currency::Data* currency = account ?
+                account = Model_Account::instance().get(m_trans[row].ACCOUNTID_W);
+                currency = account ?
                     Model_Currency::instance().get(account->CURRENCYID) : nullptr;
                 if (currency) {
                     copyText_ = Model_Currency::toString(m_trans[row].TRANSAMOUNT_W, currency);
@@ -618,9 +619,8 @@ void TransactionListCtrl::OnMouseRightClick(wxMouseEvent& event)
             case COL_DEPOSIT:
             {
                 columnIsAmount = true;
-                Model_Account::Data* account = Model_Account::instance().get(m_trans[row].ACCOUNTID_D);
-                Model_Currency::Data* currency = account ?
-                    Model_Currency::instance().get(account->CURRENCYID) : nullptr;
+                account = Model_Account::instance().get(m_trans[row].ACCOUNTID_D);
+                currency = account ? Model_Currency::instance().get(account->CURRENCYID) : nullptr;
                 if (currency) {
                     copyText_ = Model_Currency::toString(m_trans[row].TRANSAMOUNT_D, currency);
                     menuItemText = wxString::Format("%.2f", m_trans[row].TRANSAMOUNT_D);
@@ -1243,7 +1243,7 @@ void TransactionListCtrl::OnRestoreViewedTransaction(wxCommandEvent&)
             , wxYES_NO | wxNO_DEFAULT | wxICON_ERROR);
     if (msgDlg.ShowModal() == wxID_YES)
     {
-        std::set<std::pair<wxString, int64>> assetStockAccts;
+        std::set<int64> assetAccts;
         for (const auto& tran : this->m_trans) {
             if (tran.m_repeat_num) continue;
             Model_Checking::Data* trx = Model_Checking::instance().get(tran.TRANSID);
@@ -1251,13 +1251,12 @@ void TransactionListCtrl::OnRestoreViewedTransaction(wxCommandEvent&)
             Model_Checking::instance().save(trx);
             Model_Translink::Data_Set translink = Model_Translink::instance().find(Model_Translink::CHECKINGACCOUNTID(trx->TRANSID));
             if (!translink.empty()) {
-                assetStockAccts.insert(std::make_pair(translink.at(0).LINKTYPE, translink.at(0).LINKRECORDID));
+                assetAccts.insert(translink.at(0).LINKRECORDID);
             }
         }
-        if (!assetStockAccts.empty()) {
-            for (const auto& i : assetStockAccts) {
-                if (i.first == "Asset") Model_Translink::UpdateAssetValue(Model_Asset::instance().get(i.second));
-                else if (i.first == "Stock") Model_Translink::UpdateStockValue(Model_Stock::instance().get(i.second));
+        if (!assetAccts.empty()) {
+            for (const auto& i : assetAccts) {
+                Model_Translink::UpdateAssetValue(Model_Asset::instance().get(i));
             }
         }
     }
@@ -1286,7 +1285,7 @@ void TransactionListCtrl::OnRestoreTransaction(wxCommandEvent& WXUNUSED(event))
 
     if (msgDlg.ShowModal() == wxID_YES)
     {
-        std::set<std::pair<wxString, int64>> assetStockAccts;
+        std::set<int64> assetAccts;
         for (const auto& id : m_selected_id)
         {
             if (!id.second) {
@@ -1295,17 +1294,14 @@ void TransactionListCtrl::OnRestoreTransaction(wxCommandEvent& WXUNUSED(event))
                 Model_Checking::instance().save(trx);
                 Model_Translink::Data_Set translink = Model_Translink::instance().find(Model_Translink::CHECKINGACCOUNTID(trx->TRANSID));
                 if (!translink.empty()) {
-                    assetStockAccts.insert(std::make_pair(translink.at(0).LINKTYPE, translink.at(0).LINKRECORDID));
+                    assetAccts.insert(translink.at(0).LINKRECORDID);
                 }
             }
         }
         m_selected_id.clear();
-        if (!assetStockAccts.empty()) {
-            for (const auto& i : assetStockAccts) {
-                if (i.first == "Asset")
-                    Model_Translink::UpdateAssetValue(Model_Asset::instance().get(i.second));
-                else if (i.first == "Stock")
-                    Model_Translink::UpdateStockValue(Model_Stock::instance().get(i.second));
+        if (!assetAccts.empty()) {
+            for (const auto& id : assetAccts) {
+                Model_Translink::UpdateAssetValue(Model_Asset::instance().get(id));
             }
         }
     }
@@ -1369,7 +1365,7 @@ void TransactionListCtrl::DeleteTransactionsByStatus(const wxString& status)
 {
     int retainDays = Model_Setting::instance().GetIntSetting("DELETED_TRANS_RETAIN_DAYS", 30);
     wxString deletionTime = wxDateTime::Now().ToUTC().FormatISOCombined();
-    std::set<std::pair<wxString, int64>> assetStockAccts;
+    std::set<int64> assetAccts;
     const auto s = Model_Checking::status_key(status);
     Model_Checking::instance().Savepoint();
     Model_Attachment::instance().Savepoint();
@@ -1388,16 +1384,15 @@ void TransactionListCtrl::DeleteTransactionsByStatus(const wxString& status)
                 Model_Checking::instance().save(trx);
                 Model_Translink::Data_Set translink = Model_Translink::instance().find(Model_Translink::CHECKINGACCOUNTID(trx->TRANSID));
                 if (!translink.empty()) {
-                    assetStockAccts.insert(std::make_pair(translink.at(0).LINKTYPE, translink.at(0).LINKRECORDID));
+                    assetAccts.insert(translink.at(0).LINKRECORDID);
                 }
             }
         }
     }
 
-    if (!assetStockAccts.empty()) {
-        for (const auto& i : assetStockAccts) {
-            if (i.first == "Asset") Model_Translink::UpdateAssetValue(Model_Asset::instance().get(i.second));
-            else if (i.first == "Stock") Model_Translink::UpdateStockValue(Model_Stock::instance().get(i.second));
+    if (!assetAccts.empty()) {
+        for (const auto& id : assetAccts) {
+            Model_Translink::UpdateAssetValue(Model_Asset::instance().get(id));
         }
     }
 
@@ -1438,7 +1433,7 @@ void TransactionListCtrl::OnDeleteTransaction(wxCommandEvent& WXUNUSED(event))
     if (msgDlg.ShowModal() == wxID_YES)
     {
         wxString deletionTime = wxDateTime::Now().ToUTC().FormatISOCombined();
-        std::set<std::pair<wxString, int64>> assetStockAccts;
+        std::set<int64> assetAccts;
         Model_Checking::instance().Savepoint();
         Model_Attachment::instance().Savepoint();
         Model_Splittransaction::instance().Savepoint();
@@ -1461,7 +1456,7 @@ void TransactionListCtrl::OnDeleteTransaction(wxCommandEvent& WXUNUSED(event))
                 Model_Checking::instance().save(trx);
                 Model_Translink::Data_Set translink = Model_Translink::instance().find(Model_Translink::CHECKINGACCOUNTID(trx->TRANSID));
                 if (!translink.empty()) {
-                    assetStockAccts.insert(std::make_pair(translink.at(0).LINKTYPE, translink.at(0).LINKRECORDID));
+                    assetAccts.insert(translink.at(0).LINKRECORDID);
                 }
             }
             m_selectedForCopy.erase(std::remove(m_selectedForCopy.begin(), m_selectedForCopy.end(), id)
@@ -1473,10 +1468,9 @@ void TransactionListCtrl::OnDeleteTransaction(wxCommandEvent& WXUNUSED(event))
         Model_Attachment::instance().ReleaseSavepoint();
         Model_Checking::instance().ReleaseSavepoint();
 
-        if (!assetStockAccts.empty()) {
-            for (const auto& i : assetStockAccts) {
-                if (i.first == "Asset") Model_Translink::UpdateAssetValue(Model_Asset::instance().get(i.second));
-                else if (i.first == "Stock") Model_Translink::UpdateStockValue(Model_Stock::instance().get(i.second));
+        if (!assetAccts.empty()) {
+            for (const auto& i : assetAccts) {
+                Model_Translink::UpdateAssetValue(Model_Asset::instance().get(i));
             }
         }
     }
@@ -1568,13 +1562,16 @@ void TransactionListCtrl::OnEditTransaction(wxCommandEvent& /*event*/)
 
         if (Model_Checking::foreignTransaction(*checking_entry)) {
             Model_Translink::Data translink = Model_Translink::TranslinkRecord(id.first);
-            if (translink.LINKTYPE == Model_Attachment::reftype_desc(Model_Attachment::STOCK))
+            if (translink.TRANSLINKID < 0)
             {
-                ShareTransactionDialog dlg(this, &translink, checking_entry);
-                if (dlg.ShowModal() == wxID_OK)
+                mmStockDialog stockdlg(this, m_cp->m_frame, checking_entry->TOACCOUNTID, checking_entry->ACCOUNTID);
+                mmTransDialog dlg(&stockdlg, m_cp->m_AccountID, { id.first, false });
+                if (dlg.ShowModal() != wxID_CANCEL)
+                {
                     refreshVisualList();
+                }
             }
-            else if (translink.LINKTYPE == Model_Attachment::reftype_desc(Model_Attachment::ASSET))
+            else if (translink.TRANSLINKID > 0)
             {
                 mmAssetDialog dlg(this, m_cp->m_frame, &translink, checking_entry);
                 if (dlg.ShowModal() == wxID_OK)

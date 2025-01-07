@@ -1,5 +1,5 @@
 /*******************************************************
- Copyright (C) 2016 Stefano Giorgio
+ Copyright (C) 2020 Nikolay Akimov
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -15,72 +15,61 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  ********************************************************/
-
 #pragma once
 
+#include "defs.h"
+#include "mmTextCtrl.h"
 #include "model/Model_Stock.h"
-#include "model/Model_Translink.h"
-#include "model/Model_Shareinfo.h"
-
-class mmDatePickerCtrl;
-class mmTextCtrl;
-class UserTransactionPanel;
+#include <wx/webview.h>
 
 class ShareTransactionDialog : public wxDialog
 {
-    wxDECLARE_DYNAMIC_CLASS(ShareTransactionDialog);
+public:
+    ShareTransactionDialog(wxWindow* parent, int64 acc, int64 id, int64 ticker_id, int type = 0);
+
+    ~ShareTransactionDialog();
+    int64 get_id() const;
+
+private:
+    void CreateControls();
+    void OnOk(wxCommandEvent& event);
+    void OnQuit(wxCloseEvent& event);
+
+    int64 m_id;
+    int64 m_acc;
+    int m_type;
+    int m_share_precision;
+    int64 m_ticker_id;
+    wxChoice* m_choiceType;
+
+    wxDatePickerCtrl* m_purchase_date_ctrl;
+    mmTextCtrl* m_num_shares_ctrl;
+    mmTextCtrl* m_purchase_price_ctrl;
+    mmTextCtrl* m_commission_ctrl;
+    mmTextCtrl* m_stock_symbol_ctrl;
+    mmTextCtrl* m_lot_ctrl;
+    mmTextCtrl* m_notes_ctrl;
+    wxWebView* browser_;
+    wxBitmapButton* m_attachments_btn;
+
+    void OnTextEntered(wxCommandEvent& event);
+    void OnAttachments(wxCommandEvent& event);
+    void OnOrganizeAttachments(wxCommandEvent& event);
+    void fillControls();
+
     wxDECLARE_EVENT_TABLE();
 
-public:
-    ShareTransactionDialog();
-    ShareTransactionDialog(wxWindow* parent, Model_Stock::Data* stock);
-    ShareTransactionDialog(wxWindow* parent, Model_Translink::Data* transfer_entry, Model_Checking::Data* checking_entry);
-
-    int64 m_stock_id = -1;
-
-private:
-    bool Create(wxWindow* parent, wxWindowID id = wxID_ANY
-        , const wxString& caption = _("Edit Share Transaction")
-        , const wxPoint& pos = wxDefaultPosition
-        , const wxSize& size = wxDefaultSize
-        , long style = wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX);
-
-    void CreateControls();
-    void DataToControls();
-
-    double GetAmount(double shares, double price, double commision);
-    void OnQuit(wxCloseEvent& WXUNUSED(event));
-    void OnOk(wxCommandEvent& WXUNUSED(event));
-    void OnCancel(wxCommandEvent& WXUNUSED(event));
-    void OnStockPriceButton(wxCommandEvent& event);
-    void CalculateAmount(wxCommandEvent& event);
-
-private:
-    Model_Stock::Data* m_stock = nullptr;
-    wxTextCtrl* m_stock_name_ctrl = nullptr;
-    mmTextCtrl* m_share_num_ctrl = nullptr;
-    wxTextCtrl* m_stock_symbol_ctrl = nullptr;
-    mmTextCtrl* m_share_price_ctrl = nullptr;
-    wxTextCtrl* m_share_lot_ctrl = nullptr;
-    mmTextCtrl* m_share_commission_ctrl = nullptr;
-    wxTextCtrl* m_notes_ctrl = nullptr;
-    wxBitmapButton* m_attachments_btn = nullptr;
-    wxBitmapButton* web_button = nullptr;
-
-    UserTransactionPanel* m_transaction_panel = nullptr;
-    wxString m_dialog_heading;
-
-    Model_Checking::Data* m_checking_entry = nullptr;
-    Model_Translink::Data* m_translink_entry = nullptr;
-    Model_Shareinfo::Data* m_share_entry = nullptr;
     enum
     {
-        ID_STOCKTRANS_DATEPICKER_CHANGE = wxID_HIGHEST + 820,
-        ID_STOCKTRANS_SHARE_NAME,
-        ID_STOCKTRANS_SHARE_SYMBOL,
-        ID_STOCKTRANS_SHARE_NUMBER,
-        ID_STOCKTRANS_SHARE_PRICE,
-        ID_STOCKTRANS_SHARE_LOT,
-        ID_STOCKTRANS_SHARE_COMMISSION,
+        ID_STOCK_DATE = wxID_HIGHEST + 800,
+        ID_TEXTCTRL_NUMBER_SHARES,
+        ID_TEXTCTRL_STOCK_PP,
+        ID_TEXTCTRL_STOCK_COMMISSION,
+        ID_TEXTCTRL_LOT
     };
 };
+
+inline int64 ShareTransactionDialog::get_id() const
+{
+    return m_id;
+}

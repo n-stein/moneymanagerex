@@ -199,6 +199,15 @@ std::map<wxDateTime, int> Model_Currency::DateUsed(int64 CurrencyID)
             }
         }
     }
+    // Also include any stock transactions with this currency ID which may be in an account with a different currency
+    for (const auto ticker : Model_Ticker::instance().find(Model_Ticker::CURRENCYID(CurrencyID)))
+    {
+        for (const auto stock : Model_Stock::instance().find(Model_Stock::TICKERID(ticker.TICKERID)))
+        {
+            dt.ParseDate(stock.PURCHASEDATE);
+            datesList[dt] = 1;
+        }
+    }
     return datesList;
 }
 /**

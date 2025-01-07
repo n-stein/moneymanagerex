@@ -23,11 +23,11 @@
 #include "Model.h"
 #include "db/DB_Table_Stock_V1.h"
 #include "Model_Account.h"
+#include "Model_Ticker.h"
 
 class Model_Stock : public Model<DB_Table_STOCK_V1>
 {
 public:
-    using Model<DB_Table_STOCK_V1>::remove;
     Model_Stock();
     ~Model_Stock();
 
@@ -47,6 +47,17 @@ public:
     static Model_Stock& instance();
 
 public:
+
+    struct SorterBySTOCKNAME
+    {
+        bool operator()(const Model_Stock::Data& x, const Model_Stock::Data& y)
+        {
+            Model_Ticker::Data* tickerx = Model_Ticker::instance().get(x.TICKERID);
+            Model_Ticker::Data* tickery = Model_Ticker::instance().get(y.TICKERID);
+            return (tickerx->NAME) < (tickery->NAME);
+        }
+    };
+
     static wxString get_stock_name(int64 stock_id);
 
     static wxDate PURCHASEDATE(const Data* stock);
@@ -70,15 +81,8 @@ public:
     /** The current unrealized gain/loss, optionally converted to base currency */
     static double UnrealGainLoss(const Data& r, bool base_curr = false);
 
-    /** Update current price across accounts */
-    static void UpdateCurrentPrice(const wxString& symbol, const double price = -1);
 
 public:
-    /**
-    * Remove the Data record from memory and the database.
-    * Delete also all stock history
-    */
-    bool remove(int64 id);
 
     /**
     Returns the last price date of a given stock
@@ -89,6 +93,82 @@ public:
     Returns the total stock balance at a given date
     */
     double getDailyBalanceAt(const Model_Account::Data *account, const wxDate& date);
+
 };
+
+class Model_StockStat : public Model_Stock
+{
+public:
+    Model_StockStat(int64 ticker_id, int64 accountID, int64 target_currencyID = -1, wxDate date = wxDate::Today());
+    ~Model_StockStat();
+
+    double get_cost_ticker_curr() const;
+    double get_avg_price_ticker_curr() const;
+    double get_real_gain_ticker_curr() const;
+    double get_unreal_gain_ticker_curr() const;
+    double get_real_gain_target_curr() const;
+    double get_unreal_gain_target_curr() const;
+    double get_total_shares() const;
+    double get_cost_target_curr() const;
+    double get_commission_ticker_curr() const;
+    wxString get_init_date() const;
+
+private:
+    double m_total_cost;
+    double m_average_price;
+    double m_real_gain;
+    double m_unreal_gain;
+    double m_real_gain_tgt_curr;
+    double m_unreal_gain_tgt_curr;
+    double m_total_shares;
+    double m_total_cost_tgt_curr;
+    double m_commission;;
+    wxString m_init_date;
+};
+
+inline double Model_StockStat::get_cost_ticker_curr() const
+{
+    return m_total_cost;
+}
+
+inline double Model_StockStat::get_avg_price_ticker_curr() const
+{
+    return m_average_price;
+}
+inline double Model_StockStat::get_real_gain_ticker_curr() const
+{
+    return m_real_gain;
+}
+
+inline double Model_StockStat::get_unreal_gain_ticker_curr() const
+{
+    return m_unreal_gain;
+}
+inline double Model_StockStat::get_real_gain_target_curr() const
+{
+    return m_real_gain_tgt_curr;
+}
+
+inline double Model_StockStat::get_unreal_gain_target_curr() const
+{
+    return m_unreal_gain_tgt_curr;
+}
+inline double Model_StockStat::get_total_shares() const
+{
+    return m_total_shares;
+}
+inline double Model_StockStat::get_commission_ticker_curr() const
+{
+    return m_commission;
+}
+inline wxString Model_StockStat::get_init_date() const
+{
+    return m_init_date;
+}
+
+inline double Model_StockStat::get_cost_target_curr() const
+{
+    return m_total_cost_tgt_curr;
+}
 
 #endif // 

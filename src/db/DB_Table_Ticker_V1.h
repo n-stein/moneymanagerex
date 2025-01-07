@@ -12,7 +12,7 @@
  *      @brief
  *
  *      Revision History:
- *          AUTO GENERATED at 2024-12-04 15:54:58.326993.
+ *          AUTO GENERATED at 2024-12-04 14:12:11.020665.
  *          DO NOT EDIT!
  */
 //=============================================================================
@@ -20,10 +20,10 @@
 
 #include "DB_Table.h"
 
-struct DB_Table_STOCK_V1 : public DB_Table
+struct DB_Table_TICKER_V1 : public DB_Table
 {
     struct Data;
-    typedef DB_Table_STOCK_V1 Self;
+    typedef DB_Table_TICKER_V1 Self;
 
     /** A container to hold list of Data records for the table*/
     struct Data_Set : public std::vector<Self::Data>
@@ -55,7 +55,7 @@ struct DB_Table_STOCK_V1 : public DB_Table
     Data* fake_; // in case the entity not found
 
     /** Destructor: clears any data records stored in memory */
-    ~DB_Table_STOCK_V1() 
+    ~DB_Table_TICKER_V1() 
     {
         delete this->fake_;
         destroy_cache();
@@ -76,12 +76,12 @@ struct DB_Table_STOCK_V1 : public DB_Table
         {
             try
             {
-                db->ExecuteUpdate("CREATE TABLE STOCK_V1(STOCKID integer primary key, HELDAT integer, PURCHASEDATE TEXT NOT NULL, TICKERID integer NOT NULL, NUMSHARES numeric, PURCHASEPRICE numeric NOT NULL, NOTES TEXT, COMMISSION numeric, LOT TEXT default '', DELETEDTIME TEXT default '', FOREIGN KEY (TICKERID) REFERENCES TICKER_V1(TICKERID) )");
+                db->ExecuteUpdate("CREATE TABLE TICKER_V1(  TICKERID INTEGER PRIMARY KEY, SOURCE INTEGER /* Yahoo, MorningStar, MOEX */, SYMBOL TEXT COLLATE NOCASE NOT NULL, NAME TEXT, MARKET TEXT , TYPE INTEGER DEFAULT 0 /* Share, Fund, Bond */, COUNTRY TEXT, SECTOR TEXT /*Basic Materials, Consumer Cyclical, Financial Services, Real Estate, Consumer Defensive, Healthcare, Utilities, Communication Services, Energy, Industrials, Technology, Other */ , INDUSTRY TEXT, WEBPAGE TEXT, NOTES TEXT, PRECISION INTEGER, CURRENCYID INTEGER NOT NULL, CURRENTPRICE numeric NOT NULL, FOREIGN KEY (CURRENCYID) REFERENCES CURRENCYFORMATS_V1(CURRENCYID) )");
                 this->ensure_data(db);
             }
             catch(const wxSQLite3Exception &e) 
             { 
-                wxLogError("STOCK_V1: Exception %s", e.GetMessage().utf8_str());
+                wxLogError("TICKER_V1: Exception %s", e.GetMessage().utf8_str());
                 return false;
             }
         }
@@ -95,11 +95,11 @@ struct DB_Table_STOCK_V1 : public DB_Table
     {
         try
         {
-            db->ExecuteUpdate("CREATE INDEX IF NOT EXISTS IDX_STOCK_HELDAT ON STOCK_V1(HELDAT)");
+            db->ExecuteUpdate("CREATE INDEX IF NOT EXISTS IDX_TICKER ON TICKER_V1 (SYMBOL, TICKERID)");
         }
         catch(const wxSQLite3Exception &e) 
         { 
-            wxLogError("STOCK_V1: Exception %s", e.GetMessage().utf8_str());
+            wxLogError("TICKER_V1: Exception %s", e.GetMessage().utf8_str());
             return false;
         }
 
@@ -112,40 +112,64 @@ struct DB_Table_STOCK_V1 : public DB_Table
         db->Commit();
     }
     
-    struct STOCKID : public DB_Column<int64>
-    { 
-        static wxString name() { return "STOCKID"; } 
-        explicit STOCKID(const int64 &v, OP op = EQUAL): DB_Column<int64>(v, op) {}
-    };
-    
-    struct HELDAT : public DB_Column<int64>
-    { 
-        static wxString name() { return "HELDAT"; } 
-        explicit HELDAT(const int64 &v, OP op = EQUAL): DB_Column<int64>(v, op) {}
-    };
-    
-    struct PURCHASEDATE : public DB_Column<wxString>
-    { 
-        static wxString name() { return "PURCHASEDATE"; } 
-        explicit PURCHASEDATE(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
-    };
-    
     struct TICKERID : public DB_Column<int64>
     { 
         static wxString name() { return "TICKERID"; } 
         explicit TICKERID(const int64 &v, OP op = EQUAL): DB_Column<int64>(v, op) {}
     };
     
-    struct NUMSHARES : public DB_Column<double>
+    struct SOURCE : public DB_Column<int64>
     { 
-        static wxString name() { return "NUMSHARES"; } 
-        explicit NUMSHARES(const double &v, OP op = EQUAL): DB_Column<double>(v, op) {}
+        static wxString name() { return "SOURCE"; } 
+        explicit SOURCE(const int64 &v, OP op = EQUAL): DB_Column<int64>(v, op) {}
     };
     
-    struct PURCHASEPRICE : public DB_Column<double>
+    struct SYMBOL : public DB_Column<wxString>
     { 
-        static wxString name() { return "PURCHASEPRICE"; } 
-        explicit PURCHASEPRICE(const double &v, OP op = EQUAL): DB_Column<double>(v, op) {}
+        static wxString name() { return "SYMBOL"; } 
+        explicit SYMBOL(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
+    };
+    
+    struct NAME : public DB_Column<wxString>
+    { 
+        static wxString name() { return "NAME"; } 
+        explicit NAME(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
+    };
+    
+    struct MARKET : public DB_Column<wxString>
+    { 
+        static wxString name() { return "MARKET"; } 
+        explicit MARKET(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
+    };
+    
+    struct TYPE : public DB_Column<int64>
+    { 
+        static wxString name() { return "TYPE"; } 
+        explicit TYPE(const int64 &v, OP op = EQUAL): DB_Column<int64>(v, op) {}
+    };
+    
+    struct COUNTRY : public DB_Column<wxString>
+    { 
+        static wxString name() { return "COUNTRY"; } 
+        explicit COUNTRY(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
+    };
+    
+    struct SECTOR : public DB_Column<wxString>
+    { 
+        static wxString name() { return "SECTOR"; } 
+        explicit SECTOR(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
+    };
+    
+    struct INDUSTRY : public DB_Column<wxString>
+    { 
+        static wxString name() { return "INDUSTRY"; } 
+        explicit INDUSTRY(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
+    };
+    
+    struct WEBPAGE : public DB_Column<wxString>
+    { 
+        static wxString name() { return "WEBPAGE"; } 
+        explicit WEBPAGE(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
     };
     
     struct NOTES : public DB_Column<wxString>
@@ -154,37 +178,41 @@ struct DB_Table_STOCK_V1 : public DB_Table
         explicit NOTES(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
     };
     
-    struct COMMISSION : public DB_Column<double>
+    struct PRECISION : public DB_Column<int64>
     { 
-        static wxString name() { return "COMMISSION"; } 
-        explicit COMMISSION(const double &v, OP op = EQUAL): DB_Column<double>(v, op) {}
+        static wxString name() { return "PRECISION"; } 
+        explicit PRECISION(const int64 &v, OP op = EQUAL): DB_Column<int64>(v, op) {}
     };
     
-    struct LOT : public DB_Column<wxString>
+    struct CURRENCYID : public DB_Column<int64>
     { 
-        static wxString name() { return "LOT"; } 
-        explicit LOT(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
+        static wxString name() { return "CURRENCYID"; } 
+        explicit CURRENCYID(const int64 &v, OP op = EQUAL): DB_Column<int64>(v, op) {}
     };
     
-    struct DELETEDTIME : public DB_Column<wxString>
+    struct CURRENTPRICE : public DB_Column<double>
     { 
-        static wxString name() { return "DELETEDTIME"; } 
-        explicit DELETEDTIME(const wxString &v, OP op = EQUAL): DB_Column<wxString>(v, op) {}
+        static wxString name() { return "CURRENTPRICE"; } 
+        explicit CURRENTPRICE(const double &v, OP op = EQUAL): DB_Column<double>(v, op) {}
     };
     
-    typedef STOCKID PRIMARY;
+    typedef TICKERID PRIMARY;
     enum COLUMN
     {
-        COL_STOCKID = 0
-        , COL_HELDAT = 1
-        , COL_PURCHASEDATE = 2
-        , COL_TICKERID = 3
-        , COL_NUMSHARES = 4
-        , COL_PURCHASEPRICE = 5
-        , COL_NOTES = 6
-        , COL_COMMISSION = 7
-        , COL_LOT = 8
-        , COL_DELETEDTIME = 9
+        COL_TICKERID = 0
+        , COL_SOURCE = 1
+        , COL_SYMBOL = 2
+        , COL_NAME = 3
+        , COL_MARKET = 4
+        , COL_TYPE = 5
+        , COL_COUNTRY = 6
+        , COL_SECTOR = 7
+        , COL_INDUSTRY = 8
+        , COL_WEBPAGE = 9
+        , COL_NOTES = 10
+        , COL_PRECISION = 11
+        , COL_CURRENCYID = 12
+        , COL_CURRENTPRICE = 13
     };
 
     /** Returns the column name as a string*/
@@ -192,16 +220,20 @@ struct DB_Table_STOCK_V1 : public DB_Table
     {
         switch(col)
         {
-            case COL_STOCKID: return "STOCKID";
-            case COL_HELDAT: return "HELDAT";
-            case COL_PURCHASEDATE: return "PURCHASEDATE";
             case COL_TICKERID: return "TICKERID";
-            case COL_NUMSHARES: return "NUMSHARES";
-            case COL_PURCHASEPRICE: return "PURCHASEPRICE";
+            case COL_SOURCE: return "SOURCE";
+            case COL_SYMBOL: return "SYMBOL";
+            case COL_NAME: return "NAME";
+            case COL_MARKET: return "MARKET";
+            case COL_TYPE: return "TYPE";
+            case COL_COUNTRY: return "COUNTRY";
+            case COL_SECTOR: return "SECTOR";
+            case COL_INDUSTRY: return "INDUSTRY";
+            case COL_WEBPAGE: return "WEBPAGE";
             case COL_NOTES: return "NOTES";
-            case COL_COMMISSION: return "COMMISSION";
-            case COL_LOT: return "LOT";
-            case COL_DELETEDTIME: return "DELETEDTIME";
+            case COL_PRECISION: return "PRECISION";
+            case COL_CURRENCYID: return "CURRENCYID";
+            case COL_CURRENTPRICE: return "CURRENTPRICE";
             default: break;
         }
         
@@ -211,16 +243,20 @@ struct DB_Table_STOCK_V1 : public DB_Table
     /** Returns the column number from the given column name*/
     static COLUMN name_to_column(const wxString& name)
     {
-        if ("STOCKID" == name) return COL_STOCKID;
-        else if ("HELDAT" == name) return COL_HELDAT;
-        else if ("PURCHASEDATE" == name) return COL_PURCHASEDATE;
-        else if ("TICKERID" == name) return COL_TICKERID;
-        else if ("NUMSHARES" == name) return COL_NUMSHARES;
-        else if ("PURCHASEPRICE" == name) return COL_PURCHASEPRICE;
+        if ("TICKERID" == name) return COL_TICKERID;
+        else if ("SOURCE" == name) return COL_SOURCE;
+        else if ("SYMBOL" == name) return COL_SYMBOL;
+        else if ("NAME" == name) return COL_NAME;
+        else if ("MARKET" == name) return COL_MARKET;
+        else if ("TYPE" == name) return COL_TYPE;
+        else if ("COUNTRY" == name) return COL_COUNTRY;
+        else if ("SECTOR" == name) return COL_SECTOR;
+        else if ("INDUSTRY" == name) return COL_INDUSTRY;
+        else if ("WEBPAGE" == name) return COL_WEBPAGE;
         else if ("NOTES" == name) return COL_NOTES;
-        else if ("COMMISSION" == name) return COL_COMMISSION;
-        else if ("LOT" == name) return COL_LOT;
-        else if ("DELETEDTIME" == name) return COL_DELETEDTIME;
+        else if ("PRECISION" == name) return COL_PRECISION;
+        else if ("CURRENCYID" == name) return COL_CURRENCYID;
+        else if ("CURRENTPRICE" == name) return COL_CURRENTPRICE;
 
         return COLUMN(-1);
     }
@@ -228,29 +264,33 @@ struct DB_Table_STOCK_V1 : public DB_Table
     /** Data is a single record in the database table*/
     struct Data
     {
-        friend struct DB_Table_STOCK_V1;
+        friend struct DB_Table_TICKER_V1;
         /** This is a instance pointer to itself in memory. */
         Self* table_;
     
-        int64 STOCKID;//  primary key
-        int64 HELDAT;
-        wxString PURCHASEDATE;
-        int64 TICKERID;
-        double NUMSHARES;
-        double PURCHASEPRICE;
+        int64 TICKERID;//  primary key
+        int64 SOURCE;
+        wxString SYMBOL;
+        wxString NAME;
+        wxString MARKET;
+        int64 TYPE;
+        wxString COUNTRY;
+        wxString SECTOR;
+        wxString INDUSTRY;
+        wxString WEBPAGE;
         wxString NOTES;
-        double COMMISSION;
-        wxString LOT;
-        wxString DELETEDTIME;
+        int64 PRECISION;
+        int64 CURRENCYID;
+        double CURRENTPRICE;
 
         int64 id() const
         {
-            return STOCKID;
+            return TICKERID;
         }
 
         void id(const int64 id)
         {
-            STOCKID = id;
+            TICKERID = id;
         }
 
         bool operator < (const Data& r) const
@@ -265,16 +305,20 @@ struct DB_Table_STOCK_V1 : public DB_Table
 
         bool equals(const Data* r) const
         {
-            if(STOCKID != r->STOCKID) return false;
-            if(HELDAT != r->HELDAT) return false;
-            if(!PURCHASEDATE.IsSameAs(r->PURCHASEDATE)) return false;
             if(TICKERID != r->TICKERID) return false;
-            if(NUMSHARES != r->NUMSHARES) return false;
-            if(PURCHASEPRICE != r->PURCHASEPRICE) return false;
+            if(SOURCE != r->SOURCE) return false;
+            if(!SYMBOL.IsSameAs(r->SYMBOL)) return false;
+            if(!NAME.IsSameAs(r->NAME)) return false;
+            if(!MARKET.IsSameAs(r->MARKET)) return false;
+            if(TYPE != r->TYPE) return false;
+            if(!COUNTRY.IsSameAs(r->COUNTRY)) return false;
+            if(!SECTOR.IsSameAs(r->SECTOR)) return false;
+            if(!INDUSTRY.IsSameAs(r->INDUSTRY)) return false;
+            if(!WEBPAGE.IsSameAs(r->WEBPAGE)) return false;
             if(!NOTES.IsSameAs(r->NOTES)) return false;
-            if(COMMISSION != r->COMMISSION) return false;
-            if(!LOT.IsSameAs(r->LOT)) return false;
-            if(!DELETEDTIME.IsSameAs(r->DELETEDTIME)) return false;
+            if(PRECISION != r->PRECISION) return false;
+            if(CURRENCYID != r->CURRENCYID) return false;
+            if(CURRENTPRICE != r->CURRENTPRICE) return false;
             return true;
         }
         
@@ -282,44 +326,52 @@ struct DB_Table_STOCK_V1 : public DB_Table
         {
             table_ = table;
         
-            STOCKID = -1;
-            HELDAT = -1;
             TICKERID = -1;
-            NUMSHARES = 0.0;
-            PURCHASEPRICE = 0.0;
-            COMMISSION = 0.0;
+            SOURCE = -1;
+            TYPE = -1;
+            PRECISION = -1;
+            CURRENCYID = -1;
+            CURRENTPRICE = 0.0;
         }
 
         explicit Data(wxSQLite3ResultSet& q, Self* table = nullptr )
         {
             table_ = table;
         
-            STOCKID = q.GetInt64(0); // STOCKID
-            HELDAT = q.GetInt64(1); // HELDAT
-            PURCHASEDATE = q.GetString(2); // PURCHASEDATE
-            TICKERID = q.GetInt64(3); // TICKERID
-            NUMSHARES = q.GetDouble(4); // NUMSHARES
-            PURCHASEPRICE = q.GetDouble(5); // PURCHASEPRICE
-            NOTES = q.GetString(6); // NOTES
-            COMMISSION = q.GetDouble(7); // COMMISSION
-            LOT = q.GetString(8); // LOT
-            DELETEDTIME = q.GetString(9); // DELETEDTIME
+            TICKERID = q.GetInt64(0); // TICKERID
+            SOURCE = q.GetInt64(1); // SOURCE
+            SYMBOL = q.GetString(2); // SYMBOL
+            NAME = q.GetString(3); // NAME
+            MARKET = q.GetString(4); // MARKET
+            TYPE = q.GetInt64(5); // TYPE
+            COUNTRY = q.GetString(6); // COUNTRY
+            SECTOR = q.GetString(7); // SECTOR
+            INDUSTRY = q.GetString(8); // INDUSTRY
+            WEBPAGE = q.GetString(9); // WEBPAGE
+            NOTES = q.GetString(10); // NOTES
+            PRECISION = q.GetInt64(11); // PRECISION
+            CURRENCYID = q.GetInt64(12); // CURRENCYID
+            CURRENTPRICE = q.GetDouble(13); // CURRENTPRICE
         }
 
         Data& operator=(const Data& other)
         {
             if (this == &other) return *this;
 
-            STOCKID = other.STOCKID;
-            HELDAT = other.HELDAT;
-            PURCHASEDATE = other.PURCHASEDATE;
             TICKERID = other.TICKERID;
-            NUMSHARES = other.NUMSHARES;
-            PURCHASEPRICE = other.PURCHASEPRICE;
+            SOURCE = other.SOURCE;
+            SYMBOL = other.SYMBOL;
+            NAME = other.NAME;
+            MARKET = other.MARKET;
+            TYPE = other.TYPE;
+            COUNTRY = other.COUNTRY;
+            SECTOR = other.SECTOR;
+            INDUSTRY = other.INDUSTRY;
+            WEBPAGE = other.WEBPAGE;
             NOTES = other.NOTES;
-            COMMISSION = other.COMMISSION;
-            LOT = other.LOT;
-            DELETEDTIME = other.DELETEDTIME;
+            PRECISION = other.PRECISION;
+            CURRENCYID = other.CURRENCYID;
+            CURRENTPRICE = other.CURRENTPRICE;
             return *this;
         }
 
@@ -329,34 +381,54 @@ struct DB_Table_STOCK_V1 : public DB_Table
             return false;
         }
 
-        bool match(const Self::STOCKID &in) const
-        {
-            return this->STOCKID == in.v_;
-        }
-
-        bool match(const Self::HELDAT &in) const
-        {
-            return this->HELDAT == in.v_;
-        }
-
-        bool match(const Self::PURCHASEDATE &in) const
-        {
-            return this->PURCHASEDATE.CmpNoCase(in.v_) == 0;
-        }
-
         bool match(const Self::TICKERID &in) const
         {
             return this->TICKERID == in.v_;
         }
 
-        bool match(const Self::NUMSHARES &in) const
+        bool match(const Self::SOURCE &in) const
         {
-            return this->NUMSHARES == in.v_;
+            return this->SOURCE == in.v_;
         }
 
-        bool match(const Self::PURCHASEPRICE &in) const
+        bool match(const Self::SYMBOL &in) const
         {
-            return this->PURCHASEPRICE == in.v_;
+            return this->SYMBOL.CmpNoCase(in.v_) == 0;
+        }
+
+        bool match(const Self::NAME &in) const
+        {
+            return this->NAME.CmpNoCase(in.v_) == 0;
+        }
+
+        bool match(const Self::MARKET &in) const
+        {
+            return this->MARKET.CmpNoCase(in.v_) == 0;
+        }
+
+        bool match(const Self::TYPE &in) const
+        {
+            return this->TYPE == in.v_;
+        }
+
+        bool match(const Self::COUNTRY &in) const
+        {
+            return this->COUNTRY.CmpNoCase(in.v_) == 0;
+        }
+
+        bool match(const Self::SECTOR &in) const
+        {
+            return this->SECTOR.CmpNoCase(in.v_) == 0;
+        }
+
+        bool match(const Self::INDUSTRY &in) const
+        {
+            return this->INDUSTRY.CmpNoCase(in.v_) == 0;
+        }
+
+        bool match(const Self::WEBPAGE &in) const
+        {
+            return this->WEBPAGE.CmpNoCase(in.v_) == 0;
         }
 
         bool match(const Self::NOTES &in) const
@@ -364,19 +436,19 @@ struct DB_Table_STOCK_V1 : public DB_Table
             return this->NOTES.CmpNoCase(in.v_) == 0;
         }
 
-        bool match(const Self::COMMISSION &in) const
+        bool match(const Self::PRECISION &in) const
         {
-            return this->COMMISSION == in.v_;
+            return this->PRECISION == in.v_;
         }
 
-        bool match(const Self::LOT &in) const
+        bool match(const Self::CURRENCYID &in) const
         {
-            return this->LOT.CmpNoCase(in.v_) == 0;
+            return this->CURRENCYID == in.v_;
         }
 
-        bool match(const Self::DELETEDTIME &in) const
+        bool match(const Self::CURRENTPRICE &in) const
         {
-            return this->DELETEDTIME.CmpNoCase(in.v_) == 0;
+            return this->CURRENTPRICE == in.v_;
         }
 
         // Return the data record as a json string
@@ -395,56 +467,72 @@ struct DB_Table_STOCK_V1 : public DB_Table
         // Add the field data as json key:value pairs
         void as_json(PrettyWriter<StringBuffer>& json_writer) const
         {
-            json_writer.Key("STOCKID");
-            json_writer.Int64(this->STOCKID.GetValue());
-            json_writer.Key("HELDAT");
-            json_writer.Int64(this->HELDAT.GetValue());
-            json_writer.Key("PURCHASEDATE");
-            json_writer.String(this->PURCHASEDATE.utf8_str());
             json_writer.Key("TICKERID");
             json_writer.Int64(this->TICKERID.GetValue());
-            json_writer.Key("NUMSHARES");
-            json_writer.Double(this->NUMSHARES);
-            json_writer.Key("PURCHASEPRICE");
-            json_writer.Double(this->PURCHASEPRICE);
+            json_writer.Key("SOURCE");
+            json_writer.Int64(this->SOURCE.GetValue());
+            json_writer.Key("SYMBOL");
+            json_writer.String(this->SYMBOL.utf8_str());
+            json_writer.Key("NAME");
+            json_writer.String(this->NAME.utf8_str());
+            json_writer.Key("MARKET");
+            json_writer.String(this->MARKET.utf8_str());
+            json_writer.Key("TYPE");
+            json_writer.Int64(this->TYPE.GetValue());
+            json_writer.Key("COUNTRY");
+            json_writer.String(this->COUNTRY.utf8_str());
+            json_writer.Key("SECTOR");
+            json_writer.String(this->SECTOR.utf8_str());
+            json_writer.Key("INDUSTRY");
+            json_writer.String(this->INDUSTRY.utf8_str());
+            json_writer.Key("WEBPAGE");
+            json_writer.String(this->WEBPAGE.utf8_str());
             json_writer.Key("NOTES");
             json_writer.String(this->NOTES.utf8_str());
-            json_writer.Key("COMMISSION");
-            json_writer.Double(this->COMMISSION);
-            json_writer.Key("LOT");
-            json_writer.String(this->LOT.utf8_str());
-            json_writer.Key("DELETEDTIME");
-            json_writer.String(this->DELETEDTIME.utf8_str());
+            json_writer.Key("PRECISION");
+            json_writer.Int64(this->PRECISION.GetValue());
+            json_writer.Key("CURRENCYID");
+            json_writer.Int64(this->CURRENCYID.GetValue());
+            json_writer.Key("CURRENTPRICE");
+            json_writer.Double(this->CURRENTPRICE);
         }
 
         row_t to_row_t() const
         {
             row_t row;
-            row(L"STOCKID") = STOCKID.GetValue();
-            row(L"HELDAT") = HELDAT.GetValue();
-            row(L"PURCHASEDATE") = PURCHASEDATE;
             row(L"TICKERID") = TICKERID.GetValue();
-            row(L"NUMSHARES") = NUMSHARES;
-            row(L"PURCHASEPRICE") = PURCHASEPRICE;
+            row(L"SOURCE") = SOURCE.GetValue();
+            row(L"SYMBOL") = SYMBOL;
+            row(L"NAME") = NAME;
+            row(L"MARKET") = MARKET;
+            row(L"TYPE") = TYPE.GetValue();
+            row(L"COUNTRY") = COUNTRY;
+            row(L"SECTOR") = SECTOR;
+            row(L"INDUSTRY") = INDUSTRY;
+            row(L"WEBPAGE") = WEBPAGE;
             row(L"NOTES") = NOTES;
-            row(L"COMMISSION") = COMMISSION;
-            row(L"LOT") = LOT;
-            row(L"DELETEDTIME") = DELETEDTIME;
+            row(L"PRECISION") = PRECISION.GetValue();
+            row(L"CURRENCYID") = CURRENCYID.GetValue();
+            row(L"CURRENTPRICE") = CURRENTPRICE;
             return row;
         }
 
         void to_template(html_template& t) const
         {
-            t(L"STOCKID") = STOCKID.GetValue();
-            t(L"HELDAT") = HELDAT.GetValue();
-            t(L"PURCHASEDATE") = PURCHASEDATE;
             t(L"TICKERID") = TICKERID.GetValue();
-            t(L"NUMSHARES") = NUMSHARES;
-            t(L"PURCHASEPRICE") = PURCHASEPRICE;
+            t(L"SOURCE") = SOURCE.GetValue();
+            t(L"SYMBOL") = SYMBOL;
+            t(L"NAME") = NAME;
+            t(L"MARKET") = MARKET;
+            t(L"TYPE") = TYPE.GetValue();
+            t(L"COUNTRY") = COUNTRY;
+            t(L"SECTOR") = SECTOR;
+            t(L"INDUSTRY") = INDUSTRY;
+            t(L"WEBPAGE") = WEBPAGE;
             t(L"NOTES") = NOTES;
-            t(L"COMMISSION") = COMMISSION;
-            t(L"LOT") = LOT;
-            t(L"DELETEDTIME") = DELETEDTIME;
+            t(L"PRECISION") = PRECISION.GetValue();
+            t(L"CURRENCYID") = CURRENCYID.GetValue();
+            t(L"CURRENTPRICE") = CURRENTPRICE;
         }
 
         /** Save the record instance in memory to the database. */
@@ -453,7 +541,7 @@ struct DB_Table_STOCK_V1 : public DB_Table
             if (db && db->IsReadOnly()) return false;
             if (!table_ || !db) 
             {
-                wxLogError("can not save STOCK_V1");
+                wxLogError("can not save TICKER_V1");
                 return false;
             }
 
@@ -465,7 +553,7 @@ struct DB_Table_STOCK_V1 : public DB_Table
         {
             if (!table_ || !db) 
             {
-                wxLogError("can not remove STOCK_V1");
+                wxLogError("can not remove TICKER_V1");
                 return false;
             }
             
@@ -480,17 +568,17 @@ struct DB_Table_STOCK_V1 : public DB_Table
 
     enum
     {
-        NUM_COLUMNS = 10
+        NUM_COLUMNS = 14
     };
 
     size_t num_columns() const { return NUM_COLUMNS; }
 
     /** Name of the table*/    
-    wxString name() const { return "STOCK_V1"; }
+    wxString name() const { return "TICKER_V1"; }
 
-    DB_Table_STOCK_V1() : fake_(new Data())
+    DB_Table_TICKER_V1() : fake_(new Data())
     {
-        query_ = "SELECT STOCKID, HELDAT, PURCHASEDATE, TICKERID, NUMSHARES, PURCHASEPRICE, NOTES, COMMISSION, LOT, DELETEDTIME FROM STOCK_V1 ";
+        query_ = "SELECT TICKERID, SOURCE, SYMBOL, NAME, MARKET, TYPE, COUNTRY, SECTOR, INDUSTRY, WEBPAGE, NOTES, PRECISION, CURRENCYID, CURRENTPRICE FROM TICKER_V1 ";
     }
 
     /** Create a new Data record and add to memory table (cache)*/
@@ -520,27 +608,32 @@ struct DB_Table_STOCK_V1 : public DB_Table
         wxString sql = wxEmptyString;
         if (entity->id() <= 0) //  new & insert
         {
-            sql = "INSERT INTO STOCK_V1(HELDAT, PURCHASEDATE, TICKERID, NUMSHARES, PURCHASEPRICE, NOTES, COMMISSION, LOT, DELETEDTIME, STOCKID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            sql = "INSERT INTO TICKER_V1(SOURCE, SYMBOL, NAME, MARKET, TYPE, COUNTRY, SECTOR, INDUSTRY, WEBPAGE, NOTES, PRECISION, CURRENCYID, CURRENTPRICE) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         }
         else
         {
-            sql = "UPDATE STOCK_V1 SET HELDAT = ?, PURCHASEDATE = ?, TICKERID = ?, NUMSHARES = ?, PURCHASEPRICE = ?, NOTES = ?, COMMISSION = ?, LOT = ?, DELETEDTIME = ? WHERE STOCKID = ?";
+            sql = "UPDATE TICKER_V1 SET SOURCE = ?, SYMBOL = ?, NAME = ?, MARKET = ?, TYPE = ?, COUNTRY = ?, SECTOR = ?, INDUSTRY = ?, WEBPAGE = ?, NOTES = ?, PRECISION = ?, CURRENCYID = ?, CURRENTPRICE = ? WHERE TICKERID = ?";
         }
 
         try
         {
             wxSQLite3Statement stmt = db->PrepareStatement(sql);
 
-            stmt.Bind(1, entity->HELDAT);
-            stmt.Bind(2, entity->PURCHASEDATE);
-            stmt.Bind(3, entity->TICKERID);
-            stmt.Bind(4, entity->NUMSHARES);
-            stmt.Bind(5, entity->PURCHASEPRICE);
-            stmt.Bind(6, entity->NOTES);
-            stmt.Bind(7, entity->COMMISSION);
-            stmt.Bind(8, entity->LOT);
-            stmt.Bind(9, entity->DELETEDTIME);
-            stmt.Bind(10, entity->id() > 0 ? entity->STOCKID : newId());
+            stmt.Bind(1, entity->SOURCE);
+            stmt.Bind(2, entity->SYMBOL);
+            stmt.Bind(3, entity->NAME);
+            stmt.Bind(4, entity->MARKET);
+            stmt.Bind(5, entity->TYPE);
+            stmt.Bind(6, entity->COUNTRY);
+            stmt.Bind(7, entity->SECTOR);
+            stmt.Bind(8, entity->INDUSTRY);
+            stmt.Bind(9, entity->WEBPAGE);
+            stmt.Bind(10, entity->NOTES);
+            stmt.Bind(11, entity->PRECISION);
+            stmt.Bind(12, entity->CURRENCYID);
+            stmt.Bind(13, entity->CURRENTPRICE);
+            if (entity->id() > 0)
+                stmt.Bind(14, entity->TICKERID);
 
             stmt.ExecuteUpdate();
             stmt.Finalize();
@@ -557,7 +650,7 @@ struct DB_Table_STOCK_V1 : public DB_Table
         }
         catch(const wxSQLite3Exception &e) 
         { 
-            wxLogError("STOCK_V1: Exception %s, %s", e.GetMessage().utf8_str(), entity->to_json());
+            wxLogError("TICKER_V1: Exception %s, %s", e.GetMessage().utf8_str(), entity->to_json());
             return false;
         }
 
@@ -575,7 +668,7 @@ struct DB_Table_STOCK_V1 : public DB_Table
         if (id <= 0) return false;
         try
         {
-            wxString sql = "DELETE FROM STOCK_V1 WHERE STOCKID = ?";
+            wxString sql = "DELETE FROM TICKER_V1 WHERE TICKERID = ?";
             wxSQLite3Statement stmt = db->PrepareStatement(sql);
             stmt.Bind(1, id);
             stmt.ExecuteUpdate();
@@ -600,7 +693,7 @@ struct DB_Table_STOCK_V1 : public DB_Table
         }
         catch(const wxSQLite3Exception &e) 
         { 
-            wxLogError("STOCK_V1: Exception %s", e.GetMessage().utf8_str());
+            wxLogError("TICKER_V1: Exception %s", e.GetMessage().utf8_str());
             return false;
         }
 

@@ -60,31 +60,35 @@ void  mmReportSummaryStocks::RefreshData()
         account.name = a.ACCOUNTNAME;
         account.realgainloss = 0.0;
         account.unrealgainloss = 0.0;
-        account.total = Model_Account::investment_balance(a).first;
+        account.total = Model_Account::investment_balance(a).second;
         account.data.clear();
 
-        for (const auto& stock : Model_Stock::instance().find(Model_Stock::HELDAT(a.ACCOUNTID)))
+        for (const auto& ticker : Model_Account::getTickerIds(a.ACCOUNTID))
         {
+            Model_StockStat s_acct = Model_StockStat(ticker, a.ACCOUNTID, a.CURRENCYID);
+            Model_StockStat s_base = Model_StockStat(ticker, a.ACCOUNTID);
+            Model_Ticker::Data* t = Model_Ticker::instance().get(ticker);
             const Model_Currency::Data* currency = Model_Account::currency(a);
-            const double today_rate = Model_CurrencyHistory::getDayRate(currency->CURRENCYID, today);
-            m_stock_balance += today_rate * Model_Stock::CurrentValue(stock);
-            line.realgainloss = Model_Stock::RealGainLoss(stock);
-            account.realgainloss += line.realgainloss;
-            line.unrealgainloss = Model_Stock::UnrealGainLoss(stock);
-            account.unrealgainloss += line.unrealgainloss;
-            m_unreal_gain_loss_sum_total += Model_Stock::UnrealGainLoss(stock, true);
-            m_real_gain_loss_sum_total += Model_Stock::RealGainLoss(stock, true);
-            m_real_gain_loss_excl_forex += line.realgainloss * today_rate;
-            m_unreal_gain_loss_excl_forex += line.unrealgainloss * today_rate;
-
-            line.name = stock.STOCKNAME;
-            line.symbol = stock.SYMBOL;
-            line.date = stock.PURCHASEDATE;
-            line.qty = stock.NUMSHARES;
-            line.purchase = Model_Stock::InvestmentValue(stock);
-            line.current = stock.CURRENTPRICE;
-            line.commission = stock.COMMISSION;
-            line.value = Model_Stock::CurrentValue(stock);
+            const double acct_rate = Model_CurrencyHistory::getDayRate(currency->CURRENCYID);
+            const double ticker_rate = Model_CurrencyHistory::getDayRate(t->CURRENCYID);
+            m_stock_balance += (s_base.get_cost_target_curr() + s_base.get_unreal_gain_target_curr());
+            line.realgainloss = s_acct.get_real_gain_ticker_curr();
+            account.realgainloss += s_acct.get_real_gain_target_curr();
+            line.unrealgainloss = s_acct.get_unreal_gain_ticker_curr();
+            account.unrealgainloss += s_acct.get_unreal_gain_ticker_curr() * ticker_rate / acct_rate;
+            m_unreal_gain_loss_sum_total += s_base.get_unreal_gain_target_curr();
+            m_real_gain_loss_sum_total += s_base.get_real_gain_target_curr();
+            m_real_gain_loss_excl_forex += s_acct.get_real_gain_ticker_curr() * ticker_rate;
+            m_unreal_gain_loss_excl_forex += s_acct.get_unreal_gain_ticker_curr() * ticker_rate;
+            line.name = t->NAME;
+            line.symbol = t->SYMBOL;
+            line.date = s_acct.get_init_date();
+            line.qty = s_acct.get_total_shares();
+            line.purchase = s_acct.get_cost_ticker_curr();
+            line.current = t->CURRENTPRICE;
+            line.commission = s_acct.get_commission_ticker_curr();
+            line.value = s_acct.get_total_shares() * t->CURRENTPRICE;
+            line.currency = t->CURRENCYID;
             account.data.push_back(line);
         }
         m_stocks.push_back(account);
@@ -127,7 +131,7 @@ wxString mmReportSummaryStocks::getHTMLText()
             for (const auto& acct : m_stocks)
             {
                 const Model_Account::Data* account = Model_Account::instance().get(acct.id);
-                const Model_Currency::Data* currency = Model_Account::currency(account);
+                const Model_Currency::Data* acct_currency = Model_Account::currency(account);
 
                 hb.startThead();
                 {
@@ -143,6 +147,7 @@ wxString mmReportSummaryStocks::getHTMLText()
                 {
                     for (const auto& entry : acct.data)
                     {
+                        const Model_Currency::Data* currency = Model_Currency::instance().get(entry.currency);
                         hb.startTableRow();
                         {
                             hb.addTableCell(entry.name);
@@ -162,9 +167,9 @@ wxString mmReportSummaryStocks::getHTMLText()
                     {
                         hb.addTableCell(_("Total:"));
                         hb.addEmptyTableCell(6);
-                        hb.addCurrencyCell(acct.realgainloss, currency);
-                        hb.addCurrencyCell(acct.unrealgainloss, currency);
-                        hb.addCurrencyCell(acct.total, currency);
+                        hb.addCurrencyCell(acct.realgainloss, acct_currency);
+                        hb.addCurrencyCell(acct.unrealgainloss, acct_currency);
+                        hb.addCurrencyCell(acct.total, acct_currency);
                     }
                     hb.endTableRow();
                     hb.addEmptyTableRow(9);
@@ -263,15 +268,16 @@ wxString mmReportChartStocks::getHTMLText()
     wxTimeSpan dist;
     wxDate precDateDt = wxInvalidDateTime;
     wxArrayString symbols;
-    for (const auto& stock : Model_Stock::instance().all(Model_Stock::COL_SYMBOL))
+    for (const auto& stock : Model_Stock::instance().all(Model_Stock::COL_TICKERID))
     {
         Model_Account::Data* account = Model_Account::instance().get(stock.HELDAT);
+        Model_Ticker::Data* ticker = Model_Ticker::instance().get(stock.TICKERID);
         if (Model_Account::status_id(account) != Model_Account::STATUS_ID_OPEN) continue;
-        if (symbols.Index(stock.SYMBOL) != wxNOT_FOUND) continue;
+        if (symbols.Index(ticker->SYMBOL) != wxNOT_FOUND) continue;
 
-        symbols.Add(stock.SYMBOL);
+        symbols.Add(ticker->SYMBOL);
         int dataCount = 0, freq = 1;
-        auto histData = Model_StockHistory::instance().find(Model_StockHistory::SYMBOL(stock.SYMBOL),
+        auto histData = Model_StockHistory::instance().find(Model_StockHistory::SYMBOL(ticker->SYMBOL),
             Model_StockHistory::DATE(m_date_range->start_date(), GREATER_OR_EQUAL),
             Model_StockHistory::DATE(m_date_range->end_date(), LESS_OR_EQUAL));
         std::stable_sort(histData.begin(), histData.end(), SorterByDATE());
@@ -299,7 +305,7 @@ wxString mmReportChartStocks::getHTMLText()
 
         if (!gd.series.empty())
         {
-            hb.addHeader(1, wxString::Format("%s / %s - (%s)", stock.SYMBOL, stock.STOCKNAME, account->ACCOUNTNAME));
+            hb.addHeader(1, wxString::Format("%s / %s - (%s)", ticker->SYMBOL, ticker->NAME, account->ACCOUNTNAME));
             gd.type = GraphData::LINE_DATETIME;
             hb.addChart(gd);
         }

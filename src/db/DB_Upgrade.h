@@ -1,13 +1,13 @@
 //=============================================================================
 /**
- *      Copyright (c) 2016 - 2023 Gabriele-V
+ *      Copyright (c) 2016 - 2024 Gabriele-V
  *
  *      @author [sqliteupgrade2cpp.py]
  *
  *      @brief
  *
  *      Revision History:
- *          AUTO GENERATED at 2023-07-09 11:41:39.625757.
+ *          AUTO GENERATED at 2024-12-11 17:10:40.716024.
  *          DO NOT EDIT!
  */
 //=============================================================================
@@ -18,7 +18,7 @@
 #include <vector>
 #include <wx/string.h>
 
-const int dbLatestVersion = 19;
+const int dbLatestVersion = 20;
 
 const std::vector<wxString> dbUpgradeQuery =
 {
@@ -417,6 +417,165 @@ const std::vector<wxString> dbUpgradeQuery =
         
         UPDATE CHECKINGACCOUNT_V1 SET COLOR = FOLLOWUPID;
         UPDATE BILLSDEPOSITS_v1 SET COLOR = FOLLOWUPID;
+    )",
+
+    // Upgrade to version 20
+    R"(
+        -- db tidy, fix corrupt indices
+        REINDEX;
+        
+        -- Stock v2.0 update
+        -- https://github.com/moneymanagerex/moneymanagerex/issues/2702
+        -- https://github.com/moneymanagerex/moneymanagerex/issues/2718
+        
+        -- create the new TICKER_V1 table
+        CREATE TABLE TICKER_V1(
+          TICKERID INTEGER PRIMARY KEY
+        , SOURCE INTEGER /* Yahoo, MorningStar, MOEX */
+        , SYMBOL TEXT COLLATE NOCASE NOT NULL
+        , NAME TEXT
+        , MARKET TEXT 
+        , TYPE INTEGER DEFAULT 0 /* Share, Fund, Bond */
+        , COUNTRY TEXT
+        , SECTOR TEXT /*Basic Materials, Consumer Cyclical, Financial Services, Real Estate, Consumer Defensive, Healthcare, Utilities, Communication Services, Energy, Industrials, Technology, Other */ 
+        , INDUSTRY TEXT
+        , WEBPAGE TEXT
+        , NOTES TEXT
+        , PRECISION INTEGER
+        , CURRENCYID INTEGER NOT NULL
+        , CURRENTPRICE NUMERIC NOT NULL DEFAULT 0
+        , UNIQUE(SYMBOL, CURRENCYID)
+        , FOREIGN KEY (CURRENCYID) REFERENCES CURRENCYFORMATS_V1(CURRENCYID) 
+        );
+        
+        CREATE INDEX IDX_TICKER ON TICKER_V1 (SYMBOL, TICKERID);
+        
+        -- fill it with stock values
+        INSERT INTO TICKER_V1 (SYMBOL, NAME, NOTES, CURRENTPRICE, CURRENCYID, PRECISION)
+        SELECT s.SYMBOL, s.STOCKNAME AS NAME, s.NOTES, s.CURRENTPRICE, a.CURRENCYID, 4 AS PRECISION
+        FROM STOCK_V1 s
+        JOIN ACCOUNTLIST_V1 a ON a.ACCOUNTID = s.HELDAT
+        JOIN CURRENCYFORMATS_V1 c ON c.CURRENCYID = a.CURRENCYID;
+        
+        -- map the STOCKIDs to their respective tickers based on SYMBOL and CURRENCYID
+        CREATE TEMP TABLE STOCK_TICKER_MAP AS 
+            SELECT 
+                s.STOCKID, 
+                t.TICKERID,
+        		s.HELDAT 
+            FROM 
+                STOCK_V1 s
+            JOIN 
+                ACCOUNTLIST_V1 a ON a.ACCOUNTID = s.HELDAT
+            JOIN 
+                TICKER_V1 t ON s.SYMBOL = t.SYMBOL AND a.CURRENCYID = t.CURRENCYID
+        ;
+        
+        -- backup stock table
+        CREATE TEMP TABLE STOCK_V1_COPY AS 
+        SELECT * 
+        FROM STOCK_V1;
+        
+        -- rebuild the stock table
+        CREATE TABLE STOCK_V1_NEW(
+        STOCKID integer primary key
+        , HELDAT integer
+        , PURCHASEDATE TEXT NOT NULL
+        , TICKERID integer NOT NULL
+        , NUMSHARES numeric
+        , PURCHASEPRICE numeric NOT NULL
+        , NOTES TEXT
+        , COMMISSION numeric
+        , LOT TEXT default ''
+        , DELETEDTIME TEXT default ''
+        , FOREIGN KEY (TICKERID) REFERENCES TICKER_V1(TICKERID) 
+        , FOREIGN KEY (HELDAT) REFERENCES ACCOUNTLIST_V1(ACCOUNTID)
+        );
+        
+        -- replace the old table with new
+        DROP TABLE STOCK_V1;
+        ALTER TABLE STOCK_V1_NEW RENAME TO STOCK_V1;
+        
+        -- migrate share transactions to the new STOCK_V1 table
+        CREATE TEMP TABLE STOCK_MIGRATION AS
+        SELECT ROW_NUMBER() OVER (ORDER BY TRANSID) AS ROWNUM, TRANSID, HELDAT, TRANSDATE, TICKERID, SHARENUMBER, SHAREPRICE, NOTES, SHARECOMMISSION, SHARELOT 
+        FROM SHAREINFO_V1 i 
+        JOIN CHECKINGACCOUNT_V1 c ON i.CHECKINGACCOUNTID = c.TRANSID 
+        JOIN TRANSLINK_V1 t ON t.CHECKINGACCOUNTID = c.TRANSID 
+        JOIN STOCK_TICKER_MAP m ON m.STOCKID = t.LINKRECORDID
+        WHERE t.LINKTYPE = 'Stock';
+        
+        INSERT INTO STOCK_V1 (STOCKID, HELDAT, PURCHASEDATE, TICKERID, NUMSHARES, PURCHASEPRICE, NOTES, COMMISSION, LOT)
+        SELECT ROWNUM, HELDAT, TRANSDATE, TICKERID, SHARENUMBER, SHAREPRICE, NOTES, SHARECOMMISSION, SHARELOT 
+        FROM STOCK_MIGRATION;
+        
+        -- add records that were created in STOCK_V1 but didn't have any share transactions
+        INSERT INTO STOCK_V1 (HELDAT, PURCHASEDATE, TICKERID, NUMSHARES, PURCHASEPRICE, NOTES, COMMISSION)
+        SELECT s.HELDAT, PURCHASEDATE, TICKERID, NUMSHARES, PURCHASEPRICE, NOTES, COMMISSION
+        FROM STOCK_V1_COPY s
+        JOIN STOCK_TICKER_MAP m ON s.STOCKID = m.STOCKID
+        WHERE TICKERID NOT IN (SELECT TICKERID FROM STOCK_V1);
+        
+        -- migrate share account transactions to the investment account
+        CREATE TEMP TABLE SHARE_MIGRATION AS 
+        SELECT c.TRANSID, s.HELDAT, m.TICKERID, a.ACCOUNTID as SHAREACCTID, c.ACCOUNTID, c.TOACCOUNTID FROM ACCOUNTLIST_V1 a 
+        JOIN CHECKINGACCOUNT_V1 c ON a.ACCOUNTID = c.ACCOUNTID
+        JOIN STOCK_V1_COPY s ON s.STOCKNAME = a.ACCOUNTNAME
+        JOIN STOCK_TICKER_MAP m ON s.STOCKID = m.STOCKID
+        WHERE a.ACCOUNTTYPE = 'Shares'
+        UNION
+        SELECT c.TRANSID, s.HELDAT, m.TICKERID, a.ACCOUNTID as SHAREACCTID, c.ACCOUNTID, c.TOACCOUNTID  FROM ACCOUNTLIST_V1 a 
+        JOIN CHECKINGACCOUNT_V1 c ON a.ACCOUNTID = c.TOACCOUNTID
+        JOIN STOCK_V1_COPY s ON s.STOCKNAME = a.ACCOUNTNAME
+        JOIN STOCK_TICKER_MAP m ON s.STOCKID = m.STOCKID
+        WHERE a.ACCOUNTTYPE = 'Shares';
+        
+        -- move all share account transactions
+        UPDATE CHECKINGACCOUNT_V1
+        SET ACCOUNTID = (
+            SELECT HELDAT 
+            FROM SHARE_MIGRATION 
+            WHERE CHECKINGACCOUNT_V1.TRANSID = SHARE_MIGRATION.TRANSID
+        	AND CHECKINGACCOUNT_V1.ACCOUNTID = SHARE_MIGRATION.SHAREACCTID
+        )
+        WHERE TRANSID IN (SELECT TRANSID FROM SHARE_MIGRATION WHERE ACCOUNTID = SHAREACCTID);
+        
+        UPDATE CHECKINGACCOUNT_V1
+        SET TOACCOUNTID = (
+            SELECT HELDAT 
+            FROM SHARE_MIGRATION 
+            WHERE CHECKINGACCOUNT_V1.TRANSID = SHARE_MIGRATION.TRANSID
+        	AND CHECKINGACCOUNT_V1.TOACCOUNTID = SHARE_MIGRATION.SHAREACCTID
+        )
+        WHERE TRANSID IN (SELECT TRANSID FROM SHARE_MIGRATION WHERE TOACCOUNTID = SHAREACCTID);
+        
+        -- assign TICKERID as TOACCOUNTID for dividends/commission
+        UPDATE CHECKINGACCOUNT_V1
+        SET TOACCOUNTID = (
+            SELECT TICKERID 
+            FROM SHARE_MIGRATION 
+            WHERE CHECKINGACCOUNT_V1.TRANSID = SHARE_MIGRATION.TRANSID
+        )
+        WHERE TOACCOUNTID = '-1' 
+        AND TRANSID IN (SELECT TRANSID FROM SHARE_MIGRATION);
+        
+        UPDATE CHECKINGACCOUNT_V1 SET ACCOUNTID = (-1 * CHECKINGACCOUNT_V1.ACCOUNTID) WHERE ACCOUNTID IN (SELECT ACCOUNTID FROM ACCOUNTLIST_V1 WHERE ACCOUNTTYPE = 'Shares');
+        UPDATE CHECKINGACCOUNT_V1 SET TOACCOUNTID = (-1 * CHECKINGACCOUNT_V1.TOACCOUNTID) WHERE TOACCOUNTID IN (SELECT ACCOUNTID FROM ACCOUNTLIST_V1 WHERE ACCOUNTTYPE = 'Shares');
+        
+        -- migrate stock transaction attachments to the stock table
+        UPDATE ATTACHMENT_V1 SET REFID = (SELECT TICKERID FROM STOCK_TICKER_MAP WHERE ATTACHMENT_V1.REFTYPE = 'Stock' AND ATTACHMENT_V1.REFID = STOCK_TICKER_MAP.STOCKID) WHERE REFTYPE = 'Stock';
+        UPDATE ATTACHMENT_V1 SET REFTYPE = 'StockTransaction' WHERE REFTYPE = 'Transaction' AND REFID IN (SELECT TRANSID FROM STOCK_MIGRATION);
+        UPDATE ATTACHMENT_V1 SET REFID = (SELECT ROWNUM FROM STOCK_MIGRATION WHERE ATTACHMENT_V1.REFTYPE = 'StockTransaction' AND ATTACHMENT_V1.REFID = STOCK_MIGRATION.TRANSID) WHERE REFTYPE = 'StockTransaction';
+        
+        -- remove buy/sell transactions which are migrated to the STOCK_V1 table
+        DELETE FROM CHECKINGACCOUNT_V1 WHERE TRANSID IN (SELECT CHECKINGACCOUNTID FROM TRANSLINK_V1 WHERE LINKTYPE = 'Stock');
+        DELETE FROM TRANSLINK_V1 WHERE LINKTYPE = 'Stock';
+        
+        -- remove share accounts
+        DELETE FROM ACCOUNTLIST_V1 WHERE ACCOUNTTYPE = 'Shares';
+        
+        -- remove shareinfo table
+        DROP TABLE SHAREINFO_V1;
     )",
 
 };

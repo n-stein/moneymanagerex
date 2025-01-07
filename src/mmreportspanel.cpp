@@ -633,26 +633,15 @@ void mmReportsPanel::OnNewWindow(wxWebViewEvent& evt)
             Model_Checking::Data* transaction = Model_Checking::instance().get(transId);
             if (transaction && transaction->TRANSID > -1)
             {
-                if (Model_Checking::foreignTransaction(*transaction))
+                int type = Model_Checking::foreignTransaction(*transaction);
+                if (type == Model_Attachment::ASSET)
                 {
                     Model_Translink::Data translink = Model_Translink::TranslinkRecord(transId);
-                    if (translink.LINKTYPE == Model_Attachment::reftype_desc(Model_Attachment::STOCK))
+                    mmAssetDialog dlg(m_frame, m_frame, &translink, transaction);
+                    if (dlg.ShowModal() == wxID_OK)
                     {
-                        ShareTransactionDialog dlg(m_frame, &translink, transaction);
-                        if (dlg.ShowModal() == wxID_OK)
-                        {
-                            rb_->getHTMLText();
-                            saveReportText();
-                        }
-                    }
-                    else
-                    {
-                        mmAssetDialog dlg(m_frame, m_frame, &translink, transaction);
-                        if (dlg.ShowModal() == wxID_OK)
-                        {
-                            rb_->getHTMLText();
-                            saveReportText();
-                        }
+                        rb_->getHTMLText();
+                        saveReportText();
                     }
                 }
                 else

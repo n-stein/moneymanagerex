@@ -18,6 +18,7 @@
  ********************************************************/
 
 #include "Model_Account.h"
+#include "Model_CurrencyHistory.h"
 #include "Model_Stock.h"
 #include "Model_Translink.h"
 #include "Model_Shareinfo.h"
@@ -258,10 +259,13 @@ double Model_Account::balance(const Data& r)
 std::pair<double, double> Model_Account::investment_balance(const Data* r)
 {
     std::pair<double /*origianl input value*/, double /**/> sum;
-    for (const auto& stock: Model_Stock::instance().find(Model_Stock::HELDAT(r->ACCOUNTID)))
+
+    for (const auto ticker : getTickerIds(r->ACCOUNTID))
     {
-        sum.first += Model_Stock::CurrentValue(stock);
-        sum.second += Model_Stock::InvestmentValue(stock);
+        Model_StockStat s = Model_StockStat(ticker, r->ACCOUNTID, r->CURRENCYID);
+        Model_Ticker::Data* t = Model_Ticker::instance().get(ticker);
+        sum.second += s.get_total_shares() * t->CURRENTPRICE * (Model_CurrencyHistory::getDayRate(t->CURRENCYID) / Model_CurrencyHistory::getDayRate(r->CURRENCYID));
+        sum.first += s.get_cost_target_curr();
     }
     return sum;
 }
@@ -269,6 +273,26 @@ std::pair<double, double> Model_Account::investment_balance(const Data* r)
 std::pair<double, double> Model_Account::investment_balance(const Data& r)
 {
     return investment_balance(&r);
+}
+
+std::set<int64> Model_Account::getTickerIds(int64 account_id)
+{
+    std::set<int64> tickers;
+    if (account_id < 0)
+    {
+        for (const auto& stock : Model_Stock::instance().all())
+        {
+            tickers.insert(stock.TICKERID);
+        }
+    }
+    else
+    {
+        for (const auto& stock : Model_Stock::instance().find(Model_Stock::HELDAT(account_id)))
+        {
+            tickers.insert(stock.TICKERID);
+        }
+    }
+    return tickers;
 }
 
 wxString Model_Account::toCurrency(double value, const Data* r)
@@ -343,7 +367,16 @@ bool Model_Account::is_used(const Model_Currency::Data* c)
     const auto &accounts = Model_Account::instance().find(
         CURRENCYID(c->CURRENCYID),
         STATUS(STATUS_ID_CLOSED, NOT_EQUAL));
-    return !accounts.empty();
+    bool usedInStockTxn = false;
+    for (const auto ticker : Model_Ticker::instance().find(Model_Ticker::CURRENCYID(c->CURRENCYID)))
+    {
+        if (!Model_Stock::instance().find(Model_Stock::TICKERID(ticker.TICKERID)).empty())
+        {
+            usedInStockTxn = true;
+            break;
+        }
+    }
+    return !accounts.empty() || usedInStockTxn;
 }
 
 bool Model_Account::is_used(const Model_Currency::Data& c)

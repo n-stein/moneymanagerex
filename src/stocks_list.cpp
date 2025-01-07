@@ -53,8 +53,8 @@ wxBEGIN_EVENT_TABLE(StocksListCtrl, mmListCtrl)
     EVT_LIST_KEY_DOWN(wxID_ANY, StocksListCtrl::OnListKeyDown)
     EVT_MENU(MENU_TREEPOPUP_NEW, StocksListCtrl::OnNewStocks)
     EVT_MENU(MENU_TREEPOPUP_EDIT, StocksListCtrl::OnEditStocks)
-    EVT_MENU(MENU_TREEPOPUP_ADDTRANS, StocksListCtrl::OnEditStocks)
-    EVT_MENU(MENU_TREEPOPUP_VIEWTRANS, StocksListCtrl::OnEditStocks)
+    EVT_MENU(MENU_TREEPOPUP_ADDTRANS, StocksListCtrl::OnAddTransaction)
+    EVT_MENU(MENU_TREEPOPUP_VIEWTRANS, StocksListCtrl::OnViewTransactions)
     EVT_MENU(MENU_TREEPOPUP_DELETE, StocksListCtrl::OnDeleteStocks)
     EVT_MENU(MENU_TREEPOPUP_ORGANIZE_ATTACHMENTS, StocksListCtrl::OnOrganizeAttachments)
     EVT_MENU(wxID_INDEX, StocksListCtrl::OnStockWebPage)
@@ -70,6 +70,8 @@ StocksListCtrl::StocksListCtrl(mmStocksPanel* cp, wxWindow *parent, wxWindowID w
     : mmListCtrl(parent, winid)
     , m_stock_panel(cp)
 {
+    cp->m_account_id;
+    
     wxVector<wxBitmapBundle> images;
     images.push_back(mmBitmapBundle(png::PROFIT));
     images.push_back(mmBitmapBundle(png::LOSS));
@@ -169,34 +171,61 @@ void StocksListCtrl::OnMouseRightClick(wxMouseEvent& event)
 
 wxString StocksListCtrl::OnGetItemText(long item, long column) const
 {
-    column = m_real_columns[column];
+    int64 ID = m_stocks[item].TICKERID;
+    Model_Ticker::Data* ticker = Model_Ticker::instance().get(ID);
+    Model_Currency::Data* currency = Model_Currency::instance().get(Model_Account::instance().get(m_stocks[item].HELDAT)->CURRENCYID);
 
-    if (column == COL_ID)           return wxString::Format("%lld", m_stocks[item].STOCKID).Trim();
-    if (column == COL_DATE)         return mmGetDateForDisplay(m_stocks[item].PURCHASEDATE);
-    if (column == COL_NAME)         return m_stocks[item].STOCKNAME;
-    if (column == COL_SYMBOL)       return m_stocks[item].SYMBOL;
-    if (column == COL_NUMBER)
+    if (ticker)
     {
-        int precision = m_stocks[item].NUMSHARES == floor(m_stocks[item].NUMSHARES) ? 0 : 4;
-        return Model_Currency::toString(m_stocks[item].NUMSHARES, m_stock_panel->m_currency, precision);
-    }
-    if (column == COL_PRICE)        return Model_Currency::toString(m_stocks[item].PURCHASEPRICE, m_stock_panel->m_currency, 4);
-    if (column == COL_VALUE)        return Model_Currency::toString(m_stocks[item].VALUE, m_stock_panel->m_currency);
-    if (column == COL_REAL_GAIN_LOSS)    return Model_Currency::toString(GetRealGainLoss(item), m_stock_panel->m_currency);
-    if (column == COL_GAIN_LOSS)    return Model_Currency::toString(GetGainLoss(item), m_stock_panel->m_currency);
-    if (column == COL_CURRENT)      return Model_Currency::toString(m_stocks[item].CURRENTPRICE, m_stock_panel->m_currency, 4);
-    if (column == COL_CURRVALUE)    return Model_Currency::toString(Model_Stock::CurrentValue(m_stocks[item]), m_stock_panel->m_currency);
-    if (column == COL_PRICEDATE)    return mmGetDateForDisplay(Model_Stock::instance().lastPriceDate(&m_stocks[item]));
-    if (column == COL_COMMISSION)   return Model_Currency::toString(m_stocks[item].COMMISSION, m_stock_panel->m_currency);
-    if (column == COL_NOTES)
-    {
-        wxString full_notes = m_stocks[item].NOTES;
-        full_notes.Replace("\n", " ");
-        if (Model_Attachment::NrAttachments(Model_Attachment::reftype_desc(Model_Attachment::STOCK), m_stocks[item].STOCKID))
-            full_notes.Prepend(mmAttachmentManage::GetAttachmentNoteSign());
-        return full_notes;
-    }
+        Model_StockStat* s = stats_.at(ticker->TICKERID).get();
+        Model_Currency::Data* ticker_currency = Model_Currency::instance().get(ticker->CURRENCYID);
 
+        bool default_curr = (ticker_currency == currency);
+
+        if (column == COL_ID)
+            return wxString::Format("%lld", m_stocks[item].TICKERID).Trim();
+        if (column == COL_DATE)
+            return mmGetDateForDisplay(m_stocks[item].PURCHASEDATE);
+        if (column == COL_NAME)
+            return ticker->NAME;
+        if (column == COL_SYMBOL)
+            return ticker->SYMBOL;
+        if (column == COL_NUMBER)
+        {
+            int64 precision = m_stocks[item].NUMSHARES == floor(m_stocks[item].NUMSHARES) ? 0 : ticker->PRECISION;
+            return Model_Currency::toString(m_stocks[item].NUMSHARES, currency, precision.GetValue());
+        }
+        if (column == COL_PRICE)
+        {
+            return default_curr ? Model_Currency::toString(s->get_avg_price_ticker_curr(), ticker_currency, ticker_currency->SCALE.GetValue())
+                                : Model_Currency::toCurrency(s->get_avg_price_ticker_curr(), ticker_currency, ticker_currency->SCALE.GetValue());
+        }
+        if (column == COL_VALUE)
+        {
+            return default_curr ? Model_Currency::toString(s->get_cost_ticker_curr(), ticker_currency, ticker->PRECISION.GetValue())
+                                : Model_Currency::toCurrency(s->get_cost_ticker_curr(), ticker_currency, ticker->PRECISION.GetValue());
+        }
+        if (column == COL_REAL_GAIN_LOSS)
+            return Model_Currency::toString(s->get_real_gain_ticker_curr(), m_stock_panel->m_currency);
+        if (column == COL_GAIN_LOSS)
+            return Model_Currency::toString(s->get_unreal_gain_ticker_curr(), m_stock_panel->m_currency);
+        if (column == COL_CURRENT)
+            return Model_Currency::toString(Model_Ticker::get_ticker_price((m_stocks[item].TICKERID)), m_stock_panel->m_currency, 4);
+        if (column == COL_CURRVALUE)
+            return Model_Currency::toString(s->get_total_shares() * ticker->CURRENTPRICE, m_stock_panel->m_currency);
+        if (column == COL_PRICEDATE)
+            return mmGetDateForDisplay(Model_Stock::instance().lastPriceDate(&m_stocks[item]));
+        if (column == COL_COMMISSION)
+            return Model_Currency::toString(m_stocks[item].COMMISSION, m_stock_panel->m_currency);
+        if (column == COL_NOTES)
+        {
+            wxString full_notes = m_stocks[item].NOTES;
+            full_notes.Replace("\n", " ");
+            if (Model_Attachment::NrAttachments(Model_Attachment::reftype_desc(Model_Attachment::STOCK), m_stocks[item].STOCKID))
+                full_notes.Prepend(mmAttachmentManage::GetAttachmentNoteSign());
+            return full_notes;
+        }
+    }
     return wxEmptyString;
 }
 
@@ -207,7 +236,7 @@ double StocksListCtrl::GetGainLoss(long item) const
 
 double StocksListCtrl::getGainLoss(const Model_Stock::Data& stock)
 {
-    return Model_Stock::CurrentValue(stock) - stock.VALUE;
+    return Model_Stock::UnrealGainLoss(stock);
 }
 
 double StocksListCtrl::GetRealGainLoss(long item) const
@@ -272,12 +301,49 @@ void StocksListCtrl::OnListKeyDown(wxListEvent& event)
 
 void StocksListCtrl::OnNewStocks(wxCommandEvent& /*event*/)
 {
-    mmStockDialog dlg(this, m_stock_panel->m_frame, nullptr, m_stock_panel->m_account_id);
-    dlg.ShowModal();
-    if (Model_Stock::instance().get(dlg.m_stock_id))
+    wxArrayString ticker_symbols;
+    std::vector<int64> ticker_ids;
+    Model_Ticker::Data_Set tickers = Model_Ticker::instance().all(Model_Ticker::COL_SYMBOL);
+    std::vector<std::pair<int, int>> widths;
+    int space_width = GetTextExtent(" ").GetWidth();
+    int symbol_width_max = 0;
+    int name_width_max = 0;
+
+    // capture ticker name/symbol max widths for formatting purposes
+    for (auto& ticker : tickers)
     {
-        doRefreshItems(dlg.m_stock_id);
-        m_stock_panel->m_frame->RefreshNavigationTree();
+        int symbol_width = GetTextExtent(ticker.SYMBOL).GetWidth();
+        int name_width = GetTextExtent(ticker.NAME).GetWidth();
+
+        symbol_width_max = std::max(symbol_width, symbol_width_max);
+        name_width_max = std::max(name_width, name_width_max);
+        widths.push_back(std::make_pair(symbol_width, name_width));
+    }
+    int index = -1;
+
+    // Start with new ticker
+    ticker_ids.push_back(-1);
+    ticker_symbols.Add(_("New..."));
+
+    // add existing tickers
+    for (auto& ticker : tickers)
+    {
+        ticker_symbols.Add(ticker.SYMBOL + wxString(' ', (symbol_width_max - widths.at(++index).first) / space_width) + "\t" + ticker.NAME +
+                           wxString(' ', (name_width_max - widths.at(index).second) / space_width) +
+                           "\t" + Model_Currency::instance().get(ticker.CURRENCYID)->CURRENCY_SYMBOL);
+        ticker_ids.push_back(ticker.TICKERID);
+    }
+
+    mmSingleChoiceDialog ticker_dlg(this, _("Choose a ticker or create a new one"), "", ticker_symbols);
+    if (ticker_dlg.ShowModal() == wxID_OK)
+    {
+            mmStockDialog dlg(this, m_stock_panel->m_frame, ticker_ids[ticker_dlg.GetSelection()], m_stock_panel->m_account_id);
+            dlg.ShowModal();
+
+            if (Model_Stock::instance().get(dlg.get_ticker_id()))
+            {
+            doRefreshItems(dlg.get_ticker_id());
+            }
     }
 }
 
@@ -295,7 +361,6 @@ void StocksListCtrl::OnDeleteStocks(wxCommandEvent& /*event*/)
         Model_Translink::RemoveTransLinkRecords(Model_Attachment::STOCK, m_stocks[m_selected_row].STOCKID);
         DeleteItem(m_selected_row);
         doRefreshItems(-1);
-        m_stock_panel->m_frame->RefreshNavigationTree();
     }
 }
 
@@ -336,10 +401,7 @@ void StocksListCtrl::OnMoveStocks(wxCommandEvent& /*event*/)
 
 void StocksListCtrl::OnEditStocks(wxCommandEvent& event)
 {
-    if (m_selected_row < 0) return;
-
-    wxListEvent evt(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, event.GetId());
-    AddPendingEvent(evt);
+    m_stock_panel->OnEditStocks(event);
 }
 
 void StocksListCtrl::OnOrganizeAttachments(wxCommandEvent& /*event*/)
@@ -347,7 +409,7 @@ void StocksListCtrl::OnOrganizeAttachments(wxCommandEvent& /*event*/)
     if (m_selected_row < 0) return;
 
     wxString RefType = Model_Attachment::reftype_desc(Model_Attachment::STOCK);
-    int64 RefId = m_stocks[m_selected_row].STOCKID;
+    int64 RefId = m_stocks[m_selected_row].TICKERID;
 
     mmAttachmentDialog dlg(this, RefType, RefId);
     dlg.ShowModal();
@@ -358,7 +420,8 @@ void StocksListCtrl::OnOrganizeAttachments(wxCommandEvent& /*event*/)
 void StocksListCtrl::OnStockWebPage(wxCommandEvent& /*event*/)
 {
     if (m_selected_row < 0) return;
-    const wxString stockSymbol = m_stocks[m_selected_row].SYMBOL;
+    Model_Ticker::Data* ticker = Model_Ticker::instance().get(m_stocks[m_selected_row].TICKERID);
+    const wxString stockSymbol = ticker->SYMBOL;
 
     if (!stockSymbol.IsEmpty())
     {
@@ -381,19 +444,18 @@ void StocksListCtrl::OnOpenAttachment(wxCommandEvent& /*event*/)
 
 void StocksListCtrl::OnListItemActivated(wxListEvent& event)
 {
-    if ((event.GetId() == wxID_ADD) || (event.GetId() == MENU_TREEPOPUP_ADDTRANS))
-    {
-        m_stock_panel->AddStockTransaction(m_selected_row);
-        m_stock_panel->m_frame->RefreshNavigationTree();
-    }
-    else if ((event.GetId() == wxID_VIEW_DETAILS) || (event.GetId() == MENU_TREEPOPUP_VIEWTRANS))
-    {
-        m_stock_panel->ViewStockTransactions(m_selected_row);
-    }
-    else
-    {
-        m_stock_panel->OnListItemActivated(m_selected_row);
-    }
+    wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED, wxID_VIEW_DETAILS);
+    m_stock_panel->OnViewStockTransactions(evt);
+}
+
+void StocksListCtrl::OnAddTransaction(wxCommandEvent& event)
+{
+    m_stock_panel->OnAddStockTransaction(event);
+}
+
+void StocksListCtrl::OnViewTransactions(wxCommandEvent& event)
+{
+    m_stock_panel->OnViewStockTransactions(event);
 }
 
 void StocksListCtrl::OnColClick(wxListEvent& event)
@@ -418,14 +480,15 @@ void StocksListCtrl::OnColClick(wxListEvent& event)
     Model_Setting::instance().Set("STOCKS_SORT_COL", m_selected_col);
 
     int64 trx_id = -1;
-    if (m_selected_row>=0) trx_id = m_stocks[m_selected_row].STOCKID;
+    if (m_selected_row>=0) trx_id = m_stocks[m_selected_row].TICKERID;
     doRefreshItems(trx_id);
     m_stock_panel->OnListItemSelected(-1);
 }
 
-void StocksListCtrl::doRefreshItems(int64 trx_id)
+void StocksListCtrl::doRefreshItems(int64 ticker_id)
 {
-    int selectedIndex = initVirtualListControl(trx_id, m_selected_col, m_asc);
+    initVirtualListControl(ticker_id, m_selected_col, m_asc);
+    long selectedIndex = ticker_id.GetValue() > 0 ? ticker_id.GetValue() : m_selected_row;
     long cnt = static_cast<long>(m_stocks.size());
 
     if (selectedIndex >= cnt || selectedIndex < 0)
@@ -446,39 +509,63 @@ void StocksListCtrl::doRefreshItems(int64 trx_id)
     }
 }
 
-int StocksListCtrl::initVirtualListControl(int64 trx_id, int col, bool asc)
+void StocksListCtrl::initVirtualListControl(int64 ticker_id, int col, bool asc)
 {
     m_stock_panel->updateHeader();
-    /* Clear all the records */
-    DeleteAllItems();
 
-    if (col > 0)
+    if (ticker_id <= 0)
     {
-        wxListItem item;
-        item.SetMask(wxLIST_MASK_IMAGE);
-        item.SetImage(asc ? static_cast<int>(ico::ARROW_DOWN) : static_cast<int>(ico::ARROW_UP));
-        SetColumn(col, item);
+        /* Clear all the records */
+        DeleteAllItems();
+
+        std::vector<int64> list;
+
+        Model_Stock::Data_Set stocks = Model_Stock::instance().find(Model_Stock::HELDAT(m_stock_panel->m_account_id));
+        for (const auto& entry : stocks)
+        {
+            if (std::find(list.begin(), list.end(), entry.TICKERID) == list.end())
+            {
+                list.push_back(entry.TICKERID);
+            }
+        }
+
+        m_stocks.clear();
+        for (const auto& entry : list)
+        {
+            Model_Stock::Data* item = Model_Stock::instance().create();
+
+            Model_Ticker::Data* t = Model_Ticker::instance().get(entry);
+
+            wxSharedPtr<Model_StockStat> s;
+            s = new Model_StockStat(t->TICKERID, m_stock_panel->m_account_id);
+            stats_[t->TICKERID] = s;
+
+            item->PURCHASEDATE = s->get_init_date();
+            item->NUMSHARES = s->get_total_shares();
+            item->PURCHASEPRICE = s->get_avg_price_ticker_curr();
+            item->HELDAT = m_stock_panel->m_account_id;
+            item->TICKERID = entry;
+            item->COMMISSION = s->get_commission_ticker_curr();
+            item->STOCKID = t->TICKERID;
+
+            m_stocks.push_back(*item);
+        }
+    }
+    else if (m_selected_row >= 0)
+    {
+        wxSharedPtr<Model_StockStat> s;
+        s = new Model_StockStat(ticker_id, m_stock_panel->m_account_id);
+        stats_[ticker_id] = s;
+        m_stocks[m_selected_row].PURCHASEDATE = s->get_init_date();
+        m_stocks[m_selected_row].NUMSHARES = s->get_total_shares();
+        m_stocks[m_selected_row].PURCHASEPRICE = s->get_avg_price_ticker_curr();
+        m_stocks[m_selected_row].COMMISSION = s->get_commission_ticker_curr();
     }
 
-    m_stocks = Model_Stock::instance().find(Model_Stock::HELDAT(m_stock_panel->m_account_id));
     sortTable();
 
-    int cnt = 0, selected_item = -1;
-    for (auto& stock : m_stocks)
-    {
-        if (trx_id == stock.STOCKID)
-        {
-            selected_item = cnt;
-            break;
-        }
-        if (!stock.PURCHASEPRICE) {
-            Model_Translink::UpdateStockValue(&stock);
-        }
-        ++cnt;
-    }
-
     SetItemCount(m_stocks.size());
-    return selected_item;
+    return;
 }
 
 void StocksListCtrl::sortTable()
@@ -493,10 +580,22 @@ void StocksListCtrl::sortTable()
         std::stable_sort(m_stocks.begin(), m_stocks.end(), SorterByPURCHASEDATE());
         break;
     case StocksListCtrl::COL_NAME:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), SorterBySTOCKNAME());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(),
+                         [](const Model_Stock::Data& x, const Model_Stock::Data& y)
+                         {
+                             Model_Ticker::Data* tx = Model_Ticker::instance().get(x.TICKERID);
+                             Model_Ticker::Data* ty = Model_Ticker::instance().get(y.TICKERID);
+                             return tx->NAME < ty->NAME;
+                         });
         break;
     case StocksListCtrl::COL_SYMBOL:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), SorterBySYMBOL());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(),
+                         [](const Model_Stock::Data& x, const Model_Stock::Data& y)
+                         {
+                             Model_Ticker::Data* tx = Model_Ticker::instance().get(x.TICKERID);
+                             Model_Ticker::Data* ty = Model_Ticker::instance().get(y.TICKERID);
+                             return tx->SYMBOL < ty->SYMBOL;
+                         });
         break;
     case StocksListCtrl::COL_NUMBER:
         std::stable_sort(m_stocks.begin(), m_stocks.end(), SorterByNUMSHARES());
@@ -508,7 +607,9 @@ void StocksListCtrl::sortTable()
         std::stable_sort(m_stocks.begin(), m_stocks.end()
             , [](const Model_Stock::Data& x, const Model_Stock::Data& y)
             {
-                return x.VALUE < y.VALUE;
+                             Model_Ticker::Data* tx = Model_Ticker::instance().get(x.TICKERID);
+                             Model_Ticker::Data* ty = Model_Ticker::instance().get(y.TICKERID);
+                             return x.NUMSHARES * tx->CURRENTPRICE < y.NUMSHARES * ty->CURRENTPRICE;
             });
         break;
     case StocksListCtrl::COL_REAL_GAIN_LOSS:
@@ -526,7 +627,14 @@ void StocksListCtrl::sortTable()
             });
         break;
     case StocksListCtrl::COL_CURRENT:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), SorterByCURRENTPRICE());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(),
+                         [](const Model_Stock::Data& x, const Model_Stock::Data& y)
+                         {
+                             Model_Ticker::Data* tx = Model_Ticker::instance().get(x.TICKERID);
+                             Model_Ticker::Data* ty = Model_Ticker::instance().get(y.TICKERID);
+                             return tx->CURRENTPRICE < ty->CURRENTPRICE;
+                         });
+        //std::stable_sort(m_stocks.begin(), m_stocks.end(), SorterByCURRENTPRICE());
         break;
     case StocksListCtrl::COL_CURRVALUE:
         std::stable_sort(m_stocks.begin(), m_stocks.end()

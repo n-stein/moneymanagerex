@@ -22,6 +22,7 @@
 #define MM_EX_STOCKSPANEL_H_
 
 #include "stocks_list.h"
+#include "mmcheckingpanel.h"
 #include "mmpanelbase.h"
 #include <wx/tglbtn.h>
 #include "mmframe.h"
@@ -54,18 +55,15 @@ public:
     void OnNewStocks(wxCommandEvent& event);
     void OnDeleteStocks(wxCommandEvent& event);
     void OnMoveStocks(wxCommandEvent& event);
+    void OnAddStockTransaction(wxCommandEvent& event);
+    void OnViewStockTransactions(wxCommandEvent& event);
     void OnEditStocks(wxCommandEvent& event);
     void OnOpenAttachment(wxCommandEvent& event);
     void OnRefreshQuotes(wxCommandEvent& event);
     //Unhide the Edit and Delete buttons if any record selected
     void enableEditDeleteButtons(bool en);
-    void OnListItemActivated(int selectedIndex);
-    void AddStockTransaction(int selectedIndex);
     void OnListItemSelected(int selectedIndex);
     void RefreshList();
-    //void OnViewPopupSelected(wxCommandEvent& event);
-
-    void ViewStockTransactions(int selectedIndex);
 
     int64 m_account_id = -1;
     Model_Currency::Data * m_currency = nullptr;
@@ -77,9 +75,10 @@ public:
     mmGUIFrame* m_frame;
 
 private:
-    StocksListCtrl* listCtrlAccount_ = nullptr;
+    wxNotebook* notebook_ = nullptr;
+    StocksListCtrl* listCtrlStocks_ = nullptr;
+    mmCheckingPanel* listCtrlMoney_ = nullptr;
     wxStaticText* stock_details_ = nullptr;
-    void call_dialog(int selectedIndex);
     void sortTable() {}
     const wxString Total_Shares();
 

@@ -37,7 +37,7 @@ public:
     StocksListCtrl(mmStocksPanel* cp, wxWindow *parent, wxWindowID winid = wxID_ANY);
     ~StocksListCtrl();
 
-    void doRefreshItems(int64 trx_id = -1);
+    void doRefreshItems(int64 ticker_id = -1);
     void OnNewStocks(wxCommandEvent& event);
     void OnDeleteStocks(wxCommandEvent& event);
     void OnMoveStocks(wxCommandEvent& event);
@@ -52,7 +52,7 @@ public:
     /* Helper Functions/data */
     Model_Stock::Data_Set m_stocks;
     /* updates thstockide checking panel data */
-    int initVirtualListControl(int64 trx_id = -1, int col = 0, bool asc = true);
+    void initVirtualListControl(int64 trx_id = -1, int col = 0, bool asc = true);
 
 private:
     /* required overrides for virtual style list control */
@@ -62,6 +62,8 @@ private:
     void OnMouseRightClick(wxMouseEvent& event);
     void OnListLeftClick(wxMouseEvent& event);
     void OnListItemActivated(wxListEvent& event);
+    void OnAddTransaction(wxCommandEvent& event);
+    void OnViewTransactions(wxCommandEvent& event);
     void OnColClick(wxListEvent& event);
     void OnMarkTransaction(wxCommandEvent& event);
     void OnMarkAllTransactions(wxCommandEvent& event);
@@ -69,6 +71,7 @@ private:
     void OnListItemSelected(wxListEvent& event);
 
     mmStocksPanel* m_stock_panel;
+    std::map<int64, wxSharedPtr<Model_StockStat>> stats_;
     enum EColumn
     {
         COL_ICON = 0,

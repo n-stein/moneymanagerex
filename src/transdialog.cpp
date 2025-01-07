@@ -31,6 +31,7 @@
 #include "paths.h"
 #include "payeedialog.h"
 #include "splittransactionsdialog.h"
+#include "stockdialog.h"
 #include "util.h"
 #include "validators.h"
 #include "webapp.h"
@@ -700,6 +701,12 @@ bool mmTransDialog::ValidateData()
         }
         m_fused_data.TOTRANSAMOUNT = m_fused_data.TRANSAMOUNT;
         m_fused_data.PAYEEID = payee->PAYEEID;
+
+        // Save stock tickerid as the partner account if this dialog was triggered from the stock dialog
+        mmStockDialog* stockDialog = wxDynamicCast(GetParent(), mmStockDialog);
+        if (stockDialog)
+            m_fused_data.TOACCOUNTID = stockDialog->get_ticker_id();
+
         if (!Model_Checking::foreignTransaction(m_fused_data))
         {
             m_fused_data.TOACCOUNTID = -1;
@@ -864,7 +871,7 @@ void mmTransDialog::OnFocusChange(wxChildFocusEvent& event)
 
     object_in_focus_ = w->GetId();
 
-    if (!m_transfer)
+    if (!m_transfer && !Model_Checking::foreignTransaction(m_fused_data))
     {
         toTextAmount_->ChangeValue("");
         m_fused_data.TOACCOUNTID = -1;

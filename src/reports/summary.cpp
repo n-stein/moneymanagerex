@@ -143,27 +143,25 @@ wxString mmReportSummaryByDate::getHTMLText()
         const wxDate accountOpeningDate = Model_Account::get_date_by_string(account.INITIALDATE);
         if (accountOpeningDate.IsEarlierThan(dateStart))
             dateStart = accountOpeningDate;
+        accountsBalanceMap[account.ACCOUNTID] = createCheckingBalanceMap(account);
         if (Model_Account::type_id(account) == Model_Account::TYPE_ID_INVESTMENT)
         {
-            Model_Stock::Data_Set stocks = Model_Stock::instance().find(Model_Stock::HELDAT(account.id()));
-            for (const auto& stock : stocks)
+            for (const auto& tickerid : Model_Account::getTickerIds(account.ACCOUNTID))
             {
+                Model_StockStat s = Model_StockStat(tickerid, account.ACCOUNTID, account.CURRENCYID);
                 mmHistoryItem histItem;
                 histItem.acctId = account.id();
-                histItem.stockId = stock.STOCKID;
-                histItem.purchasePrice = stock.PURCHASEPRICE;
-                histItem.purchaseDate = Model_Stock::PURCHASEDATE(stock);
-                histItem.purchaseDateStr = stock.PURCHASEDATE;
-                histItem.numShares = stock.NUMSHARES;
-                histItem.stockHist = Model_StockHistory::instance().find(Model_StockHistory::SYMBOL(stock.SYMBOL));
+                histItem.stockId = tickerid;
+                histItem.purchasePrice = s.get_cost_target_curr();
+                wxDate dt;
+                histItem.purchaseDate = dt.ParseISODate(s.get_init_date());
+                histItem.purchaseDateStr = s.get_init_date();
+                histItem.numShares = s.get_total_shares();
+                histItem.stockHist = Model_StockHistory::instance().find(Model_StockHistory::SYMBOL(Model_Ticker::get_ticker_symbol(tickerid)));
                 std::stable_sort(histItem.stockHist.begin(), histItem.stockHist.end(), SorterByDATE());
                 std::reverse(histItem.stockHist.begin(), histItem.stockHist.end());
                 arHistory.push_back(histItem);
             }
-        }
-        else
-        {
-            accountsBalanceMap[account.ACCOUNTID] = createCheckingBalanceMap(account);
         }
     }
 
@@ -213,6 +211,10 @@ wxString mmReportSummaryByDate::getHTMLText()
         for (const auto& account : Model_Account::instance().all())
         {
             balancePerDay[Model_Account::type_id(account)] += getDailyBalanceAt(&account, end_date) * getDayRate(account.CURRENCYID, end_date);
+            if (Model_Account::type_id(account) == Model_Account::TYPE_ID_INVESTMENT && end_date.FormatISODate() >= account.INITIALDATE)
+            {
+                balancePerDay[Model_Account::TYPE_ID_SHARES] += getCheckingDailyBalanceAt(&account, end_date) * getDayRate(account.CURRENCYID, end_date);
+            }
         }
 
         for (const auto& asset : Model_Asset::instance().all()) {
@@ -266,7 +268,7 @@ wxString mmReportSummaryByDate::getHTMLText()
         gs_data[4].type = "column";   
         gs_data[5].name = _("Asset Accounts");
         gs_data[5].type = "column";   
-        gs_data[6].name = _("Share Accounts");
+        gs_data[6].name = _("Investment Accounts");
         gs_data[6].type = "column";
         gs_data[7].name = _("Assets");
         gs_data[7].type = "column";
@@ -304,7 +306,7 @@ wxString mmReportSummaryByDate::getHTMLText()
                     hb.addTableHeaderCell(_("Loan Accounts"), "text-right");
                     hb.addTableHeaderCell(_("Term Accounts"), "text-right");
                     hb.addTableHeaderCell(_("Asset Accounts"), "text-right");
-                    hb.addTableHeaderCell(_("Share Accounts"), "text-right");
+                    hb.addTableHeaderCell(_("Investment Accounts"), "text-right");
                     hb.addTableHeaderCell(_("Total"), "text-right");
                     hb.addTableHeaderCell(_("Assets"), "text-right");
                     hb.addTableHeaderCell(_("Stocks"), "text-right");

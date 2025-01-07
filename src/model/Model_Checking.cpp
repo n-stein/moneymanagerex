@@ -721,9 +721,17 @@ const wxString Model_Checking::Full_Data::to_json()
     return wxString::FromUTF8(json_buffer.GetString());
 }
 
-bool Model_Checking::foreignTransaction(const Data& data)
+int Model_Checking::foreignTransaction(const Data& data)
 {
-    return (data.TOACCOUNTID > 0) && (data.TRANSCODE == TYPE_STR_DEPOSIT || data.TRANSCODE == TYPE_STR_WITHDRAWAL);
+    Model_Account::Data* account = Model_Account::instance().get(data.ACCOUNTID);
+    if ((data.TOACCOUNTID > 0) && (data.TRANSCODE == TYPE_STR_DEPOSIT || data.TRANSCODE == TYPE_STR_WITHDRAWAL))
+    {
+        if (Model_Account::type_id(account) == Model_Account::TYPE_ID_INVESTMENT)
+            return Model_Attachment::STOCK;
+        else
+            return Model_Attachment::ASSET;
+    }
+    return Model_Attachment::TRANSACTION;
 }
 
 bool Model_Checking::foreignTransactionAsTransfer(const Data& data)

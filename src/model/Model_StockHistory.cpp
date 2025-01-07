@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "Model_StockHistory.h"
 #include "Model_Stock.h"
+#include "Model_CurrencyHistory.h"
 
 Model_StockHistory::Model_StockHistory()
 : Model<DB_Table_STOCKHISTORY_V1>()
@@ -81,7 +82,10 @@ int64 Model_StockHistory::addUpdate(const wxString& symbol, const wxDate& date, 
     stockHist->UPDTYPE = type;
 
     if (Model_StockHistory::instance().find(Model_StockHistory::SYMBOL(symbol), Model_StockHistory::DATE(date, GREATER)).size() == 0) {
-        Model_Stock::UpdateCurrentPrice(symbol, price);
+        for (auto ticker : Model_Ticker::instance().find(Model_Ticker::SYMBOL(symbol))){
+            ticker.CURRENTPRICE = price * Model_CurrencyHistory::getDayRate(ticker.CURRENCYID, date);
+            Model_Ticker::instance().save(&ticker);
+        }
     }
 
     return save(stockHist);

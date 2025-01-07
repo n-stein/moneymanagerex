@@ -41,5 +41,6 @@
 #include "Model_StockHistory.h"
 #include "Model_Tag.h"
 #include "Model_Taglink.h"
+#include "Model_Ticker.h"
 #include "Model_Translink.h"
 #include "Model_Usage.h"

@@ -58,11 +58,6 @@ public:
         , const int64 checking_id
         , const CHECKING_TYPE checking_type = AS_INCOME_EXPENSE);
 
-    /* Create a translink record as Stock */
-    static Model_Translink::Data* SetStockTranslink(const int64 stock_id
-        , const int64 checking_id
-        , const CHECKING_TYPE checking_type = AS_INCOME_EXPENSE);
-
     /*
     Return a list of translink records for the associated foreign table type.
     Equivalent SQL statements:
@@ -71,8 +66,6 @@ public:
     */
     static Model_Translink::Data_Set TranslinkList(Model_Attachment::REFTYPE link_table
         , const int64 link_id);
-
-    static bool HasShares(const int64 stock_id);
 
     /*
     Return the link record for the checking account 
@@ -87,13 +80,6 @@ public:
     /* Remove the checking account entry and its associated transfer transaction. */
     static void RemoveTranslinkEntry(const int64 checking_account_id);
 
-    /*
-    stock_entry.PURCHASEPRICE = avg price of shares purchased.
-    stock_entry.NUMSHARES = total amount of shares purchased.
-    stock_entry.VALUE     = value of shares based on:
-    ... share_entry.SHARENUMBER * share_entry.SHAREPRICE
-    */
-    static void UpdateStockValue(Model_Stock::Data* stock_entry);
     static void UpdateAssetValue(Model_Asset::Data* asset_entry);
 
     /* Return true with the account id of the first share entry in the stock translink list */

@@ -232,7 +232,7 @@ public:
 
     static bool getTransactionData(Data &data, const Data* r);
     static void putDataToTransaction(Data *r, const Data &data);
-    static bool foreignTransaction(const Data& data);
+    static int foreignTransaction(const Data& data);
     static bool foreignTransactionAsTransfer(const Data& data);
 };
 

@@ -120,25 +120,30 @@ void htmlWidgetStocks::calculate_stats(std::map<int64, std::pair<double, double>
 {
     this->grand_total_ = 0;
     this->grand_gain_lost_ = 0;
-    const auto &stocks = Model_Stock::instance().all();
+    Model_Account::Data_Set invest_accts = Model_Account::instance().find(Model_Account::ACCOUNTTYPE(Model_Account::TYPE_STR_INVESTMENT));
     const wxDate today = wxDate::Today();
-    for (const auto& stock : stocks)
+    for (const auto& account : invest_accts)
     {
-        double conv_rate = 1;
-        Model_Account::Data *account = Model_Account::instance().get(stock.HELDAT);
-        if (account)
+        double acct_conv_rate = Model_CurrencyHistory::getDayRate(account.CURRENCYID);
+        double base_value = 0.0;
+        double base_gain = 0.0;
+        for (int64 tickerid : Model_Account::getTickerIds(account.ACCOUNTID))
         {
-            conv_rate = Model_CurrencyHistory::getDayRate(account->CURRENCYID, today);
+            Model_Ticker::Data* t = Model_Ticker::instance().get(tickerid);
+            Model_StockStat s = Model_StockStat(tickerid, account.ACCOUNTID);
+            std::pair<double, double>& values = stockStats[account.ACCOUNTID];
+            double base_conv_rate = Model_CurrencyHistory::getDayRate(t->CURRENCYID);
+            double current_value = s.get_total_shares() * t->CURRENTPRICE;
+            double gain = s.get_unreal_gain_ticker_curr() * base_conv_rate / acct_conv_rate;
+            base_value += current_value * base_conv_rate;
+            base_gain += s.get_unreal_gain_target_curr(); 
+            values.second += current_value * base_conv_rate / acct_conv_rate;
+            values.first += gain;
         }
-        std::pair<double, double>& values = stockStats[stock.HELDAT];
-        double current_value = Model_Stock::CurrentValue(stock);
-        double gain_lost = current_value - Model_Stock::InvestmentValue(stock);
-        values.first += gain_lost;
-        values.second += current_value;
-        if (account && account->STATUS == VIEW_ACCOUNTS_OPEN_STR)
+        if (account.STATUS == VIEW_ACCOUNTS_OPEN_STR)
         {
-            grand_total_ += current_value * conv_rate;
-            grand_gain_lost_ += Model_Stock::UnrealGainLoss(stock, true);
+            grand_total_ += base_value;
+            grand_gain_lost_ += base_gain;
         }
     }
 }
