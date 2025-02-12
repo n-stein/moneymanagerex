@@ -12,7 +12,7 @@
  *      @brief
  *
  *      Revision History:
- *          AUTO GENERATED at 2025-02-04 16:22:14.834591.
+ *          AUTO GENERATED at 2025-02-12 12:32:02.138967.
  *          DO NOT EDIT!
  */
 //=============================================================================
@@ -424,7 +424,18 @@ struct DB_Table_STOCKHISTORY_V1 : public DB_Table
             stmt.Bind(2, entity->DATE);
             stmt.Bind(3, entity->VALUE);
             stmt.Bind(4, entity->UPDTYPE);
-            stmt.Bind(5, entity->id() > 0 ? entity->HISTID : newId());
+            int64 new_id = -1;
+            if (entity->id() <= 0)
+            {
+                new_id = newId();
+                Data* rec = get(new_id, db);
+                while (rec->id() > 0)
+                {
+                    new_id = newId();
+                    rec = get(new_id, db);
+                }
+            }
+            stmt.Bind(5, entity->id() > 0 ? entity->HISTID : new_id);
 
             stmt.ExecuteUpdate();
             stmt.Finalize();

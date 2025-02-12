@@ -12,7 +12,7 @@
  *      @brief
  *
  *      Revision History:
- *          AUTO GENERATED at 2025-02-04 16:22:14.834591.
+ *          AUTO GENERATED at 2025-02-12 12:32:02.138967.
  *          DO NOT EDIT!
  */
 //=============================================================================
@@ -797,7 +797,18 @@ struct DB_Table_ACCOUNTLIST_V1 : public DB_Table
             stmt.Bind(18, entity->INTERESTRATE);
             stmt.Bind(19, entity->PAYMENTDUEDATE);
             stmt.Bind(20, entity->MINIMUMPAYMENT);
-            stmt.Bind(21, entity->id() > 0 ? entity->ACCOUNTID : newId());
+            int64 new_id = -1;
+            if (entity->id() <= 0)
+            {
+                new_id = newId();
+                Data* rec = get(new_id, db);
+                while (rec->id() > 0)
+                {
+                    new_id = newId();
+                    rec = get(new_id, db);
+                }
+            }
+            stmt.Bind(21, entity->id() > 0 ? entity->ACCOUNTID : new_id);
 
             stmt.ExecuteUpdate();
             stmt.Finalize();

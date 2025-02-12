@@ -638,7 +638,18 @@ struct DB_Table_%s : public DB_Table
 
 
         s += '''
-            stmt.Bind(%d, entity->id() > 0 ? entity->%s : newId());
+            int64 new_id = -1;
+            if (entity->id() <= 0)
+            {
+                new_id = newId();
+                Data* rec = get(new_id, db);
+                while (rec->id() > 0)
+                {
+                    new_id = newId();
+                    rec = get(new_id, db);
+                }
+            }
+            stmt.Bind(%d, entity->id() > 0 ? entity->%s : new_id);
 
             stmt.ExecuteUpdate();
             stmt.Finalize();

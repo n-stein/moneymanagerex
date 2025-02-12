@@ -12,7 +12,7 @@
  *      @brief
  *
  *      Revision History:
- *          AUTO GENERATED at 2025-02-04 16:22:14.834591.
+ *          AUTO GENERATED at 2025-02-12 12:32:02.138967.
  *          DO NOT EDIT!
  */
 //=============================================================================
@@ -425,7 +425,18 @@ struct DB_Table_CURRENCYHISTORY_V1 : public DB_Table
             stmt.Bind(2, entity->CURRDATE);
             stmt.Bind(3, entity->CURRVALUE);
             stmt.Bind(4, entity->CURRUPDTYPE);
-            stmt.Bind(5, entity->id() > 0 ? entity->CURRHISTID : newId());
+            int64 new_id = -1;
+            if (entity->id() <= 0)
+            {
+                new_id = newId();
+                Data* rec = get(new_id, db);
+                while (rec->id() > 0)
+                {
+                    new_id = newId();
+                    rec = get(new_id, db);
+                }
+            }
+            stmt.Bind(5, entity->id() > 0 ? entity->CURRHISTID : new_id);
 
             stmt.ExecuteUpdate();
             stmt.Finalize();
