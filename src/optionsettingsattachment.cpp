@@ -174,19 +174,19 @@ void OptionSettingsAttachment::Create()
 
     attachmentStaticBoxSizer->AddSpacer(20);
 
-    m_delete_attachments = new wxCheckBox(attachment_panel, wxID_STATIC,
+    m_delete_attachments = new wxCheckBox(attachment_panel, wxID_ANY,
         _("Delete file after import"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
     m_delete_attachments->SetValue(Model_Infotable::instance().getBool("ATTACHMENTSDELETE", false));
     mmToolTip(m_delete_attachments, _("Select to delete file after import in attachments archive"));
     attachmentStaticBoxSizer->Add(m_delete_attachments, g_flagsV);
 
-    m_trash_attachments = new wxCheckBox(attachment_panel, wxID_STATIC,
+    m_trash_attachments = new wxCheckBox(attachment_panel, wxID_ANY,
         _("When remove attachment, move file instead of delete"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
     m_trash_attachments->SetValue(Model_Infotable::instance().getBool("ATTACHMENTSTRASH", false));
     mmToolTip(m_trash_attachments, _("Select to don't delete file when attachment is removed, but instead move it to 'Deleted' subfolder"));
     attachmentStaticBoxSizer->Add(m_trash_attachments, g_flagsV);
 
-    m_duplicate_attachments = new wxCheckBox(attachment_panel, wxID_STATIC,
+    m_duplicate_attachments = new wxCheckBox(attachment_panel, wxID_ANY,
         _("When duplicating transactions duplicate the attachments also"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
     m_duplicate_attachments->SetValue(Model_Infotable::instance().getBool("ATTACHMENTSDUPLICATE", false));
     mmToolTip(m_trash_attachments, _("Select if you want to copy the attachments to new transactions when they are duplicated or pasted"));

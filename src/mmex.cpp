@@ -325,21 +325,11 @@ bool OnInitImpl(mmGUIApp* app)
 
 #endif
 
-#if defined(__WXMSW__)
-    // https://msdn.microsoft.com/en-us/library/ee330730(v=vs.85).aspx
-    // https://kevinragsdale.net/windows-10-and-the-web-browser-control/
-    wxRegKey Key(wxRegKey::HKCU, R"(Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION)");
-    if (!(Key.Create(true) && Key.SetValue(wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetFullName(), 11001)))
-        wxASSERT(false);
 
-    wxRegKey theme_key(wxRegKey::HKCU, R"(Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)");
-    if (theme_key.Exists() && theme_key.HasValue("AppsUseLightTheme"))
-    {
-        long AppsUseLightTheme;
-        theme_key.QueryValue("AppsUseLightTheme", &AppsUseLightTheme);
-        wxLogDebug("App Use Light Theme: %s", AppsUseLightTheme ? "True" : "False");
-    }
-
+#if defined (__WXMSW__)
+    if (Option::THEME_MODE::DARK == Option::instance().getThemeMode() ||
+        (mmex::isDarkMode() && (Option::THEME_MODE::AUTO == Option::instance().getThemeMode())))
+        app->MSWEnableDarkMode();
 #endif
 
     /* Initialize CURL */
