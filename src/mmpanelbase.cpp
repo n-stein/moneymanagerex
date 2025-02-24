@@ -144,7 +144,7 @@ void mmListCtrl::savePreferences()
         json_writer.Key("col_nr_id");
         json_writer.StartArray();
         for (int col_nr = 0; col_nr < getColNrSize(); ++col_nr)
-            json_writer.Int(getColId(col_nr));
+            json_writer.Int(getColIdFromOrder(col_nr));
         json_writer.EndArray();
     }
 
@@ -194,8 +194,8 @@ void mmListCtrl::savePreferences_v190()
     // save m_col_nr_id
     if (!m_col_nr_id.empty() && !o_col_order_prefix.empty()) {
         wxString order_str;
-        for (int col_id : m_col_nr_id)
-            order_str.Append((order_str.IsEmpty() ? "" : "|") + wxString::Format("%i", col_id));
+        for (int col_nr = 0; col_nr < GetColumnCount(); ++col_nr)
+            order_str.Append((order_str.IsEmpty() ? "" : "|") + wxString::Format("%i", getColIdFromOrder(col_nr)));
         Model_Setting::instance().setString(getColOrderKey_v190(), order_str);
     }
 

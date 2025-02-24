@@ -101,6 +101,7 @@ public:
     bool isValidColId(int col_id) const;
     bool isValidColNr(int col_nr) const;
     int getColId(int col_nr) const;
+    int getColIdFromOrder(int col_nr) const;
     int getColNr(int col_id) const;
     const wxString getColHeader(int col_id, bool show_icon = false) const;
     bool isDisabledColId(int col_id) const;
@@ -172,6 +173,19 @@ inline bool mmListCtrl::isValidColNr(int col_nr) const
 
 inline int mmListCtrl::getColId(int col_nr) const
 {
+    return m_col_nr_id.empty() ? col_nr : m_col_nr_id[col_nr];
+}
+
+// On macOS and Linux, this function is identical to getColId.
+// On Windows, this function returns the column ID based on the visual order
+// which may differ from the wxListCtrl column index due to drag/drop actions.
+inline int mmListCtrl::getColIdFromOrder(int col_nr) const
+{
+#ifdef wxHAS_LISTCTRL_COLUMN_ORDER
+    if (GetColumnCount() > col_nr)
+    col_nr = GetColumnIndexFromOrder(col_nr);
+#endif
+
     return m_col_nr_id.empty() ? col_nr : m_col_nr_id[col_nr];
 }
 
