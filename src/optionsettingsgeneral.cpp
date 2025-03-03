@@ -171,7 +171,7 @@ void OptionSettingsGeneral::Create()
 
     m_currencyStaticBoxSizer->AddSpacer(15);
 
-    m_currency_history = new wxCheckBox(general_panel, wxID_STATIC, _t("Use historical currency"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+    m_currency_history = new wxCheckBox(general_panel, wxID_ANY, _t("Use historical currency"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
     m_currency_history->SetValue(Option::instance().getUseCurrencyHistory());
     mmToolTip(m_currency_history, _t("Select to use historical currency (one rate for each day), deselect to use a fixed rate"));
     m_currencyStaticBoxSizer->Add(m_currency_history, g_flagsV);
@@ -211,12 +211,12 @@ void OptionSettingsGeneral::Create()
     // Misc settings
     generalPanelSizer->AddSpacer(15);
 
-    m_use_org_date_copy_paste = new wxCheckBox(general_panel, wxID_STATIC, _t("Use Original Date when Pasting Transactions"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+    m_use_org_date_copy_paste = new wxCheckBox(general_panel, wxID_ANY, _t("Use Original Date when Pasting Transactions"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
     m_use_org_date_copy_paste->SetValue(GetIniDatabaseCheckboxValue(INIDB_USE_ORG_DATE_COPYPASTE, false));
     mmToolTip(m_use_org_date_copy_paste, _t("Select whether to use the original transaction date or current date when copying/pasting transactions"));
     generalPanelSizer->Add(m_use_org_date_copy_paste, g_flagsV);
 
-    m_use_org_date_duplicate = new wxCheckBox(general_panel, wxID_STATIC, _t("Use Original Date when Duplicating Transactions"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+    m_use_org_date_duplicate = new wxCheckBox(general_panel, wxID_ANY, _t("Use Original Date when Duplicating Transactions"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
     m_use_org_date_duplicate->SetValue(GetIniDatabaseCheckboxValue(INIDB_USE_ORG_DATE_DUPLICATE, false));
     mmToolTip(m_use_org_date_duplicate, _t("Select whether to use the original transaction date or current date when duplicating transactions"));
     generalPanelSizer->Add(m_use_org_date_duplicate, g_flagsV);

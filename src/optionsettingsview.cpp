@@ -108,7 +108,7 @@ void OptionSettingsView::Create()
     viewChoiceSizer->Add(m_categ_delimiter_list, g_flagsH);
 
     m_showToolTips = new wxCheckBox(
-        panelWindow, wxID_STATIC,
+        panelWindow, wxID_ANY,
         _t("Show Tooltips"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE
     );
@@ -116,7 +116,7 @@ void OptionSettingsView::Create()
     viewChoiceSizer->Add(m_showToolTips, g_flagsH);
 
     m_showMoneyTips = new wxCheckBox(
-        panelWindow, wxID_STATIC,
+        panelWindow, wxID_ANY,
         _t("Show Money Tips"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE
     );
@@ -130,7 +130,7 @@ void OptionSettingsView::Create()
     panelSizer->Add(trxSizer, wxSizerFlags(g_flagsExpand).Proportion(0));
 
     m_budget_financial_years = new wxCheckBox(
-        panelWindow, wxID_STATIC,
+        panelWindow, wxID_ANY,
         _t("View Budgets as Financial Years"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE
     );
@@ -138,7 +138,7 @@ void OptionSettingsView::Create()
     trxSizer->Add(m_budget_financial_years, g_flagsV);
 
     m_budget_include_transfers = new wxCheckBox(
-        panelWindow, wxID_STATIC,
+        panelWindow, wxID_ANY,
         _t("View Budgets with 'transfer' transactions"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE
     );
@@ -146,7 +146,7 @@ void OptionSettingsView::Create()
     trxSizer->Add(m_budget_include_transfers, g_flagsV);
 
     m_budget_summary_without_category = new wxCheckBox(
-        panelWindow, wxID_STATIC,
+        panelWindow, wxID_ANY,
         _t("View Budget Category Report with Summaries"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE
     );
@@ -155,7 +155,7 @@ void OptionSettingsView::Create()
 
     // Budget Yearly/Monthly relationship if both exist
     m_budget_override = new wxCheckBox(
-        panelWindow, wxID_STATIC,
+        panelWindow, wxID_ANY,
         _t("Override yearly budget with monthly budget"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE
     );
@@ -165,7 +165,7 @@ void OptionSettingsView::Create()
 
     // Option to deduct monthly budget from yearly budget for reporting
     m_budget_deduct_monthly = new wxCheckBox(
-        panelWindow, wxID_STATIC,
+        panelWindow, wxID_ANY,
         _t("Subtract monthly budgets from yearly budget in reporting"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE
     );
@@ -203,7 +203,7 @@ void OptionSettingsView::Create()
     trxChoiceSizer->Add(m_reporting_first_weekday, g_flagsH);
 
     m_ignore_future_transactions = new wxCheckBox(
-        panelWindow, wxID_STATIC,
+        panelWindow, wxID_ANY,
         _t("Ignore Future Transactions"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE
     );
