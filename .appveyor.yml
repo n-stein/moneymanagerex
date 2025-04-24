@@ -1,7 +1,7 @@
 version: '{build}'
 clone_depth: 10 # to allow queued build jobs
-image:
-- Visual Studio 2022
+build_cloud: NS-DESKTOP
+image: Windows
 configuration:
 - Release
 # - Debug
