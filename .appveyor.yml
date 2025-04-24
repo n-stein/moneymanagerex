@@ -30,7 +30,7 @@ environment:
   wxVer: 3.2.7
   wxComp: 14x
   wxwin: C:\wxWidgets-$(wxVer)-$(configuration)
-  wxShared: 1
+  wxShared: 0
   wxURL: https://github.com/wxWidgets/wxWidgets/releases/download/v$(wxVer)
   # Microsoft compiler options
   CL: /MP
