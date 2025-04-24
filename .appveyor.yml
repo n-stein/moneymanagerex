@@ -35,7 +35,7 @@ environment:
   # Microsoft compiler options
   CL: /MP
   # Python version to use
-  pythonDir: C:\Python38-x64
+  pythonDir: Z:\dev\python313
   matrix:
   - { comp: 143, wxShared: 1 }
 
