@@ -33,6 +33,7 @@
 #include <wx/sstream.h>
 #include <wx/xml/xml.h>
 #include <wx/fs_mem.h>
+#include <wx/webview.h>
 
 #include "build.h"
 #include "util.h"
@@ -225,7 +226,15 @@ bool getNewsRSS(std::vector<WebsiteNews>& WebsiteNewsList)
     return true;
 }
 
-/*--- CSV specific ---------*/
+void formatHTML(wxString& html)
+{
+#if defined(__WXMSW__)
+    if (wxWebView::IsBackendAvailable(wxWebViewBackendEdge))
+        html.Replace("memory:", "");
+#endif
+}
+
+    /*--- CSV specific ---------*/
 void csv2tab_separated_values(wxString& line, const wxString& delimit)
 {
     //csv line example:

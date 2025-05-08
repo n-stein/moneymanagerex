@@ -159,7 +159,7 @@ void mmCustomFieldEditDialog::CreateControls()
     itemFlexGridSizer6->Add(m_itemRegEx, g_flagsExpand);
 
     itemFlexGridSizer6->Add(new wxStaticText(itemPanel5, wxID_STATIC, _t("Autocomplete")), g_flagsH);
-    m_itemAutocomplete = new wxCheckBox(itemPanel5, wxID_STATIC, "", wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+    m_itemAutocomplete = new wxCheckBox(itemPanel5, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
     m_itemAutocomplete->SetValue(FALSE);
     mmToolTip(m_itemAutocomplete, _t("Enables autocomplete on custom field"));
     itemFlexGridSizer6->Add(m_itemAutocomplete, g_flagsExpand);

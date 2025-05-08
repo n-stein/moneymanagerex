@@ -1096,7 +1096,9 @@ void mmGeneralReportManager::newReport(int sample)
     case ID_NEW_SAMPLE_ASSETS:
         sqlContent = SAMPLE_ASSETS_SQL;
         luaContent = SAMPLE_ASSETS_LUA;
-        httContent = SAMPLE_ASSETS_HTT;
+        wxString htt = SAMPLE_ASSETS_HTT;
+        formatHTML(htt);
+        httContent = htt;
         description = _t("Assets");
         break;
     }
@@ -1306,7 +1308,9 @@ const wxString mmGeneralReportManager::getTemplate(wxString& sql)
             }
         }
     }
-    return wxString::Format(HTT_CONTEINER, header, body, params);
+    wxString htt = HTT_CONTEINER;
+    formatHTML(htt);
+    return wxString::Format(htt, header, body, params);
 }
 
 #if wxUSE_DRAG_AND_DROP

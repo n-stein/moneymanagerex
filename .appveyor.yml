@@ -27,7 +27,7 @@ environment:
   curldir: C:\curl-$(curlVer)
   curlStatic: ON
   # wxWidgets config
-  wxVer: 3.2.8
+  wxVer: 3.3.0
   wxComp: 14x
   wxwin: C:\wxWidgets-$(wxVer)-$(configuration)
   wxShared: 0
@@ -81,24 +81,30 @@ install:
 - copy clcache\clcache-%clcVer%\clcache.exe clcache\clcache-%clcVer%\cl.exe
 - if exist %APPVEYOR_BUILD_FOLDER%\clcache\clcache-%clcVer%\cl.exe set "PATH=%APPVEYOR_BUILD_FOLDER%\clcache\clcache-%clcVer%;%PATH%"
 - clcache -s
-# wxWidgets
-- curl -fsSL -O %wxURL%/wxWidgets-%wxVer%.7z
-- 7z x -y "-o%wxwin%" wx*-%wxVer%*.7z
+# wxWidgets is not precompiled with Edge backend, so we have to compile ourselves 
 # wxWidgets, build script from build/tools/msvs/officialbuild.bat
+- if %configuration%==Release set "wxConf=BUILD=release"
 - if not %platform:~-2%==64 (
     set "wxFlags=CPPFLAGS=/arch:SSE CFLAGS=/arch:SSE" &&
     set "cmake_gen=-DCMAKE_GENERATOR_PLATFORM=WIN32"
-  ) else (set "cmake_gen=-DCMAKE_GENERATOR_PLATFORM=x64")                                                                                        
+  ) else (set "cmake_gen=-DCMAKE_GENERATOR_PLATFORM=x64")
+# first try to download source code of an official wxWidgets release
+# if the version isn't released yet, pull the master branch of current wxWidgets codebase
 - if not exist "%wxLibFolder%" (
-    echo Building wxWidgets %wxVer% &&                                                                                
+    echo Building wxWidgets %wxVer% &&
+    ((curl -fsSL --fail-early -O %wxURL%/wxWidgets-%wxVer%.7z &&
+        7z x -y "-o%wxwin%" wx*-%wxVer%*.7z) ||
+      (git clone -q --recursive --single-branch https://github.com/wxWidgets/wxWidgets.git %wxwin%)) &&
+    echo Building wxWidgets %wxVer% &&
     cd %wxwin% &&
     cmake . -G "NMake Makefiles"
-      -DCMAKE_BUILD_TYPE=%configuration% 
-      -DwxBUILD_SHARED=%wxShared% 
-      -DwxBUILD_OPTIMISE=ON 
-      -DwxUSE_STL=ON 
-      -DwxUSE_UNSAFE_WXSTRING_CONV=OFF 
-      -DwxBUILD_VENDOR=mmex 
+      -DCMAKE_BUILD_TYPE=%configuration%
+      -DwxBUILD_SHARED=%wxShared%
+      -DwxBUILD_OPTIMISE=ON
+      -DwxUSE_STL=ON
+      -DwxUSE_UNSAFE_WXSTRING_CONV=OFF
+      -DwxUSE_WEBVIEW_EDGE=ON 
+      -DwxBUILD_VENDOR=mmex
       -S . -B . &&
     cmake --build .
   )
