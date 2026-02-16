@@ -1377,7 +1377,7 @@ void JournalList::onMoveTransaction(wxCommandEvent& /*event*/)
         if (scd.ShowModal() == wxID_OK) {
             int64 dest_account_id = -1;
             wxString dest_account_name = scd.GetStringSelection();
-            AccountModel::Data* dest_account = AccountModel::instance().cache_key(dest_account_name);
+            AccountModel::Data* dest_account = AccountModel::instance().get_key(dest_account_name);
             if (dest_account)
                 dest_account_id = dest_account->ACCOUNTID;
             else

@@ -107,11 +107,11 @@ void AssetDialog::dataToControls()
     if (!this->m_asset) return;
 
     m_assetName->SetValue(m_asset->ASSETNAME);
-    if (AccountModel::instance().cache_key(m_asset->ASSETNAME))
+    if (AccountModel::instance().get_key(m_asset->ASSETNAME))
         m_assetName->Enable(false);
     m_dpc->SetValue(AssetModel::STARTDATE(m_asset));
     m_assetType->SetSelection(AssetModel::type_id(m_asset));
-    if (AccountModel::instance().cache_key(m_asset->ASSETTYPE)) m_assetType->Enable(false);
+    if (AccountModel::instance().get_key(m_asset->ASSETTYPE)) m_assetType->Enable(false);
 
     auto bal = AssetModel::value(m_asset);
     m_value->SetValue(bal.first);
@@ -448,7 +448,7 @@ void AssetDialog::OnOk(wxCommandEvent& /*event*/)
         return;
     }
 
-    AccountModel::Data* asset_account = AccountModel::instance().cache_key(name);
+    AccountModel::Data* asset_account = AccountModel::instance().get_key(name);
     if (is_new && !asset_account) {
         if (wxMessageBox(
             _t("Asset account not found.") + "\n\n" + _t("Do you want to create one?"),

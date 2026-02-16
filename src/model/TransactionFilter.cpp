@@ -63,7 +63,7 @@ void TransactionFilter::setAccountList(wxSharedPtr<wxArrayString> accountList)
         m_account_a.clear();
         for (const auto &entry : *accountList)
         {
-            const auto account = AccountModel::instance().cache_key(entry);
+            const auto account = AccountModel::instance().get_key(entry);
             if (account) m_account_a.push_back(account->ACCOUNTID);
         }
         m_filter_account = true;

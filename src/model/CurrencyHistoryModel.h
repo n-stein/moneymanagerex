@@ -48,7 +48,7 @@ public:
     static CurrencyHistoryModel& instance();
 
 public:
-    Data* cache_key(const int64& currencyID, const wxDate& date);
+    Data* get_key(const int64& currencyID, const wxDate& date);
     static wxDate CURRDATE(const Data& hist);
 
     static CurrencyHistoryTable::CURRDATE CURRDATE(OP op, const wxDate& date);

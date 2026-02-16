@@ -77,7 +77,7 @@ public:
     {
         int64 id = -1;
         if (m_payee) {
-            PayeeModel::Data * p = PayeeModel::instance().cache_key(this->GetValue());
+            PayeeModel::Data * p = PayeeModel::instance().get_key(this->GetValue());
             if (p) {
                 id = p->PAYEEID;
             }
@@ -90,7 +90,7 @@ public:
             }
         }
         else {
-            AccountModel::Data* a = AccountModel::instance().cache_key(this->GetValue());
+            AccountModel::Data* a = AccountModel::instance().get_key(this->GetValue());
             if (a) id = a->ACCOUNTID;
             else {
                 //TODO:

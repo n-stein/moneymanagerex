@@ -321,7 +321,7 @@ void TransactionDialog::dataToControls()
             }
             else if (m_mode == MODE_NEW && PreferencesModel::instance().getTransPayeeNone() == PreferencesModel::UNUSED)
             {
-                PayeeModel::Data *payee = PayeeModel::instance().cache_key(_t("Unknown"));
+                PayeeModel::Data *payee = PayeeModel::instance().get_key(_t("Unknown"));
                 if (!payee)
                 {
                     payee = PayeeModel::instance().create();
@@ -727,7 +727,7 @@ bool TransactionDialog::ValidateData()
         if (payee_loc != wxNOT_FOUND)
             payee_name = cbPayee_->GetString(payee_loc);
 
-        PayeeModel::Data* payee = PayeeModel::instance().cache_key(payee_name);
+        PayeeModel::Data* payee = PayeeModel::instance().get_key(payee_name);
         if (!payee)
         {
             wxMessageDialog msgDlg( this
@@ -762,7 +762,7 @@ bool TransactionDialog::ValidateData()
     }
     else //transfer
     {
-        const AccountModel::Data *to_account = AccountModel::instance().cache_key(cbToAccount_->GetValue());
+        const AccountModel::Data *to_account = AccountModel::instance().get_key(cbToAccount_->GetValue());
 
         if (!to_account || to_account->ACCOUNTID == m_journal_data.ACCOUNTID)
         {
@@ -931,7 +931,7 @@ void TransactionDialog::SetDialogTitle(const wxString& title)
 
 void TransactionDialog::OnPayeeChanged(wxCommandEvent& /*event*/)
 {
-    PayeeModel::Data * payee = PayeeModel::instance().cache_key(cbPayee_->GetValue());
+    PayeeModel::Data * payee = PayeeModel::instance().get_key(cbPayee_->GetValue());
     if (payee)
     {
         SetCategoryForPayee(payee);
@@ -1028,7 +1028,7 @@ void TransactionDialog::SetCategoryForPayee(const PayeeModel::Data *payee)
     if (m_mode == MODE_NEW && PreferencesModel::instance().getTransCategoryNone() == PreferencesModel::UNUSED
         && m_local_splits.empty())
     {
-        CategoryModel::Data *category = CategoryModel::instance().cache_key(_t("Unknown"), int64(-1));
+        CategoryModel::Data *category = CategoryModel::instance().get_key(_t("Unknown"), int64(-1));
         if (!category)
         {
             category = CategoryModel::instance().create();
@@ -1045,7 +1045,7 @@ void TransactionDialog::SetCategoryForPayee(const PayeeModel::Data *payee)
 
     if (!payee)
     {
-        payee = PayeeModel::instance().cache_key(cbPayee_->GetValue());
+        payee = PayeeModel::instance().get_key(cbPayee_->GetValue());
         if (!payee)
             return;
     }

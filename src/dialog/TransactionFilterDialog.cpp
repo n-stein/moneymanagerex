@@ -1978,7 +1978,7 @@ const wxString TransactionFilterDialog::mmGetJsonSettings(bool i18n) const
             if (tag == "&" || tag == "|")
                 json_writer.String(tag.utf8_str());
             else
-                json_writer.Int64(TagModel::instance().cache_key(tag)->TAGID.GetValue());
+                json_writer.Int64(TagModel::instance().get_key(tag)->TAGID.GetValue());
         }
 
         json_writer.EndArray();
@@ -2327,7 +2327,7 @@ void TransactionFilterDialog::OnAccountsButton(wxCommandEvent& WXUNUSED(event))
         {
             int index = entry;
             const wxString accounts_name = m_accounts_name[index];
-            const auto account = AccountModel::instance().cache_key(accounts_name);
+            const auto account = AccountModel::instance().get_key(accounts_name);
             if (account)
                 m_selected_accounts_id.push_back(account->ACCOUNTID);
             baloon += accounts_name + "\n";

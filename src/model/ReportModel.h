@@ -53,7 +53,7 @@ public:
     //wxString get_html(const Data& r);
 
 public:
-    Data* cache_key(const wxString& name);
+    Data* get_key(const wxString& name);
     static bool PrepareSQL(wxString& sql, std::map <wxString, wxString>& rep_params);
     static const std::vector<std::pair<wxString, wxString>> getParamNames();
 

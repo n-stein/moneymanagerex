@@ -84,7 +84,7 @@ CategoryModel::Data* CategoryModel::cache_name(const wxString& name, const wxStr
     return category;
 }
 
-CategoryModel::Data* CategoryModel::cache_key(const wxString& name, const int64 parentid)
+CategoryModel::Data* CategoryModel::get_key(const wxString& name, const int64 parentid)
 {
     Data* category = this->search_cache(CATEGNAME(name), PARENTID(parentid));
     if (category) return category;

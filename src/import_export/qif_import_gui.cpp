@@ -467,7 +467,7 @@ bool mmQIFImportDialog::mmReadQIFFile()
     wxString accName = "";
     if (accountCheckBox_->IsChecked()) {
         accName = accountDropDown_->GetStringSelection();
-        AccountModel::Data* acc = AccountModel::instance().cache_key(accName);
+        AccountModel::Data* acc = AccountModel::instance().get_key(accName);
         if (acc) {
             m_accountNameStr = acc->ACCOUNTNAME;
         }
@@ -806,7 +806,7 @@ void mmQIFImportDialog::refreshTabs(int tabs)
 
             AccountModel::Data* account = (accountNumberCheckBox_->IsChecked())
                 ? AccountModel::instance().cache_num(acc.first)
-                : AccountModel::instance().cache_key(acc.first);
+                : AccountModel::instance().get_key(acc.first);
 
             wxString status;
             const wxString type = acc.second.find(AccountType) != acc.second.end()
@@ -1085,7 +1085,7 @@ void mmQIFImportDialog::validatePayees() {
             }
         }
         if (!payee_found) {
-            PayeeModel::Data* payee = PayeeModel::instance().cache_key(payee_name);
+            PayeeModel::Data* payee = PayeeModel::instance().get_key(payee_name);
             if (payee) {
                 m_QIFpayeeNames[payee_name] = std::make_tuple(payee->PAYEEID, payee->PAYEENAME, "");
             }
@@ -1188,7 +1188,7 @@ void mmQIFImportDialog::OnOk(wxCommandEvent& WXUNUSED(event))
                         wxString tagname = tagTokens.GetNextToken().Trim(false).Trim();
                         // make tag names single-word
                         tagname.Replace(" ", "_");
-                        TagModel::Data* tag = TagModel::instance().cache_key(tagname);
+                        TagModel::Data* tag = TagModel::instance().get_key(tagname);
                         if (!tag)
                         {
                             tag = TagModel::instance().create();
@@ -1557,7 +1557,7 @@ bool mmQIFImportDialog::completeTransaction(/*in*/ const std::unordered_map <int
                     wxString tagname = tagTokens.GetNextToken().Trim(false).Trim();
                     // make tag names single-word
                     tagname.Replace(" ", "_");
-                    TagModel::Data* tag = TagModel::instance().cache_key(tagname);
+                    TagModel::Data* tag = TagModel::instance().get_key(tagname);
                     if (!tag)
                     {
                         tag = TagModel::instance().create();
@@ -1700,7 +1700,7 @@ int64 mmQIFImportDialog::getOrCreateAccounts()
         int64 accountID = -1;
         AccountModel::Data* acc = (accountNumberCheckBox_->IsChecked())
             ? AccountModel::instance().cache_num(item.first)
-            : AccountModel::instance().cache_key(item.first);
+            : AccountModel::instance().get_key(item.first);
 
         if (!acc)
         {
@@ -1736,7 +1736,7 @@ int64 mmQIFImportDialog::getOrCreateAccounts()
         m_QIFaccountsID[item.first] = accountID;
     }
 
-    AccountModel::Data* acc = AccountModel::instance().cache_key(m_accountNameStr);
+    AccountModel::Data* acc = AccountModel::instance().get_key(m_accountNameStr);
     if (acc) {
         m_QIFaccountsID[m_accountNameStr] = acc->ACCOUNTID;
     }
@@ -1777,7 +1777,7 @@ void mmQIFImportDialog::getOrCreateCategories()
         int64 parentID = -1;
         while(token.HasMoreTokens()){
             categStr = token.GetNextToken().Trim(false).Trim();
-            CategoryModel::Data* c = CategoryModel::instance().cache_key(categStr, parentID);
+            CategoryModel::Data* c = CategoryModel::instance().get_key(categStr, parentID);
             if (temp.Index(categStr + wxString::Format(":%lld", parentID)) == wxNOT_FOUND) {
 
                 if (!c)
@@ -1800,7 +1800,7 @@ void mmQIFImportDialog::getOrCreateCategories()
 int64 mmQIFImportDialog::get_last_imported_acc()
 {
     int64 accID = -1;
-    AccountModel::Data* acc = AccountModel::instance().cache_key(m_accountNameStr);
+    AccountModel::Data* acc = AccountModel::instance().get_key(m_accountNameStr);
     if (acc)
         accID = acc->ACCOUNTID;
     return accID;

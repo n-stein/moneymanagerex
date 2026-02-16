@@ -478,7 +478,7 @@ void TransactionLinkDialog::SetTransactionCategory(const int64 categid)
 
 void TransactionLinkDialog::SetTransactionAccount(const wxString& trans_account)
 {
-    AccountModel::Data* account = AccountModel::instance().cache_key(trans_account);
+    AccountModel::Data* account = AccountModel::instance().get_key(trans_account);
     if (account)
     {
         m_account->SetLabelText(account->ACCOUNTNAME);

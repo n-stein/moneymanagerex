@@ -187,8 +187,8 @@ void MergeTagDialog::OnOk(wxCommandEvent& WXUNUSED(event))
 void MergeTagDialog::IsOkOk()
 {
     bool e = true;
-    TagModel::Data* source = TagModel::instance().cache_key(cbSourceTag_->GetValue());
-    TagModel::Data* dest = TagModel::instance().cache_key(cbDestTag_->GetValue());
+    TagModel::Data* source = TagModel::instance().get_key(cbSourceTag_->GetValue());
+    TagModel::Data* dest = TagModel::instance().get_key(cbDestTag_->GetValue());
     if (dest) destTagID_ = dest->TAGID;
     if (source) sourceTagID_ = source->TAGID;
     int trxs_size = (sourceTagID_ < 0) ? 0 : TagLinkModel::instance().find(

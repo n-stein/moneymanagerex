@@ -122,8 +122,8 @@ void AssetList::OnMouseRightClick(wxMouseEvent& event)
     }
     else
     {
-        auto asset_account = AccountModel::instance().cache_key(m_panel->m_assets[m_selected_row].ASSETNAME);  // ASSETNAME <=> ACCOUNTNAME
-        if (!asset_account) asset_account = AccountModel::instance().cache_key(m_panel->m_assets[m_selected_row].ASSETTYPE);  // ASSETTYPE <=> ACCOUNTNAME
+        auto asset_account = AccountModel::instance().get_key(m_panel->m_assets[m_selected_row].ASSETNAME);  // ASSETNAME <=> ACCOUNTNAME
+        if (!asset_account) asset_account = AccountModel::instance().get_key(m_panel->m_assets[m_selected_row].ASSETTYPE);  // ASSETTYPE <=> ACCOUNTNAME
         menu.Enable(MENU_TREEPOPUP_GOTOACCOUNT, asset_account);
         menu.Enable(MENU_TREEPOPUP_VIEWTRANS, asset_account);
     }
@@ -777,8 +777,8 @@ void AssetPanel::AddAssetTrans(const int selected_index)
 {
     AssetModel::Data* asset = &m_assets[selected_index];
     AssetDialog asset_dialog(this, asset, true);
-    AccountModel::Data* account = AccountModel::instance().cache_key(asset->ASSETNAME);
-    AccountModel::Data* account2 = AccountModel::instance().cache_key(asset->ASSETTYPE);
+    AccountModel::Data* account = AccountModel::instance().get_key(asset->ASSETNAME);
+    AccountModel::Data* account2 = AccountModel::instance().get_key(asset->ASSETTYPE);
     if (account || account2)
     {
         asset_dialog.SetTransactionAccountName(account ? asset->ASSETNAME : asset->ASSETTYPE);
@@ -935,7 +935,7 @@ void AssetPanel::CopySelectedRowsToClipboard(wxListCtrl* listCtrl)
 void AssetPanel::GotoAssetAccount(const int selected_index)
 {
     AssetModel::Data* asset = &m_assets[selected_index];
-    const AccountModel::Data* account = AccountModel::instance().cache_key(asset->ASSETNAME);
+    const AccountModel::Data* account = AccountModel::instance().get_key(asset->ASSETNAME);
     if (account)
     {
         SetAccountParameters(account);

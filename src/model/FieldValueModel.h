@@ -48,7 +48,7 @@ public:
 
 public:
     std::map<int64, Data_Set> get_all_id(const wxString& reftype);
-    Data* cache_key(int64 FieldID, int64 RefID);
+    Data* get_key(int64 FieldID, int64 RefID);
     wxArrayString allValue(const int64 FieldID);
     static bool DeleteAllData(const wxString& RefType, int64 RefID);
 };

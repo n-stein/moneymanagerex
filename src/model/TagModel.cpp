@@ -49,7 +49,7 @@ TagModel& TagModel::instance()
     return Singleton<TagModel>::instance();
 }
 
-TagModel::Data* TagModel::cache_key(const wxString& name)
+TagModel::Data* TagModel::get_key(const wxString& name)
 {
     Data* tag = this->search_cache(TAGNAME(name));
     if (tag)

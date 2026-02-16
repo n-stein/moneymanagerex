@@ -49,7 +49,7 @@ public:
     * Return the Data record pointer for the given payee name
     * Returns 0 when payee not found.
     */
-    Data* cache_key(const wxString& refType, int64 refId, int64 tagId);
+    Data* get_key(const wxString& refType, int64 refId, int64 tagId);
 
     /**
     * Return a map of all tags for the specified transaction

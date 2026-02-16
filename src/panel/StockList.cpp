@@ -333,7 +333,7 @@ void StockList::OnMoveStocks(wxCommandEvent& /*event*/)
     if (error_code == wxID_OK)
     {
         wxString acctName = scd.GetStringSelection();
-        const AccountModel::Data* to_account = AccountModel::instance().cache_key(acctName);
+        const AccountModel::Data* to_account = AccountModel::instance().get_key(acctName);
         toAccountID = to_account->ACCOUNTID;
     }
 

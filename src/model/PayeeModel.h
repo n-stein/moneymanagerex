@@ -56,7 +56,7 @@ public:
     * Return the Data record pointer for the given payee name
     * Returns 0 when payee not found.
     */
-    Data* cache_key(const wxString& name);
+    Data* get_key(const wxString& name);
     static wxString get_payee_name(int64 payee_id);
 
     bool remove(int64 id);

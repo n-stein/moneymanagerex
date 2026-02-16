@@ -48,7 +48,7 @@ public:
     static StockHistoryModel& instance();
 
 public:
-    Data* cache_key(const wxString& symbol, const wxDate& date);
+    Data* get_key(const wxString& symbol, const wxDate& date);
     static wxDate DATE(const Data& hist);
 
     static StockHistoryTable::DATE DATE(OP op, const wxDate& date);

@@ -253,7 +253,7 @@ void TagManager::OnEdit(wxCommandEvent& WXUNUSED(event))
     if (text.IsEmpty() || old_name == text)
         return;
 
-    TagModel::Data* tag = TagModel::instance().cache_key(text);
+    TagModel::Data* tag = TagModel::instance().get_key(text);
     if (tag)
     {
         wxString errMsg = _t("A tag with this name already exists");
@@ -261,7 +261,7 @@ void TagManager::OnEdit(wxCommandEvent& WXUNUSED(event))
         return;
     }
 
-    tag = TagModel::instance().cache_key(old_name);
+    tag = TagModel::instance().get_key(old_name);
     tag->TAGNAME = text;
     TagModel::instance().save(tag);
     tagList_.Remove(old_name);
@@ -294,7 +294,7 @@ void TagManager::OnDelete(wxCommandEvent& WXUNUSED(event))
     TransactionSplitModel::instance().Savepoint();
     for (const auto& selection : stringSelections)
     {
-        TagModel::Data* tag = TagModel::instance().cache_key(selection);
+        TagModel::Data* tag = TagModel::instance().get_key(selection);
         int tag_used = TagModel::instance().is_used(tag->TAGID);
         if (tag_used == 1)
         {
@@ -369,7 +369,7 @@ void TagManager::OnListSelChanged(wxCommandEvent& WXUNUSED(event))
         bool is_used = false;
         for (const auto& selection : stringSelections)
         {
-            TagModel::Data* tag = TagModel::instance().cache_key(selection);
+            TagModel::Data* tag = TagModel::instance().get_key(selection);
             is_used |= TagModel::instance().is_used(tag->TAGID) == 1;
         }
         buttonDelete_->Enable(!is_used);

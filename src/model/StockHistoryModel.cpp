@@ -47,7 +47,7 @@ StockHistoryModel& StockHistoryModel::instance()
     return Singleton<StockHistoryModel>::instance();
 }
 
-StockHistoryModel::Data* StockHistoryModel::cache_key(const wxString& symbol, const wxDate& date)
+StockHistoryModel::Data* StockHistoryModel::get_key(const wxString& symbol, const wxDate& date)
 {
     Data* hist = this->search_cache(
         SYMBOL(symbol),
@@ -77,7 +77,7 @@ Adds or updates an element in stock history
 */
 int64 StockHistoryModel::addUpdate(const wxString& symbol, const wxDate& date, double price, UPDTYPE type)
 {
-    Data *stockHist = this->cache_key(symbol, date);
+    Data *stockHist = this->get_key(symbol, date);
     if (!stockHist) stockHist = this->create();
 
     stockHist->SYMBOL = symbol;

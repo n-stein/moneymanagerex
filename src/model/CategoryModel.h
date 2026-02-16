@@ -60,7 +60,7 @@ public:
 
 public:
     /** Return the Data record for the given category name */
-    Data* cache_key(const wxString& name, const int64 parentid);
+    Data* get_key(const wxString& name, const int64 parentid);
     Data* cache_name(const wxString& name, const wxString& parentname);
 
     const wxArrayString FilterCategory(const wxString& category_pattern);

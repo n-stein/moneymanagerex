@@ -48,7 +48,7 @@ CurrencyHistoryModel& CurrencyHistoryModel::instance()
     return Singleton<CurrencyHistoryModel>::instance();
 }
 
-CurrencyHistoryModel::Data* CurrencyHistoryModel::cache_key(const int64& currencyID, const wxDate& date)
+CurrencyHistoryModel::Data* CurrencyHistoryModel::get_key(const int64& currencyID, const wxDate& date)
 {
     Data* hist = this->search_cache(
         CURRENCYID(currencyID),
@@ -81,7 +81,7 @@ Adds or updates an element in stock history
 */
 int64 CurrencyHistoryModel::addUpdate(const int64 currencyID, const wxDate& date, double price, UPDTYPE type)
 {
-    Data *currHist = this->cache_key(currencyID, date);
+    Data *currHist = this->get_key(currencyID, date);
     if (!currHist) currHist = this->create();
 
     currHist->CURRENCYID = currencyID;

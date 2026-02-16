@@ -65,7 +65,7 @@ const PayeeModel::Data_Set PayeeModel::FilterPayees(const wxString& payee_patter
     return payees;
 }
 
-PayeeModel::Data* PayeeModel::cache_key(const wxString& name)
+PayeeModel::Data* PayeeModel::get_key(const wxString& name)
 {
     Data* payee = this->search_cache(PAYEENAME(name));
     if (payee)

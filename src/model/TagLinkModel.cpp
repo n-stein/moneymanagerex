@@ -50,7 +50,7 @@ TagLinkModel& TagLinkModel::instance()
     return Singleton<TagLinkModel>::instance();
 }
 
-TagLinkModel::Data* TagLinkModel::cache_key(const wxString& refType, int64 refId, int64 tagId)
+TagLinkModel::Data* TagLinkModel::get_key(const wxString& refType, int64 refId, int64 tagId)
 {
     Data* link = this->search_cache(REFTYPE(refType), REFID(refId), TAGID(tagId));
     if (link)

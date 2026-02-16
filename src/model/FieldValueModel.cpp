@@ -51,7 +51,7 @@ FieldValueModel& FieldValueModel::instance()
     return Singleton<FieldValueModel>::instance();
 }
 
-FieldValueModel::Data* FieldValueModel::cache_key(int64 FieldID, int64 RefID)
+FieldValueModel::Data* FieldValueModel::get_key(int64 FieldID, int64 RefID)
 {
     FieldValueModel::Data_Set items = this->find(FIELDID(FieldID), REFID(RefID));
     if (!items.empty())
@@ -99,7 +99,7 @@ bool FieldValueModel::DeleteAllData(const wxString& RefType, int64 RefID)
 
     for (const auto& field : fields)
     {
-        Data* data = FieldValueModel::instance().cache_key(field.FIELDID, RefID);
+        Data* data = FieldValueModel::instance().get_key(field.FIELDID, RefID);
         if (data)
             FieldValueModel::instance().remove(data->FIELDATADID);
     }

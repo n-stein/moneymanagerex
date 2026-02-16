@@ -942,7 +942,7 @@ void ScheduledDialog::OnOk(wxCommandEvent& WXUNUSED(event))
         if (payee_loc != wxNOT_FOUND)
             payee_name = cbPayee_->GetString(payee_loc);
 
-        PayeeModel::Data* payee = PayeeModel::instance().cache_key(payee_name);
+        PayeeModel::Data* payee = PayeeModel::instance().get_key(payee_name);
         if (!payee)
         {
             wxMessageDialog msgDlg( this

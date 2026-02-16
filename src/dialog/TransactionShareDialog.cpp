@@ -492,7 +492,7 @@ void TransactionShareDialog::OnDeductibleSplit(wxCommandEvent&)
         double commission = 0;
         m_share_commission_ctrl->GetDouble(commission);
 
-        CategoryModel::Data* category = CategoryModel::instance().cache_key(_("Investment"), int64(-1L));
+        CategoryModel::Data* category = CategoryModel::instance().get_key(_("Investment"), int64(-1L));
         if (!category)
         {
             category = CategoryModel::instance().create();

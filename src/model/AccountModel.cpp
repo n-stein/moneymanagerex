@@ -96,7 +96,7 @@ const std::map<wxString, int64> AccountModel::all_accounts(bool skip_closed)
 }
 
 /** Get the Data record instance in memory. */
-AccountModel::Data* AccountModel::cache_key(const wxString& name)
+AccountModel::Data* AccountModel::get_key(const wxString& name)
 {
     Data* account = this->search_cache(ACCOUNTNAME(name));
     if (account)
@@ -328,7 +328,7 @@ const AccountModel::Data_Set AccountModel::FilterAccounts(const wxString& accoun
 void AccountModel::resetAccountType(wxString oldtype)
 {
     for (auto item : AccountModel::instance().find(ACCOUNTTYPE(oldtype))) {
-        AccountModel::Data* adata = this->cache_key(item.ACCOUNTNAME);
+        AccountModel::Data* adata = this->get_key(item.ACCOUNTNAME);
         adata->ACCOUNTTYPE = "Checking";
         this->save(adata);
     }
@@ -338,7 +338,7 @@ void AccountModel::resetUnknownAccountTypes()
 {
     for (const auto &account : this->get_all(Col::COL_ID_ACCOUNTNAME)) {
         if (NavigatorTypes::instance().getTypeIdFromDBName(account.ACCOUNTTYPE, -1) == -1) {
-            AccountModel::Data* adata = this->cache_key(account.ACCOUNTNAME);
+            AccountModel::Data* adata = this->get_key(account.ACCOUNTNAME);
             adata->ACCOUNTTYPE = "Checking";
             this->save(adata);
         }

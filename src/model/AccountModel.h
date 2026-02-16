@@ -72,7 +72,7 @@ public:
 
 public:
     /** Return the Data record for the given account name */
-    Data* cache_key(const wxString& name);
+    Data* get_key(const wxString& name);
 
     /** Return the Data record for the given account num */
     Data* cache_num(const wxString& num);

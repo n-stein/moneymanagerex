@@ -668,7 +668,7 @@ void GeneralReportManager::importReport()
     openZipFile(reportFileName, htt, sql, lua, txt);
 
     reportName = fn.FileName(reportFileName).GetName();
-    ReportModel::Data *report = ReportModel::instance().cache_key(reportName);
+    ReportModel::Data *report = ReportModel::instance().get_key(reportName);
 
     if (!report) report = ReportModel::instance().create();
     report->GROUPNAME = m_selectedGroup;
@@ -1522,7 +1522,7 @@ void GeneralReportManager::DownloadAndStoreReport(const wxString& groupName, con
         return;
     }
 
-    ReportModel::Data *report = ReportModel::instance().cache_key(reportName);
+    ReportModel::Data *report = ReportModel::instance().get_key(reportName);
 
     if (!report) report = ReportModel::instance().create();
     report->GROUPNAME = groupName;

@@ -1053,7 +1053,7 @@ void mmGUIFrame::DoRecreateNavTreeControl(bool home_page)
                         {
                             if (!processedStockNames.insert(stock.STOCKNAME).second)
                                 continue;
-                            AccountModel::Data* share_account = AccountModel::instance().cache_key(stock.STOCKNAME);
+                            AccountModel::Data* share_account = AccountModel::instance().get_key(stock.STOCKNAME);
                             if (!share_account)
                                 continue;
                             stockItem = m_nav_tree_ctrl->AppendItem(accountItem, stock.STOCKNAME, accountImg, accountImg);
@@ -3913,7 +3913,7 @@ void mmGUIFrame::OnEditAccount(wxCommandEvent& /*event*/)
 
     mmSingleChoiceDialog scd(this, _t("Choose Account to Edit"), _t("Accounts"), accounts);
     if (scd.ShowModal() == wxID_OK) {
-        AccountModel::Data* account = AccountModel::instance().cache_key(scd.GetStringSelection());
+        AccountModel::Data* account = AccountModel::instance().get_key(scd.GetStringSelection());
         AccountDialog dlg(account, this);
         if (dlg.ShowModal() == wxID_OK)
             RefreshNavigationTree();
@@ -3931,7 +3931,7 @@ void mmGUIFrame::OnDeleteAccount(wxCommandEvent& /*event*/)
 
     mmSingleChoiceDialog scd(this, _t("Choose Account to Delete"), _t("Accounts"), accounts);
     if (scd.ShowModal() == wxID_OK) {
-        AccountModel::Data* account = AccountModel::instance().cache_key(scd.GetStringSelection());
+        AccountModel::Data* account = AccountModel::instance().get_key(scd.GetStringSelection());
         wxString deletingAccountName = wxString::Format(
             _t("Do you you want to delete\n%1$s account: %2$s?"),
             wxGetTranslation(account->ACCOUNTTYPE),
@@ -3957,7 +3957,7 @@ void mmGUIFrame::OnReallocateAccount(wxCommandEvent& WXUNUSED(event))
     );
 
     if (account_choice.ShowModal() == wxID_OK) {
-        AccountModel::Data* account = AccountModel::instance().cache_key(account_choice.GetStringSelection());
+        AccountModel::Data* account = AccountModel::instance().get_key(account_choice.GetStringSelection());
         if (account)
             ReallocateAccount(account->ACCOUNTID);
     }

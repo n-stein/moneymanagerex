@@ -420,7 +420,7 @@ int ReportModel::get_html(const Data* r, wxString& out)
     return 0;
 }
 
-ReportModel::Data* ReportModel::cache_key(const wxString& name)
+ReportModel::Data* ReportModel::get_key(const wxString& name)
 {
     Data* report = this->search_cache(REPORTNAME(name));
     if (report)

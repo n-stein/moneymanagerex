@@ -286,7 +286,7 @@ void mmQIFExportDialog::OnAccountsButton(wxCommandEvent& WXUNUSED(event))
         {
             int index = entry;
             const wxString accounts_name = m_accounts_name[index];
-            const auto account = AccountModel::instance().cache_key(accounts_name);
+            const auto account = AccountModel::instance().get_key(accounts_name);
             if (account) selected_accounts_id_.push_back(account->ACCOUNTID);
             baloon += accounts_name + "\n";
         }

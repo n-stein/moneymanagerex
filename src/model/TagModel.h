@@ -49,7 +49,7 @@ public:
     * Return the Data record pointer for the given tag name
     * Returns 0 when tag not found.
     */
-    Data* cache_key(const wxString& name);
+    Data* get_key(const wxString& name);
 
     /* Returns 0 if not used, 1 if used, and -1 if used only in deleted transactions */
     int is_used(int64 id);

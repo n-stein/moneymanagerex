@@ -468,7 +468,7 @@ int64 mmWebApp::MMEX_InsertNewTransaction(webtran_holder& WebAppTrans)
     wxString TrStatus;
 
     //Search Account
-    const AccountModel::Data* Account = AccountModel::instance().cache_key(WebAppTrans.Account);
+    const AccountModel::Data* Account = AccountModel::instance().get_key(WebAppTrans.Account);
     wxString accountName, accountInitialDate;
     if (Account != nullptr)
     {
@@ -505,13 +505,13 @@ int64 mmWebApp::MMEX_InsertNewTransaction(webtran_holder& WebAppTrans)
     AccountModel::Data* ToAccount = nullptr;
     if (WebAppTrans.ToAccount != "None")
     {
-        ToAccount = AccountModel::instance().cache_key(WebAppTrans.ToAccount);
+        ToAccount = AccountModel::instance().get_key(WebAppTrans.ToAccount);
         if (ToAccount != nullptr)
             ToAccountID = ToAccount->ACCOUNTID;
     }
 
     //Search or insert Category
-    const CategoryModel::Data* Category = CategoryModel::instance().cache_key(WebAppTrans.Category, int64(-1));
+    const CategoryModel::Data* Category = CategoryModel::instance().get_key(WebAppTrans.Category, int64(-1));
     if (Category != nullptr)
         CategoryID = Category->CATEGID;
     else
@@ -526,7 +526,7 @@ int64 mmWebApp::MMEX_InsertNewTransaction(webtran_holder& WebAppTrans)
     //Search or insert SubCategory
     if (!WebAppTrans.SubCategory.IsEmpty())
     {
-        const CategoryModel::Data* SubCategory = CategoryModel::instance().cache_key(WebAppTrans.SubCategory, CategoryID);
+        const CategoryModel::Data* SubCategory = CategoryModel::instance().get_key(WebAppTrans.SubCategory, CategoryID);
         if (SubCategory != nullptr)
             CategoryID = SubCategory->CATEGID;
         else if (CategoryID != -1)
@@ -540,7 +540,7 @@ int64 mmWebApp::MMEX_InsertNewTransaction(webtran_holder& WebAppTrans)
     }
 
     //Search or insert Payee
-    const PayeeModel::Data* Payee = PayeeModel::instance().cache_key(WebAppTrans.Payee);
+    const PayeeModel::Data* Payee = PayeeModel::instance().get_key(WebAppTrans.Payee);
     if (Payee != nullptr)
     {
         PayeeID = Payee->PAYEEID;

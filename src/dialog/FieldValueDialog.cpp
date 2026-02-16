@@ -81,7 +81,7 @@ bool FieldValueDialog::FillCustomFields(wxBoxSizer* box_sizer)
     for (const auto &field : m_fields)
     {
         bool nonDefaultData = true;
-        FieldValueModel::Data* fieldData = FieldValueModel::instance().cache_key(field.FIELDID, m_ref_id);
+        FieldValueModel::Data* fieldData = FieldValueModel::instance().get_key(field.FIELDID, m_ref_id);
         if (!fieldData)
         {
             fieldData = FieldValueModel::instance().create();
@@ -479,7 +479,7 @@ bool FieldValueDialog::SaveCustomValues(int64 ref_id)
         wxWindowID controlID = GetBaseID() + field_index++ * FIELDMULTIPLIER;
         const auto& data = IsWidgetChanged(controlID) ? GetWidgetData(controlID) : "";
 
-        FieldValueModel::Data* fieldData = FieldValueModel::instance().cache_key(field.FIELDID, ref_id);
+        FieldValueModel::Data* fieldData = FieldValueModel::instance().get_key(field.FIELDID, ref_id);
         FieldValueModel::Data oldData;
         if(fieldData) oldData = *fieldData;
         if (!data.empty())
@@ -534,7 +534,7 @@ void FieldValueDialog::UpdateCustomValues(int64 ref_id)
         if (is_changed)
         {
             const auto& data = GetWidgetData(controlID);
-            FieldValueModel::Data* fieldData = FieldValueModel::instance().cache_key(field.FIELDID, ref_id);
+            FieldValueModel::Data* fieldData = FieldValueModel::instance().get_key(field.FIELDID, ref_id);
             FieldValueModel::Data oldData;
             if (fieldData) oldData = *fieldData;
             if (!data.empty())
