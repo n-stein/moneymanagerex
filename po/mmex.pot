@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MMEX\n"
 "Report-Msgid-Bugs-To: developer@moneymanagerex.org\n"
-"POT-Creation-Date: 2026-02-13 16:58+0000\n"
+"POT-Creation-Date: 2026-02-16 13:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3015,7 +3015,7 @@ msgid "Account Selection"
 msgstr ""
 
 #: dialog/TransactionLinkDialog.h:46 dialog/TransactionLinkDialog.h:82
-msgid "TransactionLinkDialog"
+msgid "Transaction Link Dialog"
 msgstr ""
 
 #: dialog/TransactionShareDialog.cpp:66
@@ -8716,7 +8716,7 @@ msgid "Cleared balance:"
 msgstr ""
 
 #: uicontrols/reconciledialog.cpp:228
-msgid "Finish la&ter"
+msgid "&Finish later"
 msgstr ""
 
 #: uicontrols/reconciledialog.cpp:231
