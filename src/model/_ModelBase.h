@@ -105,8 +105,8 @@ template<typename TableType>
 class Model : public ModelBase, public TableType
 {
 public:
-    using Data = TableType::Row;
-    using Data_Set = TableType::RowA;
+    using Data = typename TableType::Row;
+    using Data_Set = typename TableType::RowA;
     using TableType::save;
     using TableType::remove;
     using TableType::get_id;

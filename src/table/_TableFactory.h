@@ -16,8 +16,8 @@ struct TableFactory : TableBase
 {
 public:
     using Row = RowType;
-    using Col = Row::Col;
-    using COL_ID = Col::COL_ID;
+    using Col = typename Row::Col;
+    using COL_ID = typename Col::COL_ID;
     using Cache = std::vector<Row*>;
     using CacheIndex = std::map<int64, Row*>;
 
