@@ -241,9 +241,9 @@ public:
 
 public:
     bool remove(int64 id);
-    int64 save(Data* r);
-    int save(std::vector<Data>& rows);
-    int save(std::vector<Data*>& rows);
+    int64 save_trx(Data* r);
+    int save_trx(std::vector<Data>& rows);
+    int save_trx(std::vector<Data*>& rows);
     void updateTimestamp(int64 id);
 public:
     static const TransactionModel::Data_Set allByDateTimeId();

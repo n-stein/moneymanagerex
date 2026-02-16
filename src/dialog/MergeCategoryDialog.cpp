@@ -177,7 +177,7 @@ void MergeCategoryDialog::OnOk(wxCommandEvent& WXUNUSED(event))
         {
             entry.CATEGID = m_destCatID;
         }
-        m_changedRecords += TransactionModel::instance().save(transactions);
+        m_changedRecords += TransactionModel::instance().save_trx(transactions);
 
         for (auto &entry : billsdeposits)
         {

@@ -538,7 +538,7 @@ int64 TransactionLinkDialog::SaveChecking()
     m_checking_entry->TRANSDATE = trxDate.FormatISOCombined();
     m_checking_entry->TOTRANSAMOUNT = m_checking_entry->TRANSAMOUNT;
 
-    return TransactionModel::instance().save(m_checking_entry);
+    return TransactionModel::instance().save_trx(m_checking_entry);
 }
 
 int TransactionLinkDialog::TransactionType()

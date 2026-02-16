@@ -113,7 +113,7 @@ bool TransactionModel::remove(int64 id)
     return this->remove(id);
 }
 
-int64 TransactionModel::save(Data* r)
+int64 TransactionModel::save_trx(Data* r)
 {
     wxSharedPtr<Data> oldData(instance().get_id(r->TRANSID));
     if (!oldData || (!oldData->equals(r) && oldData->DELETEDTIME.IsEmpty() && r->DELETEDTIME.IsEmpty()))
@@ -122,28 +122,28 @@ int64 TransactionModel::save(Data* r)
     return r->TRANSID;
 }
 
-int TransactionModel::save(std::vector<Data>& rows)
+int TransactionModel::save_trx(std::vector<Data>& rows)
 {
     this->Savepoint();
     for (auto& r : rows)
     {
         if (r.id() < 0)
             wxLogDebug("Incorrect function call to save %s", r.to_json().utf8_str());
-        save(&r);
+        save_trx(&r);
     }
     this->ReleaseSavepoint();
 
     return rows.size();
 }
 
-int TransactionModel::save(std::vector<Data*>& rows)
+int TransactionModel::save_trx(std::vector<Data*>& rows)
 {
     this->Savepoint();
     for (auto& r : rows)
     {
         if (r->id() < 0)
             wxLogDebug("Incorrect function call to save %s", r->to_json().utf8_str());
-        save(r);
+        save_trx(r);
     }
     this->ReleaseSavepoint();
 

@@ -1153,7 +1153,7 @@ void ScheduledDialog::OnOk(wxCommandEvent& WXUNUSED(event))
             tran->TOTRANSAMOUNT = m_bill_data.TOTRANSAMOUNT;
             tran->FOLLOWUPID = m_bill_data.FOLLOWUPID;
             tran->COLOR = m_bill_data.COLOR;
-            int64 trans_id = TransactionModel::instance().save(tran);
+            int64 trans_id = TransactionModel::instance().save_trx(tran);
 
             TransactionSplitModel::Data_Set checking_splits;
             for (auto &item : m_bill_data.local_splits)

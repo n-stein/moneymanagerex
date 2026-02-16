@@ -1668,7 +1668,7 @@ bool mmOFXImportDialog::ImportTransactions(wxXmlNode* banktranlist, wxLongLong a
 
                             try
                             {
-                                TransactionModel::instance().save(&existing);
+                                TransactionModel::instance().save_trx(&existing);
                                 result.imported = true;
                                 result.transType = "Transfer";
                                 result.importedPayee = AccountModel::instance().cache_id(existing.ACCOUNTID)->ACCOUNTNAME;
@@ -1811,7 +1811,7 @@ bool mmOFXImportDialog::ImportTransactions(wxXmlNode* banktranlist, wxLongLong a
         {
             try
             {
-                TransactionModel::instance().save(transaction);
+                TransactionModel::instance().save_trx(transaction);
                 stats.importedTransactions++;
                 wxLogDebug("Imported: FITID='%s', Type='%s', Payee='%s', Mode='%s'", fitid, result.transType, result.importedPayee, result.matchMode);
             }

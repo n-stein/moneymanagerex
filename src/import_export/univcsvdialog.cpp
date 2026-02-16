@@ -1539,7 +1539,7 @@ void mmUnivCSVDialog::OnImport(wxCommandEvent& WXUNUSED(event))
             pTransaction->NOTES.Append((pTransaction->NOTES.IsEmpty() ? "" : "\n" ) + holder.PayeeMatchNotes);
         pTransaction->COLOR = color_id;
 
-        TransactionModel::instance().save(pTransaction);
+        TransactionModel::instance().save_trx(pTransaction);
 
         // save custom field data
         if (!holder.customFieldData.empty())

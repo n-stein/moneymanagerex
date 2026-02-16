@@ -166,7 +166,7 @@ void MergePayeeDialog::OnOk(wxCommandEvent& WXUNUSED(event))
         for (auto &entry : transactions) {
             entry.PAYEEID = destPayeeID_;
         }
-        m_changed_records += TransactionModel::instance().save(transactions);
+        m_changed_records += TransactionModel::instance().save_trx(transactions);
         TransactionModel::instance().ReleaseSavepoint();
 
         ScheduledModel::instance().Savepoint();

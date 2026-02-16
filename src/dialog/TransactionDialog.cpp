@@ -1258,7 +1258,7 @@ void TransactionDialog::OnOk(wxCommandEvent& event)
         TransactionModel::instance().create();
 
     TransactionModel::putDataToTransaction(r, m_journal_data);
-    m_journal_data.TRANSID = TransactionModel::instance().save(r);
+    m_journal_data.TRANSID = TransactionModel::instance().save_trx(r);
     m_journal_data.m_bdid = 0;
     m_journal_data.m_repeat_num = 0;
 

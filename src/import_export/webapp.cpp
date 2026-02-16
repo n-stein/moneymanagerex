@@ -583,7 +583,7 @@ int64 mmWebApp::MMEX_InsertNewTransaction(webtran_holder& WebAppTrans)
     desktopNewTransaction->FOLLOWUPID = -1;
     desktopNewTransaction->TOTRANSAMOUNT = WebAppTrans.Amount;
     desktopNewTransaction->COLOR = -1;
-    DeskNewTrID = TransactionModel::instance().save(desktopNewTransaction);
+    DeskNewTrID = TransactionModel::instance().save_trx(desktopNewTransaction);
 
     if (DeskNewTrID > 0)
     {

@@ -95,7 +95,7 @@ TransactionLinkModel::Data* TransactionLinkModel::SetTranslink(const int64 check
     */
     TransactionModel::Data* checking_entry = TransactionModel::instance().cache_id(checking_id);
     // checking_entry->TOACCOUNTID = checking_type;
-    TransactionModel::instance().save(checking_entry);
+    TransactionModel::instance().save_trx(checking_entry);
 
     return translink;
 }

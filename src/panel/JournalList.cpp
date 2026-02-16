@@ -1178,7 +1178,7 @@ void JournalList::onDeleteTransaction(wxCommandEvent& WXUNUSED(event))
             }
             else {
                 trx->DELETEDTIME = deletionTime;
-                TransactionModel::instance().save(trx);
+                TransactionModel::instance().save_trx(trx);
                 TransactionLinkModel::Data_Set translink = TransactionLinkModel::instance().find(TransactionLinkModel::CHECKINGACCOUNTID(trx->TRANSID));
                 if (!translink.empty()) {
                     assetStockAccts.emplace(translink.at(0).LINKTYPE, translink.at(0).LINKRECORDID);
@@ -1234,7 +1234,7 @@ void JournalList::onRestoreTransaction(wxCommandEvent& WXUNUSED(event))
             if (!id.second) {
                 TransactionModel::Data* trx = TransactionModel::instance().cache_id(id.first);
                 trx->DELETEDTIME.Clear();
-                TransactionModel::instance().save(trx);
+                TransactionModel::instance().save_trx(trx);
                 TransactionLinkModel::Data_Set translink = TransactionLinkModel::instance().find(
                     TransactionLinkModel::CHECKINGACCOUNTID(trx->TRANSID)
                 );
@@ -1272,7 +1272,7 @@ void JournalList::onRestoreViewedTransaction(wxCommandEvent&)
             if (tran.m_repeat_num) continue;
             TransactionModel::Data* trx = TransactionModel::instance().cache_id(tran.TRANSID);
             trx->DELETEDTIME.Clear();
-            TransactionModel::instance().save(trx);
+            TransactionModel::instance().save_trx(trx);
             TransactionLinkModel::Data_Set translink = TransactionLinkModel::instance().find(
                 TransactionLinkModel::CHECKINGACCOUNTID(trx->TRANSID)
             );
@@ -1395,7 +1395,7 @@ void JournalList::onMoveTransaction(wxCommandEvent& /*event*/)
                         skip_trx.push_back(trx->TRANSID);
                     } else {
                         trx->ACCOUNTID = dest_account_id;
-                        TransactionModel::instance().save(trx);
+                        TransactionModel::instance().save_trx(trx);
                     }
                 }
             }
@@ -1534,7 +1534,7 @@ void JournalList::onMarkTransaction(wxCommandEvent& event)
                 //bRefreshRequired |= (status == TransactionModel::STATUS_KEY_VOID) || (m_trans[row].STATUS == TransactionModel::STATUS_KEY_VOID);
                 if (!m_trans[row].m_repeat_num) {
                     m_trans[row].STATUS = status;
-                    TransactionModel::instance().save(&m_trans[row]);
+                    TransactionModel::instance().save_trx(&m_trans[row]);
                 }
             }
         }
@@ -1676,7 +1676,7 @@ int64 JournalList::onPaste(TransactionModel::Data* tran)
         (m_cp->m_account_id != copy->ACCOUNTID && m_cp->m_account_id != copy->TOACCOUNTID)
     )
     copy->ACCOUNTID = m_cp->m_account_id;
-    int64 transactionID = TransactionModel::instance().save(copy);
+    int64 transactionID = TransactionModel::instance().save_trx(copy);
     m_pasted_id.push_back({transactionID, 0});   // add the newly pasted transaction
 
     // Clone transaction tags
@@ -1797,7 +1797,7 @@ void JournalList::onSetUserColour(wxCommandEvent& event)
             TransactionModel::Data* tran = TransactionModel::instance().cache_id(id.first);
             if (tran) {
                 tran->COLOR = user_color_id;
-                TransactionModel::instance().save(tran);
+                TransactionModel::instance().save_trx(tran);
             }
         }
         else {
@@ -2170,7 +2170,7 @@ void JournalList::deleteTransactionsByStatus(const wxString& status)
             else {
                 TransactionModel::Data* trx = TransactionModel::instance().cache_id(tran.TRANSID);
                 trx->DELETEDTIME = deletionTime;
-                TransactionModel::instance().save(trx);
+                TransactionModel::instance().save_trx(trx);
                 TransactionLinkModel::Data_Set translink = TransactionLinkModel::instance().find(TransactionLinkModel::CHECKINGACCOUNTID(trx->TRANSID));
                 if (!translink.empty()) {
                     assetStockAccts.emplace(translink.at(0).LINKTYPE, translink.at(0).LINKRECORDID);

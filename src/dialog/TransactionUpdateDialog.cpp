@@ -534,7 +534,7 @@ void TransactionUpdateDialog::OnOk(wxCommandEvent& WXUNUSED(event))
 
         m_custom_fields->UpdateCustomValues(id);
 
-        TransactionModel::instance().save(trx);
+        TransactionModel::instance().save_trx(trx);
     }
     TagLinkModel::instance().ReleaseSavepoint();
     TransactionModel::instance().ReleaseSavepoint();

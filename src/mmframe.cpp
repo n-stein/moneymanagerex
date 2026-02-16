@@ -633,7 +633,7 @@ void mmGUIFrame::OnAutoRepeatTransactionsTimer(wxTimerEvent& /*event*/)
                 const wxDateTime payment_date = bills.getTransDateTime(q1);
                 tran->TRANSDATE = payment_date.FormatISOCombined();
                 tran->COLOR = q1.COLOR;
-                int64 transID = TransactionModel::instance().save(tran);
+                int64 transID = TransactionModel::instance().save_trx(tran);
 
                 TransactionSplitModel::Cache checking_splits;
                 std::vector<wxArrayInt64> splitTags;

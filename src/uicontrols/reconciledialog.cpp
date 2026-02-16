@@ -783,7 +783,7 @@ void mmReconcileDialog::OnClose(wxCommandEvent& event)
                 trx->STATUS = "";
             }
         }
-        TransactionModel::instance().save(trx);
+        TransactionModel::instance().save_trx(trx);
     };
 
     if (event.GetId() != wxID_CANCEL) {

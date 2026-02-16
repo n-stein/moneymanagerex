@@ -1268,7 +1268,7 @@ void mmQIFImportDialog::OnOk(wxCommandEvent& WXUNUSED(event))
             if (!m_txnTaglinks[std::make_pair(0, i)].empty())
             {
                 // we need to know the transid for the taglink, so save the transaction first
-                int64 transid = TransactionModel::instance().save(trx_data_set[i]);
+                int64 transid = TransactionModel::instance().save_trx(trx_data_set[i]);
                 // apply that transid to all associated tags
                 for (const auto& taglink : m_txnTaglinks[std::make_pair(0, i)])
                     taglink->REFID = transid;
@@ -1277,7 +1277,7 @@ void mmQIFImportDialog::OnOk(wxCommandEvent& WXUNUSED(event))
             }
         }
         TagLinkModel::instance().ReleaseSavepoint();
-        TransactionModel::instance().save(trx_data_set);
+        TransactionModel::instance().save_trx(trx_data_set);
         progressDlg.Update(count, _t("Importing Split transactions"));
         joinSplit(trx_data_set, m_splitDataSets);
         saveSplit();
