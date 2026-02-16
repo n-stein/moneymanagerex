@@ -151,7 +151,7 @@ wxString BalanceReport::getHTMLText()
             histItem.stockHist = StockHistoryModel::instance().find(
                 StockHistoryModel::SYMBOL(stock.SYMBOL)
             );
-            std::stable_sort(histItem.stockHist.begin(), histItem.stockHist.end(), StockHistoryTable::SorterByDATE());
+            std::stable_sort(histItem.stockHist.begin(), histItem.stockHist.end(), StockHistoryRow::SorterByDATE());
             std::reverse(histItem.stockHist.begin(), histItem.stockHist.end());
             m_stock_a.push_back(histItem);
         }

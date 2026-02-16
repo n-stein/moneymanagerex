@@ -53,7 +53,7 @@ void  StocksReport::refreshData()
     account_holder account;
     const wxDate today = wxDate::Today();
 
-    for (const auto& a : AccountModel::instance().get_all(AccountModel::COL_ACCOUNTNAME))
+    for (const auto& a : AccountModel::instance().get_all(AccountCol::COL_ID_ACCOUNTNAME))
     {
         if (AccountModel::type_id(a) != NavigatorTypes::TYPE_ID_INVESTMENT) continue;
         if (AccountModel::status_id(a) != AccountModel::STATUS_ID_OPEN) continue;
@@ -264,7 +264,7 @@ wxString mmReportChartStocks::getHTMLText()
 
     wxTimeSpan dist;
     wxArrayString symbols;
-    for (const auto& stock : StockModel::instance().get_all(StockModel::COL_SYMBOL))
+    for (const auto& stock : StockModel::instance().get_all(StockCol::COL_ID_SYMBOL))
     {
         AccountModel::Data* account = AccountModel::instance().cache_id(stock.HELDAT);
         if (AccountModel::status_id(account) != AccountModel::STATUS_ID_OPEN) continue;
@@ -276,7 +276,7 @@ wxString mmReportChartStocks::getHTMLText()
             StockHistoryModel::SYMBOL(stock.SYMBOL),
             StockHistoryModel::DATE(OP_GE, m_date_range->start_date()),
             StockHistoryModel::DATE(OP_LE, m_date_range->end_date()));
-        std::stable_sort(histData.begin(), histData.end(), StockHistoryTable::SorterByDATE());
+        std::stable_sort(histData.begin(), histData.end(), StockHistoryRow::SorterByDATE());
 
         //bool showGridLines = (histData.size() <= 366);
         //bool pointDot = (histData.size() <= 30);

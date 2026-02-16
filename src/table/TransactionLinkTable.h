@@ -6,209 +6,182 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      TransactionLinkTable.h
+ *
+ *      Interface to database table TRANSLINK_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct TransactionLinkTable : public TableBase
+// Columns in database table TRANSLINK_V1
+struct TransactionLinkCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_TRANSLINKID = 0,
-        COL_CHECKINGACCOUNTID,
-        COL_LINKTYPE,
-        COL_LINKRECORDID,
-        COL_size
+        COL_ID_TRANSLINKID = 0,
+        COL_ID_CHECKINGACCOUNTID,
+        COL_ID_LINKTYPE,
+        COL_ID_LINKRECORDID,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct TRANSLINKID : public TableOpV<int64>
     {
-        static wxString name() { return "TRANSLINKID"; }
+        static COL_ID col_id() { return COL_ID_TRANSLINKID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_TRANSLINKID]; }
         explicit TRANSLINKID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit TRANSLINKID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct CHECKINGACCOUNTID : public TableOpV<int64>
     {
-        static wxString name() { return "CHECKINGACCOUNTID"; }
+        static COL_ID col_id() { return COL_ID_CHECKINGACCOUNTID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CHECKINGACCOUNTID]; }
         explicit CHECKINGACCOUNTID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit CHECKINGACCOUNTID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct LINKTYPE : public TableOpV<wxString>
     {
-        static wxString name() { return "LINKTYPE"; }
+        static COL_ID col_id() { return COL_ID_LINKTYPE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_LINKTYPE]; }
         explicit LINKTYPE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit LINKTYPE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct LINKRECORDID : public TableOpV<int64>
     {
-        static wxString name() { return "LINKRECORDID"; }
+        static COL_ID col_id() { return COL_ID_LINKRECORDID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_LINKRECORDID]; }
         explicit LINKRECORDID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit LINKRECORDID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
+};
 
-    typedef TRANSLINKID PRIMARY;
+// A single record in database table TRANSLINK_V1
+struct TransactionLinkRow
+{
+    using Col = TransactionLinkCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 TRANSLINKID; // primary key
-        int64 CHECKINGACCOUNTID;
-        wxString LINKTYPE;
-        int64 LINKRECORDID;
+    int64 TRANSLINKID; // primary key
+    int64 CHECKINGACCOUNTID;
+    wxString LINKTYPE;
+    int64 LINKRECORDID;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit TransactionLinkRow();
+    explicit TransactionLinkRow(wxSQLite3ResultSet& q);
+    TransactionLinkRow(const TransactionLinkRow& other) = default;
 
-        int64 id() const { return TRANSLINKID; }
-        void id(const int64 id) { TRANSLINKID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return TRANSLINKID; }
+    void id(const int64 id) { TRANSLINKID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const TransactionLinkRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    TransactionLinkRow& operator=(const TransactionLinkRow& other);
+    bool operator< (const TransactionLinkRow& other) const { return id() < other.id(); }
+    bool operator< (const TransactionLinkRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const TRANSLINKID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::TRANSLINKID& col)
     {
-        return data->TRANSLINKID == op.m_value;
+        return TRANSLINKID == col.m_value;
     }
 
-    static bool match(const Data* data, const CHECKINGACCOUNTID& op)
+    bool match(const Col::CHECKINGACCOUNTID& col)
     {
-        return data->CHECKINGACCOUNTID == op.m_value;
+        return CHECKINGACCOUNTID == col.m_value;
     }
 
-    static bool match(const Data* data, const LINKTYPE& op)
+    bool match(const Col::LINKTYPE& col)
     {
-        return data->LINKTYPE.CmpNoCase(op.m_value) == 0;
+        return LINKTYPE.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const LINKRECORDID& op)
+    bool match(const Col::LINKRECORDID& col)
     {
-        return data->LINKRECORDID == op.m_value;
+        return LINKRECORDID == col.m_value;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
 
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    TransactionLinkTable();
-    ~TransactionLinkTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
+    struct SorterByTRANSLINKID
     {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && TransactionLinkTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
+        bool operator()(const TransactionLinkRow& x, const TransactionLinkRow& y)
+        {
+            return x.TRANSLINKID < y.TRANSLINKID;
         }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
+    };
 
     struct SorterByCHECKINGACCOUNTID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TransactionLinkRow& x, const TransactionLinkRow& y)
         {
             return x.CHECKINGACCOUNTID < y.CHECKINGACCOUNTID;
         }
     };
 
-    struct SorterByLINKRECORDID
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.LINKRECORDID < y.LINKRECORDID;
-        }
-    };
-
     struct SorterByLINKTYPE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TransactionLinkRow& x, const TransactionLinkRow& y)
         {
             return x.LINKTYPE < y.LINKTYPE;
         }
     };
 
-    struct SorterByTRANSLINKID
+    struct SorterByLINKRECORDID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TransactionLinkRow& x, const TransactionLinkRow& y)
         {
-            return x.TRANSLINKID < y.TRANSLINKID;
+            return x.LINKRECORDID < y.LINKRECORDID;
         }
     };
+};
+
+// Interface to database table TRANSLINK_V1
+struct TransactionLinkTable : public TableFactory<TransactionLinkRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using TRANSLINKID = Col::TRANSLINKID;
+    using CHECKINGACCOUNTID = Col::CHECKINGACCOUNTID;
+    using LINKTYPE = Col::LINKTYPE;
+    using LINKRECORDID = Col::LINKRECORDID;
+
+    TransactionLinkTable();
+    ~TransactionLinkTable();
+
+    void ensure_data() override;
 };

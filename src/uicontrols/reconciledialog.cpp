@@ -282,7 +282,7 @@ void mmReconcileDialog::FillControls(bool init)
     );
 
     all_trans.insert(all_trans.end(), all_trans2.begin(), all_trans2.end());
-    std::stable_sort(all_trans.begin(), all_trans.end(), TransactionTable::SorterByTRANSDATE());
+    std::stable_sort(all_trans.begin(), all_trans.end(), TransactionRow::SorterByTRANSDATE());
 
     long ritemIndex = -1;
     long litemIndex = -1;

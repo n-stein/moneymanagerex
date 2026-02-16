@@ -1537,7 +1537,7 @@ void mmTagTextCtrl::init()
     // Initialize the tag map and dropdown checkboxes
     tag_map_.clear();
     tagCheckListBox_->Clear();
-    for (const auto& tag : TagModel::instance().get_all(TagTable::COL_TAGNAME))
+    for (const auto& tag : TagModel::instance().get_all(TagCol::COL_ID_TAGNAME))
     {
         tag_map_[tag.TAGNAME] = tag.TAGID;
         tagCheckListBox_->Append(tag.TAGNAME);

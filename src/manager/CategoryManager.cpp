@@ -202,7 +202,7 @@ void CategoryManager::fillControls()
     const wxString match = m_maskStr + "*";
     wxTreeItemId maincat = root_;
     m_categ_children.clear();
-    for (CategoryModel::Data cat : CategoryModel::instance().get_all(CategoryModel::COL_CATEGNAME)) {
+    for (CategoryModel::Data cat : CategoryModel::instance().get_all(CategoryCol::COL_ID_CATEGNAME)) {
         m_categ_children[cat.PARENTID].push_back(cat);
     }
 

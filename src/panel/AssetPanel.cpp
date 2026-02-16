@@ -522,17 +522,17 @@ void AssetPanel::CreateControls()
 void AssetPanel::sortList()
 {
     std::sort(this->m_assets.begin(), this->m_assets.end());
-    std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetTable::SorterBySTARTDATE());
+    std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetRow::SorterBySTARTDATE());
     switch (this->m_lc->getSortColId())
     {
     case AssetList::LIST_ID_ID:
-        std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetTable::SorterByASSETID());
+        std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetRow::SorterByASSETID());
         break;
     case AssetList::LIST_ID_NAME:
-        std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetTable::SorterByASSETNAME());
+        std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetRow::SorterByASSETNAME());
         break;
     case AssetList::LIST_ID_TYPE:
-        std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetTable::SorterByASSETTYPE());
+        std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetRow::SorterByASSETTYPE());
         break;
     case AssetList::LIST_ID_VALUE_INITIAL:
         std::stable_sort(this->m_assets.begin(), this->m_assets.end()
@@ -551,7 +551,7 @@ void AssetPanel::sortList()
     case AssetList::LIST_ID_DATE:
         break;
     case AssetList::LIST_ID_NOTES:
-        std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetTable::SorterByNOTES());
+        std::stable_sort(this->m_assets.begin(), this->m_assets.end(), AssetRow::SorterByNOTES());
     default:
         break;
     }

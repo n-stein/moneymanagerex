@@ -6,279 +6,201 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      PayeeTable.h
+ *
+ *      Interface to database table PAYEE_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct PayeeTable : public TableBase
+// Columns in database table PAYEE_V1
+struct PayeeCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_PAYEEID = 0,
-        COL_PAYEENAME,
-        COL_CATEGID,
-        COL_NUMBER,
-        COL_WEBSITE,
-        COL_NOTES,
-        COL_ACTIVE,
-        COL_PATTERN,
-        COL_size
+        COL_ID_PAYEEID = 0,
+        COL_ID_PAYEENAME,
+        COL_ID_CATEGID,
+        COL_ID_NUMBER,
+        COL_ID_WEBSITE,
+        COL_ID_NOTES,
+        COL_ID_ACTIVE,
+        COL_ID_PATTERN,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct PAYEEID : public TableOpV<int64>
     {
-        static wxString name() { return "PAYEEID"; }
+        static COL_ID col_id() { return COL_ID_PAYEEID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_PAYEEID]; }
         explicit PAYEEID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit PAYEEID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct PAYEENAME : public TableOpV<wxString>
     {
-        static wxString name() { return "PAYEENAME"; }
+        static COL_ID col_id() { return COL_ID_PAYEENAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_PAYEENAME]; }
         explicit PAYEENAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit PAYEENAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct CATEGID : public TableOpV<int64>
     {
-        static wxString name() { return "CATEGID"; }
+        static COL_ID col_id() { return COL_ID_CATEGID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CATEGID]; }
         explicit CATEGID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit CATEGID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct NUMBER : public TableOpV<wxString>
     {
-        static wxString name() { return "NUMBER"; }
+        static COL_ID col_id() { return COL_ID_NUMBER; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_NUMBER]; }
         explicit NUMBER(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit NUMBER(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct WEBSITE : public TableOpV<wxString>
     {
-        static wxString name() { return "WEBSITE"; }
+        static COL_ID col_id() { return COL_ID_WEBSITE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_WEBSITE]; }
         explicit WEBSITE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit WEBSITE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct NOTES : public TableOpV<wxString>
     {
-        static wxString name() { return "NOTES"; }
+        static COL_ID col_id() { return COL_ID_NOTES; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_NOTES]; }
         explicit NOTES(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit NOTES(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct ACTIVE : public TableOpV<int64>
     {
-        static wxString name() { return "ACTIVE"; }
+        static COL_ID col_id() { return COL_ID_ACTIVE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_ACTIVE]; }
         explicit ACTIVE(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit ACTIVE(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct PATTERN : public TableOpV<wxString>
     {
-        static wxString name() { return "PATTERN"; }
+        static COL_ID col_id() { return COL_ID_PATTERN; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_PATTERN]; }
         explicit PATTERN(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit PATTERN(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
+};
 
-    typedef PAYEEID PRIMARY;
+// A single record in database table PAYEE_V1
+struct PayeeRow
+{
+    using Col = PayeeCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 PAYEEID; // primary key
-        wxString PAYEENAME;
-        int64 CATEGID;
-        wxString NUMBER;
-        wxString WEBSITE;
-        wxString NOTES;
-        int64 ACTIVE;
-        wxString PATTERN;
+    int64 PAYEEID; // primary key
+    wxString PAYEENAME;
+    int64 CATEGID;
+    wxString NUMBER;
+    wxString WEBSITE;
+    wxString NOTES;
+    int64 ACTIVE;
+    wxString PATTERN;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit PayeeRow();
+    explicit PayeeRow(wxSQLite3ResultSet& q);
+    PayeeRow(const PayeeRow& other) = default;
 
-        int64 id() const { return PAYEEID; }
-        void id(const int64 id) { PAYEEID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return PAYEEID; }
+    void id(const int64 id) { PAYEEID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const PayeeRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    PayeeRow& operator=(const PayeeRow& other);
+    bool operator< (const PayeeRow& other) const { return id() < other.id(); }
+    bool operator< (const PayeeRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const PAYEEID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::PAYEEID& col)
     {
-        return data->PAYEEID == op.m_value;
+        return PAYEEID == col.m_value;
     }
 
-    static bool match(const Data* data, const PAYEENAME& op)
+    bool match(const Col::PAYEENAME& col)
     {
-        return data->PAYEENAME.CmpNoCase(op.m_value) == 0;
+        return PAYEENAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const CATEGID& op)
+    bool match(const Col::CATEGID& col)
     {
-        return data->CATEGID == op.m_value;
+        return CATEGID == col.m_value;
     }
 
-    static bool match(const Data* data, const NUMBER& op)
+    bool match(const Col::NUMBER& col)
     {
-        return data->NUMBER.CmpNoCase(op.m_value) == 0;
+        return NUMBER.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const WEBSITE& op)
+    bool match(const Col::WEBSITE& col)
     {
-        return data->WEBSITE.CmpNoCase(op.m_value) == 0;
+        return WEBSITE.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const NOTES& op)
+    bool match(const Col::NOTES& col)
     {
-        return data->NOTES.CmpNoCase(op.m_value) == 0;
+        return NOTES.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const ACTIVE& op)
+    bool match(const Col::ACTIVE& col)
     {
-        return data->ACTIVE == op.m_value;
+        return ACTIVE == col.m_value;
     }
 
-    static bool match(const Data* data, const PATTERN& op)
+    bool match(const Col::PATTERN& col)
     {
-        return data->PATTERN.CmpNoCase(op.m_value) == 0;
+        return PATTERN.CmpNoCase(col.m_value) == 0;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    PayeeTable();
-    ~PayeeTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && PayeeTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-
-    struct SorterByACTIVE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.ACTIVE < y.ACTIVE;
-        }
-    };
-
-    struct SorterByCATEGID
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.CATEGID < y.CATEGID;
-        }
-    };
-
-    struct SorterByNOTES
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.NOTES < y.NOTES;
-        }
-    };
-
-    struct SorterByNUMBER
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.NUMBER < y.NUMBER;
-        }
-    };
-
-    struct SorterByPATTERN
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.PATTERN < y.PATTERN;
-        }
-    };
 
     struct SorterByPAYEEID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const PayeeRow& x, const PayeeRow& y)
         {
             return x.PAYEEID < y.PAYEEID;
         }
@@ -286,18 +208,77 @@ struct PayeeTable : public TableBase
 
     struct SorterByPAYEENAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const PayeeRow& x, const PayeeRow& y)
         {
             // Locale case-insensitive
             return std::wcscoll(x.PAYEENAME.Lower().wc_str(), y.PAYEENAME.Lower().wc_str()) < 0;
         }
     };
 
+    struct SorterByCATEGID
+    {
+        bool operator()(const PayeeRow& x, const PayeeRow& y)
+        {
+            return x.CATEGID < y.CATEGID;
+        }
+    };
+
+    struct SorterByNUMBER
+    {
+        bool operator()(const PayeeRow& x, const PayeeRow& y)
+        {
+            return x.NUMBER < y.NUMBER;
+        }
+    };
+
     struct SorterByWEBSITE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const PayeeRow& x, const PayeeRow& y)
         {
             return x.WEBSITE < y.WEBSITE;
         }
     };
+
+    struct SorterByNOTES
+    {
+        bool operator()(const PayeeRow& x, const PayeeRow& y)
+        {
+            return x.NOTES < y.NOTES;
+        }
+    };
+
+    struct SorterByACTIVE
+    {
+        bool operator()(const PayeeRow& x, const PayeeRow& y)
+        {
+            return x.ACTIVE < y.ACTIVE;
+        }
+    };
+
+    struct SorterByPATTERN
+    {
+        bool operator()(const PayeeRow& x, const PayeeRow& y)
+        {
+            return x.PATTERN < y.PATTERN;
+        }
+    };
+};
+
+// Interface to database table PAYEE_V1
+struct PayeeTable : public TableFactory<PayeeRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using PAYEEID = Col::PAYEEID;
+    using PAYEENAME = Col::PAYEENAME;
+    using CATEGID = Col::CATEGID;
+    using NUMBER = Col::NUMBER;
+    using WEBSITE = Col::WEBSITE;
+    using NOTES = Col::NOTES;
+    using ACTIVE = Col::ACTIVE;
+    using PATTERN = Col::PATTERN;
+
+    PayeeTable();
+    ~PayeeTable();
+
+    void ensure_data() override;
 };

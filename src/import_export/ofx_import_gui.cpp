@@ -669,7 +669,7 @@ mmPayeeSelectionDialog::mmPayeeSelectionDialog(wxWindow* parent, const wxString&
         wxInt64ClientData* suggestedPayeeIdData = nullptr;
         if (!suggestedPayeeName_.IsEmpty())
         {
-            PayeeModel::Data_Set payees = PayeeModel::instance().get_all(PayeeModel::COL_PAYEENAME);
+            PayeeModel::Data_Set payees = PayeeModel::instance().get_all(PayeeCol::COL_ID_PAYEENAME);
             for (size_t i = 0; i < payees.size(); ++i)
             {
                 if (payees[i].PAYEENAME == suggestedPayeeName_)
@@ -696,7 +696,7 @@ mmPayeeSelectionDialog::mmPayeeSelectionDialog(wxWindow* parent, const wxString&
     payeeSizer_ = new wxBoxSizer(wxVERTICAL);
     existingPayeeLabel_ = new wxStaticText(this, wxID_ANY, _("Select Existing Payee:"));
     payeeChoice_ = new wxChoice(this, wxID_ANY);
-    PayeeModel::Data_Set payees = PayeeModel::instance().get_all(PayeeModel::COL_PAYEENAME);
+    PayeeModel::Data_Set payees = PayeeModel::instance().get_all(PayeeCol::COL_ID_PAYEENAME);
 
     // Add a blank entry as the first item with ID -1
     payeeChoice_->Append("", new wxInt64ClientData(-1));
@@ -738,7 +738,7 @@ mmPayeeSelectionDialog::mmPayeeSelectionDialog(wxWindow* parent, const wxString&
 
     categoryChoice_ = new wxChoice(this, wxID_ANY);
     categoryChoice_->Append(_("Uncategorized"), new wxStringClientData("-1"));
-    CategoryModel::Data_Set categories = CategoryModel::instance().get_all(CategoryModel::COL_CATEGNAME);
+    CategoryModel::Data_Set categories = CategoryModel::instance().get_all(CategoryCol::COL_ID_CATEGNAME);
     categoryMap.clear();
     for (const auto& cat : categories)
     {
@@ -908,7 +908,7 @@ mmOFXImportDialog::mmOFXImportDialog(wxWindow* parent)
 
     mainSizer->Add(new wxStaticText(this, wxID_ANY, _("&Account:")), 0, wxALL, 5);
     accountDropDown_ = new wxChoice(this, wxID_ANY);
-    for (const auto& account : AccountModel::instance().get_all(AccountModel::COL_ACCOUNTNAME))
+    for (const auto& account : AccountModel::instance().get_all(AccountCol::COL_ID_ACCOUNTNAME))
     {
         wxString accountIdStr = wxString::Format("%lld", account.ACCOUNTID.GetValue());
         int idx = accountDropDown_->Append(account.ACCOUNTNAME, new wxStringClientData(accountIdStr));

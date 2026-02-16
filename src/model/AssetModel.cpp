@@ -164,7 +164,7 @@ std::pair<double, double> AssetModel::valueAtDate(const Data* r, const wxDate& d
             if(tran && tran->DELETEDTIME.IsEmpty()) trans.push_back(*tran);
         }
 
-        std::stable_sort(trans.begin(), trans.end(), TransactionTable::SorterByTRANSDATE());
+        std::stable_sort(trans.begin(), trans.end(), TransactionRow::SorterByTRANSDATE());
 
         wxDate last = date;
         for (const auto& tran: trans)

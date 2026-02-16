@@ -80,7 +80,7 @@ wxArrayString FieldValueModel::allValue(const int64 FieldID)
     wxString PreviousValue;
 
     FieldValueModel::Data_Set items = this->find(FIELDID(FieldID));
-    std::sort(items.begin(), items.end(), FieldValueTable::SorterByCONTENT());
+    std::sort(items.begin(), items.end(), FieldValueRow::SorterByCONTENT());
 
     for (const auto &item : items)
     {

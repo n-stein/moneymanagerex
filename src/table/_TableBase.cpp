@@ -9,6 +9,45 @@ Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
 
 #include "_TableBase.h"
 
+// Creates the database table if the table does not exist
+bool TableBase::ensure_table()
+{
+    if (!m_db->TableExists(m_table_name)) {
+        try {
+            m_db->ExecuteUpdate(m_create_query);
+            ensure_data();
+        }
+        catch(const wxSQLite3Exception &e) {
+            wxLogError("%s: Exception %s", m_table_name, e.GetMessage().utf8_str());
+            return false;
+        }
+    }
+
+    ensure_index();
+
+    return true;
+}
+
+bool TableBase::ensure_index()
+{
+    try {
+        for (const auto& query : m_index_query_a)
+            m_db->ExecuteUpdate(query);
+    }
+    catch(const wxSQLite3Exception &e) {
+        wxLogError("%s: Exception %s", m_table_name, e.GetMessage().utf8_str());
+        return false;
+    }
+
+    return true;
+}
+
+void TableBase::drop_table()
+{
+    // TODO: drop indeces on this table
+    m_db->ExecuteUpdate(m_drop_query);
+}
+
 int64 TableBase::newId()
 {
     // Get the current time in milliseconds as wxLongLong/int64
@@ -28,3 +67,4 @@ int64 TableBase::newId()
     // Combine ticks and randomSuffix
     return (ticks * 1000) + randomSuffix;
 }
+

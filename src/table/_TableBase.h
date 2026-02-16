@@ -41,7 +41,7 @@ enum OP {
     OP_NE      // Not Equal
 };
 
-template<class V>
+template<typename V>
 struct TableOpV
 {
     OP m_operator;
@@ -55,16 +55,19 @@ struct TableBase
 protected:
     // member variables are independent for each table derived from TableBase
     wxSQLite3Database* m_db;
-    wxString m_table_name;
-    wxString m_query_select;
     int64 m_ticks;
-    size_t m_hit, m_miss, m_skip;
+    wxString m_table_name;
+    wxString m_create_query;
+    wxString m_drop_query;
+    wxArrayString m_index_query_a;
+    wxString m_insert_query;
+    wxString m_update_query;
+    wxString m_delete_query;
+    wxString m_select_query;
 
 public:
-    TableBase(): m_db(0), m_ticks(0), m_hit(0), m_miss(0), m_skip(0) {};
+    TableBase(): m_db(0), m_ticks(0) {};
     virtual ~TableBase() {};
-
-    virtual size_t num_columns() const = 0;
 
     void Begin() { m_db->Begin(); }
     void Commit() { m_db->Commit(); }
@@ -72,85 +75,11 @@ public:
     void ReleaseSavepoint(const wxString name = "MMEX") { m_db->ReleaseSavepoint(name); }
     void Rollback(const wxString name = "MMEX") { m_db->Rollback(name); }
 
-    bool table_exists() const
-    {
-       return m_db->TableExists(m_table_name);
-    }
-
-    void drop_table() const
-    {
-        m_db->ExecuteUpdate("DROP TABLE IF EXISTS " + m_table_name);
-    }
-
+    bool ensure_table();
+    bool ensure_index();
+    void drop_table();
     int64 newId();
 
-    // the first argument helps the compiler to infer the type
-    template<typename TABLE, typename... Args>
-    const typename TABLE::Data_Set find_by(TABLE *table, bool op_and, const Args&... args)
-    {
-        typename TABLE::Data_Set result;
-        try {
-            wxString query = this->m_query_select + " WHERE ";
-            condition(query, op_and, args...);
-            wxSQLite3Statement stmt = this->m_db->PrepareStatement(query);
-            bind(stmt, 1, args...);
-
-            wxSQLite3ResultSet q = stmt.ExecuteQuery();
-
-            while(q.NextRow()) {
-                typename TABLE::Data entity(q);
-                result.push_back(std::move(entity));
-            }
-
-            q.Finalize();
-        }
-        catch(const wxSQLite3Exception &e) {
-            wxLogError("%s: Exception %s", m_table_name.utf8_str(), e.GetMessage().utf8_str());
-        }
-
-        return result;
-    }
+    virtual void ensure_data() = 0;
 };
 
-template<typename Arg1>
-void condition(wxString& out, bool /*op_and*/, const Arg1& arg1)
-{
-    out += Arg1::name();
-    switch (arg1.m_operator) {
-        case OP_GT: out += " > ? ";  break;
-        case OP_GE: out += " >= ? "; break;
-        case OP_LT: out += " < ? ";  break;
-        case OP_LE: out += " <= ? "; break;
-        case OP_NE: out += " != ? "; break;
-        default:    out += " = ? ";  break;
-    }
-}
-
-template<typename Arg1, typename... Args>
-void condition(wxString& out, bool op_and, const Arg1& arg1, const Args&... args)
-{
-    out += Arg1::name();
-    switch (arg1.m_operator) {
-    case OP_GT: out += " > ? ";  break;
-    case OP_GE: out += " >= ? "; break;
-    case OP_LT: out += " < ? ";  break;
-    case OP_LE: out += " <= ? "; break;
-    case OP_NE: out += " != ? "; break;
-    default:    out += " = ? ";  break;
-    }
-    out += op_and? " AND " : " OR ";
-    condition(out, op_and, args...);
-}
-
-template<typename Arg1>
-void bind(wxSQLite3Statement& stmt, int index, const Arg1& arg1)
-{
-    stmt.Bind(index, arg1.m_value);
-}
-
-template<typename Arg1, typename... Args>
-void bind(wxSQLite3Statement& stmt, int index, const Arg1& arg1, const Args&... args)
-{
-    stmt.Bind(index, arg1.m_value);
-    bind(stmt, index+1, args...);
-}

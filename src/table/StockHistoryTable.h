@@ -6,205 +6,156 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      StockHistoryTable.h
+ *
+ *      Interface to database table STOCKHISTORY_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct StockHistoryTable : public TableBase
+// Columns in database table STOCKHISTORY_V1
+struct StockHistoryCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_HISTID = 0,
-        COL_SYMBOL,
-        COL_DATE,
-        COL_VALUE,
-        COL_UPDTYPE,
-        COL_size
+        COL_ID_HISTID = 0,
+        COL_ID_SYMBOL,
+        COL_ID_DATE,
+        COL_ID_VALUE,
+        COL_ID_UPDTYPE,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct HISTID : public TableOpV<int64>
     {
-        static wxString name() { return "HISTID"; }
+        static COL_ID col_id() { return COL_ID_HISTID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_HISTID]; }
         explicit HISTID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit HISTID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct SYMBOL : public TableOpV<wxString>
     {
-        static wxString name() { return "SYMBOL"; }
+        static COL_ID col_id() { return COL_ID_SYMBOL; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SYMBOL]; }
         explicit SYMBOL(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit SYMBOL(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct DATE : public TableOpV<wxString>
     {
-        static wxString name() { return "DATE"; }
+        static COL_ID col_id() { return COL_ID_DATE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_DATE]; }
         explicit DATE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit DATE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct VALUE : public TableOpV<double>
     {
-        static wxString name() { return "VALUE"; }
+        static COL_ID col_id() { return COL_ID_VALUE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_VALUE]; }
         explicit VALUE(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit VALUE(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct UPDTYPE : public TableOpV<int64>
     {
-        static wxString name() { return "UPDTYPE"; }
+        static COL_ID col_id() { return COL_ID_UPDTYPE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_UPDTYPE]; }
         explicit UPDTYPE(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit UPDTYPE(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
+};
 
-    typedef HISTID PRIMARY;
+// A single record in database table STOCKHISTORY_V1
+struct StockHistoryRow
+{
+    using Col = StockHistoryCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 HISTID; // primary key
-        wxString SYMBOL;
-        wxString DATE;
-        double VALUE;
-        int64 UPDTYPE;
+    int64 HISTID; // primary key
+    wxString SYMBOL;
+    wxString DATE;
+    double VALUE;
+    int64 UPDTYPE;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit StockHistoryRow();
+    explicit StockHistoryRow(wxSQLite3ResultSet& q);
+    StockHistoryRow(const StockHistoryRow& other) = default;
 
-        int64 id() const { return HISTID; }
-        void id(const int64 id) { HISTID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return HISTID; }
+    void id(const int64 id) { HISTID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const StockHistoryRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    StockHistoryRow& operator=(const StockHistoryRow& other);
+    bool operator< (const StockHistoryRow& other) const { return id() < other.id(); }
+    bool operator< (const StockHistoryRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const HISTID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::HISTID& col)
     {
-        return data->HISTID == op.m_value;
+        return HISTID == col.m_value;
     }
 
-    static bool match(const Data* data, const SYMBOL& op)
+    bool match(const Col::SYMBOL& col)
     {
-        return data->SYMBOL.CmpNoCase(op.m_value) == 0;
+        return SYMBOL.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const DATE& op)
+    bool match(const Col::DATE& col)
     {
-        return data->DATE.CmpNoCase(op.m_value) == 0;
+        return DATE.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const VALUE& op)
+    bool match(const Col::VALUE& col)
     {
-        return data->VALUE == op.m_value;
+        return VALUE == col.m_value;
     }
 
-    static bool match(const Data* data, const UPDTYPE& op)
+    bool match(const Col::UPDTYPE& col)
     {
-        return data->UPDTYPE == op.m_value;
+        return UPDTYPE == col.m_value;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    StockHistoryTable();
-    ~StockHistoryTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && StockHistoryTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-
-    struct SorterByDATE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.DATE < y.DATE;
-        }
-    };
 
     struct SorterByHISTID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const StockHistoryRow& x, const StockHistoryRow& y)
         {
             return x.HISTID < y.HISTID;
         }
@@ -212,25 +163,49 @@ struct StockHistoryTable : public TableBase
 
     struct SorterBySYMBOL
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const StockHistoryRow& x, const StockHistoryRow& y)
         {
             return x.SYMBOL < y.SYMBOL;
         }
     };
 
-    struct SorterByUPDTYPE
+    struct SorterByDATE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const StockHistoryRow& x, const StockHistoryRow& y)
         {
-            return x.UPDTYPE < y.UPDTYPE;
+            return x.DATE < y.DATE;
         }
     };
 
     struct SorterByVALUE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const StockHistoryRow& x, const StockHistoryRow& y)
         {
             return x.VALUE < y.VALUE;
         }
     };
+
+    struct SorterByUPDTYPE
+    {
+        bool operator()(const StockHistoryRow& x, const StockHistoryRow& y)
+        {
+            return x.UPDTYPE < y.UPDTYPE;
+        }
+    };
+};
+
+// Interface to database table STOCKHISTORY_V1
+struct StockHistoryTable : public TableFactory<StockHistoryRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using HISTID = Col::HISTID;
+    using SYMBOL = Col::SYMBOL;
+    using DATE = Col::DATE;
+    using VALUE = Col::VALUE;
+    using UPDTYPE = Col::UPDTYPE;
+
+    StockHistoryTable();
+    ~StockHistoryTable();
+
+    void ensure_data() override;
 };

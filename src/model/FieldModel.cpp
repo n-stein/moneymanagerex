@@ -276,7 +276,7 @@ const wxArrayString FieldModel::UDFC_FIELDS()
     return choices;
 }
 
-const wxArrayString FieldModel::getUDFCList(FieldTable::Data* r)
+const wxArrayString FieldModel::getUDFCList(FieldModel::Data* r)
 {
     const wxString& ref_type = TransactionModel::refTypeName;
     const auto& a = FieldModel::instance().find(FieldModel::FieldTable::REFTYPE(ref_type));

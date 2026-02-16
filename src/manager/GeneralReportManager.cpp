@@ -331,8 +331,8 @@ void GeneralReportManager::fillControls()
     m_selectedItemID = m_rootItem;
     m_treeCtrl->SetItemBold(m_rootItem, true);
     auto records = ReportModel::instance().get_all();
-    std::sort(records.begin(), records.end(), ReportTable::SorterByREPORTNAME());
-    std::stable_sort(records.begin(), records.end(), ReportTable::SorterByGROUPNAME());
+    std::sort(records.begin(), records.end(), ReportRow::SorterByREPORTNAME());
+    std::stable_sort(records.begin(), records.end(), ReportRow::SorterByGROUPNAME());
     wxTreeItemId group;
     wxString group_name;
     for (const auto& record : records)

@@ -292,7 +292,7 @@ void StockPanel::LoadStockTransactions(wxListCtrl* listCtrl, wxString symbol, in
             checking_list.push_back(*checking_entry);
         }
     }
-    std::stable_sort(checking_list.begin(), checking_list.end(), TransactionTable::SorterByTRANSDATE());
+    std::stable_sort(checking_list.begin(), checking_list.end(), TransactionRow::SorterByTRANSDATE());
 
     int row = 0;
     for (const auto& stock_trans : checking_list)

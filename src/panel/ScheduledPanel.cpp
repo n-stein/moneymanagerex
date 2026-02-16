@@ -342,7 +342,7 @@ int ScheduledPanel::initVirtualListControl(int64 id)
     bills_.clear();
     const auto split = ScheduledSplitModel::instance().get_all_id();
     for (const ScheduledModel::Data& data
-        : ScheduledModel::instance().get_all(ScheduledModel::COL_NEXTOCCURRENCEDATE))
+        : ScheduledModel::instance().get_all(ScheduledCol::COL_ID_NEXTOCCURRENCEDATE))
     {
         if (transFilterActive_ && !transFilterDlg_->mmIsRecordMatches(data, split))
             continue;
@@ -796,13 +796,13 @@ void ScheduledPanel::sortList()
     switch (m_lc->getSortColId())
     {
     case ScheduledList::LIST_ID_ID:
-        std::stable_sort(bills_.begin(), bills_.end(), ScheduledTable::SorterByBDID());
+        std::stable_sort(bills_.begin(), bills_.end(), ScheduledRow::SorterByBDID());
         break;
     case ScheduledList::LIST_ID_PAYMENT_DATE:
-        std::stable_sort(bills_.begin(), bills_.end(), ScheduledTable::SorterByTRANSDATE());
+        std::stable_sort(bills_.begin(), bills_.end(), ScheduledRow::SorterByTRANSDATE());
         break;
     case ScheduledList::LIST_ID_DUE_DATE:
-        std::stable_sort(bills_.begin(), bills_.end(), ScheduledTable::SorterByNEXTOCCURRENCEDATE());
+        std::stable_sort(bills_.begin(), bills_.end(), ScheduledRow::SorterByNEXTOCCURRENCEDATE());
         break;
     case ScheduledList::LIST_ID_ACCOUNT:
         std::stable_sort(bills_.begin(), bills_.end(), ScheduledModel::SorterByACCOUNTNAME());
@@ -811,7 +811,7 @@ void ScheduledPanel::sortList()
         std::stable_sort(bills_.begin(), bills_.end(), ScheduledModel::SorterByPAYEENAME());
         break;
     case ScheduledList::LIST_ID_STATUS:
-        std::stable_sort(bills_.begin(), bills_.end(), ScheduledTable::SorterBySTATUS());
+        std::stable_sort(bills_.begin(), bills_.end(), ScheduledRow::SorterBySTATUS());
         break;
     case ScheduledList::LIST_ID_CATEGORY:
         std::stable_sort(bills_.begin(), bills_.end(), ScheduledModel::SorterByCATEGNAME());
@@ -855,10 +855,10 @@ void ScheduledPanel::sortList()
         break;
     case ScheduledList::LIST_ID_REMAINING:
         // in almost all cases, sorting by remaining days is equivalent to sorting by TRANSDATE
-        std::stable_sort(bills_.begin(), bills_.end(), ScheduledTable::SorterByTRANSDATE());
+        std::stable_sort(bills_.begin(), bills_.end(), ScheduledRow::SorterByTRANSDATE());
         break;
     case ScheduledList::LIST_ID_NOTES:
-        std::stable_sort(bills_.begin(), bills_.end(), ScheduledTable::SorterByNOTES());
+        std::stable_sort(bills_.begin(), bills_.end(), ScheduledRow::SorterByNOTES());
         break;
     default:
         break;

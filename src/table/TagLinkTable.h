@@ -6,209 +6,182 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      TagLinkTable.h
+ *
+ *      Interface to database table TAGLINK_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct TagLinkTable : public TableBase
+// Columns in database table TAGLINK_V1
+struct TagLinkCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_TAGLINKID = 0,
-        COL_REFTYPE,
-        COL_REFID,
-        COL_TAGID,
-        COL_size
+        COL_ID_TAGLINKID = 0,
+        COL_ID_REFTYPE,
+        COL_ID_REFID,
+        COL_ID_TAGID,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct TAGLINKID : public TableOpV<int64>
     {
-        static wxString name() { return "TAGLINKID"; }
+        static COL_ID col_id() { return COL_ID_TAGLINKID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_TAGLINKID]; }
         explicit TAGLINKID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit TAGLINKID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct REFTYPE : public TableOpV<wxString>
     {
-        static wxString name() { return "REFTYPE"; }
+        static COL_ID col_id() { return COL_ID_REFTYPE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_REFTYPE]; }
         explicit REFTYPE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit REFTYPE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct REFID : public TableOpV<int64>
     {
-        static wxString name() { return "REFID"; }
+        static COL_ID col_id() { return COL_ID_REFID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_REFID]; }
         explicit REFID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit REFID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct TAGID : public TableOpV<int64>
     {
-        static wxString name() { return "TAGID"; }
+        static COL_ID col_id() { return COL_ID_TAGID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_TAGID]; }
         explicit TAGID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit TAGID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
+};
 
-    typedef TAGLINKID PRIMARY;
+// A single record in database table TAGLINK_V1
+struct TagLinkRow
+{
+    using Col = TagLinkCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 TAGLINKID; // primary key
-        wxString REFTYPE;
-        int64 REFID;
-        int64 TAGID;
+    int64 TAGLINKID; // primary key
+    wxString REFTYPE;
+    int64 REFID;
+    int64 TAGID;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit TagLinkRow();
+    explicit TagLinkRow(wxSQLite3ResultSet& q);
+    TagLinkRow(const TagLinkRow& other) = default;
 
-        int64 id() const { return TAGLINKID; }
-        void id(const int64 id) { TAGLINKID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return TAGLINKID; }
+    void id(const int64 id) { TAGLINKID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const TagLinkRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    TagLinkRow& operator=(const TagLinkRow& other);
+    bool operator< (const TagLinkRow& other) const { return id() < other.id(); }
+    bool operator< (const TagLinkRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const TAGLINKID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::TAGLINKID& col)
     {
-        return data->TAGLINKID == op.m_value;
+        return TAGLINKID == col.m_value;
     }
 
-    static bool match(const Data* data, const REFTYPE& op)
+    bool match(const Col::REFTYPE& col)
     {
-        return data->REFTYPE.CmpNoCase(op.m_value) == 0;
+        return REFTYPE.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const REFID& op)
+    bool match(const Col::REFID& col)
     {
-        return data->REFID == op.m_value;
+        return REFID == col.m_value;
     }
 
-    static bool match(const Data* data, const TAGID& op)
+    bool match(const Col::TAGID& col)
     {
-        return data->TAGID == op.m_value;
+        return TAGID == col.m_value;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
 
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    TagLinkTable();
-    ~TagLinkTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
+    struct SorterByTAGLINKID
     {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && TagLinkTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-
-    struct SorterByREFID
-    {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TagLinkRow& x, const TagLinkRow& y)
         {
-            return x.REFID < y.REFID;
+            return x.TAGLINKID < y.TAGLINKID;
         }
     };
 
     struct SorterByREFTYPE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TagLinkRow& x, const TagLinkRow& y)
         {
             return x.REFTYPE < y.REFTYPE;
         }
     };
 
+    struct SorterByREFID
+    {
+        bool operator()(const TagLinkRow& x, const TagLinkRow& y)
+        {
+            return x.REFID < y.REFID;
+        }
+    };
+
     struct SorterByTAGID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TagLinkRow& x, const TagLinkRow& y)
         {
             return x.TAGID < y.TAGID;
         }
     };
+};
 
-    struct SorterByTAGLINKID
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.TAGLINKID < y.TAGLINKID;
-        }
-    };
+// Interface to database table TAGLINK_V1
+struct TagLinkTable : public TableFactory<TagLinkRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using TAGLINKID = Col::TAGLINKID;
+    using REFTYPE = Col::REFTYPE;
+    using REFID = Col::REFID;
+    using TAGID = Col::TAGID;
+
+    TagLinkTable();
+    ~TagLinkTable();
+
+    void ensure_data() override;
 };

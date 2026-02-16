@@ -925,7 +925,7 @@ void StockDialog::ShowStockHistory()
 
     AccountModel::Data* account = AccountModel::instance().cache_id(m_stock->HELDAT);
     StockHistoryModel::Data_Set histData = StockHistoryModel::instance().find(StockHistoryModel::SYMBOL(m_stock->SYMBOL));
-    std::stable_sort(histData.begin(), histData.end(), StockHistoryTable::SorterByDATE());
+    std::stable_sort(histData.begin(), histData.end(), StockHistoryRow::SorterByDATE());
     std::reverse(histData.begin(), histData.end());
     if (histData.size()>300)
         histData.resize(300);

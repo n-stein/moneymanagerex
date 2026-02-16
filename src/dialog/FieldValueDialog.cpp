@@ -50,7 +50,7 @@ FieldValueDialog::FieldValueDialog(wxDialog* dialog, const wxString& ref_type, i
 {
     m_dialog = dialog;
     m_fields = FieldModel::instance().find(FieldModel::FieldTable::REFTYPE(m_ref_type));
-    std::sort(m_fields.begin(), m_fields.end(), FieldTable::SorterByDESCRIPTION());
+    std::sort(m_fields.begin(), m_fields.end(), FieldRow::SorterByDESCRIPTION());
     m_data_changed.clear();
 }
 

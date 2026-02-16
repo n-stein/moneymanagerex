@@ -6,271 +6,201 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      ReportTable.h
+ *
+ *      Interface to database table REPORT_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct ReportTable : public TableBase
+// Columns in database table REPORT_V1
+struct ReportCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_REPORTID = 0,
-        COL_REPORTNAME,
-        COL_GROUPNAME,
-        COL_ACTIVE,
-        COL_SQLCONTENT,
-        COL_LUACONTENT,
-        COL_TEMPLATECONTENT,
-        COL_DESCRIPTION,
-        COL_size
+        COL_ID_REPORTID = 0,
+        COL_ID_REPORTNAME,
+        COL_ID_GROUPNAME,
+        COL_ID_ACTIVE,
+        COL_ID_SQLCONTENT,
+        COL_ID_LUACONTENT,
+        COL_ID_TEMPLATECONTENT,
+        COL_ID_DESCRIPTION,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct REPORTID : public TableOpV<int64>
     {
-        static wxString name() { return "REPORTID"; }
+        static COL_ID col_id() { return COL_ID_REPORTID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_REPORTID]; }
         explicit REPORTID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit REPORTID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct REPORTNAME : public TableOpV<wxString>
     {
-        static wxString name() { return "REPORTNAME"; }
+        static COL_ID col_id() { return COL_ID_REPORTNAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_REPORTNAME]; }
         explicit REPORTNAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit REPORTNAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct GROUPNAME : public TableOpV<wxString>
     {
-        static wxString name() { return "GROUPNAME"; }
+        static COL_ID col_id() { return COL_ID_GROUPNAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_GROUPNAME]; }
         explicit GROUPNAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit GROUPNAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct ACTIVE : public TableOpV<int64>
     {
-        static wxString name() { return "ACTIVE"; }
+        static COL_ID col_id() { return COL_ID_ACTIVE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_ACTIVE]; }
         explicit ACTIVE(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit ACTIVE(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct SQLCONTENT : public TableOpV<wxString>
     {
-        static wxString name() { return "SQLCONTENT"; }
+        static COL_ID col_id() { return COL_ID_SQLCONTENT; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SQLCONTENT]; }
         explicit SQLCONTENT(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit SQLCONTENT(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct LUACONTENT : public TableOpV<wxString>
     {
-        static wxString name() { return "LUACONTENT"; }
+        static COL_ID col_id() { return COL_ID_LUACONTENT; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_LUACONTENT]; }
         explicit LUACONTENT(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit LUACONTENT(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct TEMPLATECONTENT : public TableOpV<wxString>
     {
-        static wxString name() { return "TEMPLATECONTENT"; }
+        static COL_ID col_id() { return COL_ID_TEMPLATECONTENT; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_TEMPLATECONTENT]; }
         explicit TEMPLATECONTENT(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit TEMPLATECONTENT(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct DESCRIPTION : public TableOpV<wxString>
     {
-        static wxString name() { return "DESCRIPTION"; }
+        static COL_ID col_id() { return COL_ID_DESCRIPTION; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_DESCRIPTION]; }
         explicit DESCRIPTION(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit DESCRIPTION(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
+};
 
-    typedef REPORTID PRIMARY;
+// A single record in database table REPORT_V1
+struct ReportRow
+{
+    using Col = ReportCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 REPORTID; // primary key
-        wxString REPORTNAME;
-        wxString GROUPNAME;
-        int64 ACTIVE;
-        wxString SQLCONTENT;
-        wxString LUACONTENT;
-        wxString TEMPLATECONTENT;
-        wxString DESCRIPTION;
+    int64 REPORTID; // primary key
+    wxString REPORTNAME;
+    wxString GROUPNAME;
+    int64 ACTIVE;
+    wxString SQLCONTENT;
+    wxString LUACONTENT;
+    wxString TEMPLATECONTENT;
+    wxString DESCRIPTION;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit ReportRow();
+    explicit ReportRow(wxSQLite3ResultSet& q);
+    ReportRow(const ReportRow& other) = default;
 
-        int64 id() const { return REPORTID; }
-        void id(const int64 id) { REPORTID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return REPORTID; }
+    void id(const int64 id) { REPORTID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const ReportRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    ReportRow& operator=(const ReportRow& other);
+    bool operator< (const ReportRow& other) const { return id() < other.id(); }
+    bool operator< (const ReportRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const REPORTID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::REPORTID& col)
     {
-        return data->REPORTID == op.m_value;
+        return REPORTID == col.m_value;
     }
 
-    static bool match(const Data* data, const REPORTNAME& op)
+    bool match(const Col::REPORTNAME& col)
     {
-        return data->REPORTNAME.CmpNoCase(op.m_value) == 0;
+        return REPORTNAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const GROUPNAME& op)
+    bool match(const Col::GROUPNAME& col)
     {
-        return data->GROUPNAME.CmpNoCase(op.m_value) == 0;
+        return GROUPNAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const ACTIVE& op)
+    bool match(const Col::ACTIVE& col)
     {
-        return data->ACTIVE == op.m_value;
+        return ACTIVE == col.m_value;
     }
 
-    static bool match(const Data* data, const SQLCONTENT& op)
+    bool match(const Col::SQLCONTENT& col)
     {
-        return data->SQLCONTENT.CmpNoCase(op.m_value) == 0;
+        return SQLCONTENT.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const LUACONTENT& op)
+    bool match(const Col::LUACONTENT& col)
     {
-        return data->LUACONTENT.CmpNoCase(op.m_value) == 0;
+        return LUACONTENT.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const TEMPLATECONTENT& op)
+    bool match(const Col::TEMPLATECONTENT& col)
     {
-        return data->TEMPLATECONTENT.CmpNoCase(op.m_value) == 0;
+        return TEMPLATECONTENT.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const DESCRIPTION& op)
+    bool match(const Col::DESCRIPTION& col)
     {
-        return data->DESCRIPTION.CmpNoCase(op.m_value) == 0;
+        return DESCRIPTION.CmpNoCase(col.m_value) == 0;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    ReportTable();
-    ~ReportTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && ReportTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-
-    struct SorterByACTIVE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.ACTIVE < y.ACTIVE;
-        }
-    };
-
-    struct SorterByDESCRIPTION
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.DESCRIPTION < y.DESCRIPTION;
-        }
-    };
-
-    struct SorterByGROUPNAME
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.GROUPNAME < y.GROUPNAME;
-        }
-    };
-
-    struct SorterByLUACONTENT
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.LUACONTENT < y.LUACONTENT;
-        }
-    };
 
     struct SorterByREPORTID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const ReportRow& x, const ReportRow& y)
         {
             return x.REPORTID < y.REPORTID;
         }
@@ -278,25 +208,76 @@ struct ReportTable : public TableBase
 
     struct SorterByREPORTNAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const ReportRow& x, const ReportRow& y)
         {
             return x.REPORTNAME < y.REPORTNAME;
         }
     };
 
+    struct SorterByGROUPNAME
+    {
+        bool operator()(const ReportRow& x, const ReportRow& y)
+        {
+            return x.GROUPNAME < y.GROUPNAME;
+        }
+    };
+
+    struct SorterByACTIVE
+    {
+        bool operator()(const ReportRow& x, const ReportRow& y)
+        {
+            return x.ACTIVE < y.ACTIVE;
+        }
+    };
+
     struct SorterBySQLCONTENT
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const ReportRow& x, const ReportRow& y)
         {
             return x.SQLCONTENT < y.SQLCONTENT;
         }
     };
 
+    struct SorterByLUACONTENT
+    {
+        bool operator()(const ReportRow& x, const ReportRow& y)
+        {
+            return x.LUACONTENT < y.LUACONTENT;
+        }
+    };
+
     struct SorterByTEMPLATECONTENT
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const ReportRow& x, const ReportRow& y)
         {
             return x.TEMPLATECONTENT < y.TEMPLATECONTENT;
         }
     };
+
+    struct SorterByDESCRIPTION
+    {
+        bool operator()(const ReportRow& x, const ReportRow& y)
+        {
+            return x.DESCRIPTION < y.DESCRIPTION;
+        }
+    };
+};
+
+// Interface to database table REPORT_V1
+struct ReportTable : public TableFactory<ReportRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using REPORTID = Col::REPORTID;
+    using REPORTNAME = Col::REPORTNAME;
+    using GROUPNAME = Col::GROUPNAME;
+    using ACTIVE = Col::ACTIVE;
+    using SQLCONTENT = Col::SQLCONTENT;
+    using LUACONTENT = Col::LUACONTENT;
+    using TEMPLATECONTENT = Col::TEMPLATECONTENT;
+    using DESCRIPTION = Col::DESCRIPTION;
+
+    ReportTable();
+    ~ReportTable();
+
+    void ensure_data() override;
 };

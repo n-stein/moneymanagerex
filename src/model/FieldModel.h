@@ -76,7 +76,7 @@ public:
     static bool getAutocomplete(const wxString& properties);
     static const wxString getDefault(const wxString& properties);
     static const wxArrayString getChoices(const wxString& properties);
-    static const wxArrayString getUDFCList(FieldTable::Data* r);
+    static const wxArrayString getUDFCList(Data* r);
     static const wxString getUDFC(const wxString& properties);
     static const wxString getUDFCName(const wxString& ref_type, const wxString& name);
     static TYPE_ID getUDFCType(const wxString& ref_type, const wxString& name);

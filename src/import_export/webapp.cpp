@@ -179,7 +179,7 @@ bool mmWebApp::WebApp_UpdateAccount()
 
     json_writer.StartArray();
 
-    for (const auto &account : AccountModel::instance().get_all(AccountModel::COL_ACCOUNTNAME))
+    for (const auto &account : AccountModel::instance().get_all(AccountCol::COL_ID_ACCOUNTNAME))
     {
         if (AccountModel::type_id(account) != NavigatorTypes::TYPE_ID_INVESTMENT && AccountModel::status_id(account) != AccountModel::STATUS_ID_CLOSED)
         {
@@ -224,7 +224,7 @@ bool mmWebApp::WebApp_UpdatePayee()
     json_writer.StartArray();
 
     wxString def_category_name, def_subcategory_name;
-    for (const auto &payee : PayeeModel::instance().get_all(PayeeModel::COL_PAYEENAME))
+    for (const auto &payee : PayeeModel::instance().get_all(PayeeCol::COL_ID_PAYEENAME))
     {
         const CategoryModel::Data* def_category = CategoryModel::instance().cache_id(payee.CATEGID);
         if (def_category != nullptr)
@@ -482,7 +482,7 @@ int64 mmWebApp::MMEX_InsertNewTransaction(webtran_holder& WebAppTrans)
         TrStatus = TransactionModel::STATUS_KEY_FOLLOWUP;
 
         //Search first bank account
-        for (const auto &FirstAccount : AccountModel::instance().get_all(AccountModel::COL_ACCOUNTNAME))
+        for (const auto &FirstAccount : AccountModel::instance().get_all(AccountCol::COL_ID_ACCOUNTNAME))
         {
             if (AccountModel::type_id(FirstAccount) != NavigatorTypes::TYPE_ID_INVESTMENT && AccountModel::type_id(FirstAccount) != NavigatorTypes::TYPE_ID_TERM)
             {

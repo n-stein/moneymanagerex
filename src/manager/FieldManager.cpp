@@ -107,7 +107,7 @@ void FieldManager::fillControls()
     FieldModel::Data_Set fields = FieldModel::instance().get_all();
     if (fields.empty()) return;
 
-    std::sort(fields.begin(), fields.end(), FieldTable::SorterByDESCRIPTION());
+    std::sort(fields.begin(), fields.end(), FieldRow::SorterByDESCRIPTION());
     int64 firstInTheListID = -1;
     for (const auto& entry : fields)
     {

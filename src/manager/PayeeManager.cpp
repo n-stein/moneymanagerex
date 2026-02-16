@@ -605,7 +605,7 @@ void mmPayeeDialog::fillControls()
         switch (m_sort)
         {
             case PAYEE_HIDDEN:
-                std::stable_sort(payees.begin(), payees.end(), PayeeTable::SorterByACTIVE());
+                std::stable_sort(payees.begin(), payees.end(), PayeeRow::SorterByACTIVE());
                 break;
             case PAYEE_CATEGORY:
                 std::stable_sort(payees.begin(), payees.end(), [] (PayeeModel::Data x, PayeeModel::Data y)
@@ -618,19 +618,19 @@ void mmPayeeDialog::fillControls()
                 });
                 break;
             case PAYEE_NUMBER:
-                std::stable_sort(payees.begin(), payees.end(), PayeeTable::SorterByNUMBER());
+                std::stable_sort(payees.begin(), payees.end(), PayeeRow::SorterByNUMBER());
                 break;
             case PAYEE_WEBSITE:
-                std::stable_sort(payees.begin(), payees.end(), PayeeTable::SorterByWEBSITE());
+                std::stable_sort(payees.begin(), payees.end(), PayeeRow::SorterByWEBSITE());
                 break;
             case PAYEE_NOTES:
-                std::stable_sort(payees.begin(), payees.end(), PayeeTable::SorterByNOTES());
+                std::stable_sort(payees.begin(), payees.end(), PayeeRow::SorterByNOTES());
                 break;
             case PAYEE_PATTERN:
-                std::stable_sort(payees.begin(), payees.end(), PayeeTable::SorterByPATTERN());
+                std::stable_sort(payees.begin(), payees.end(), PayeeRow::SorterByPATTERN());
                 break;
             default:
-                std::stable_sort(payees.begin(), payees.end(), PayeeTable::SorterByPAYEENAME());
+                std::stable_sort(payees.begin(), payees.end(), PayeeRow::SorterByPAYEENAME());
                 break;
         }
         if (m_sortReverse)

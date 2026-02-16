@@ -395,7 +395,7 @@ void BudgetPanel::initVirtualListControl()
 
     //start with only the root categories
     CategoryModel::Data_Set categories = CategoryModel::instance().find(CategoryModel::PARENTID(-1));
-    std::stable_sort(categories.begin(), categories.end(), CategoryTable::SorterByCATEGNAME());
+    std::stable_sort(categories.begin(), categories.end(), CategoryRow::SorterByCATEGNAME());
     for (const auto& category : categories)
     {
         displayDetails_[category.CATEGID].first = 0;

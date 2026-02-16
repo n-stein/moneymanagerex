@@ -458,7 +458,8 @@ void mmGUIFrame::ShutdownDatabase()
     if (!m_db)
         return;
 
-    if (!InfoModel::instance().m_cache.empty()) { //Cache empty on InfoTable means instance never initialized
+    // Cache empty on InfoTable means instance never initialized
+    if (!InfoModel::instance().cache_empty()) {
         if (!db_lockInPlace)
             InfoModel::instance().setBool("ISUSED", false);
     }
@@ -999,7 +1000,7 @@ void mmGUIFrame::DoRecreateNavTreeControl(bool home_page)
         wxTreeItemId accountItem;
         wxTreeItemId sectionid;
 
-        for (const auto& account : AccountModel::instance().get_all(AccountModel::COL_ACCOUNTNAME)) {
+        for (const auto& account : AccountModel::instance().get_all(AccountCol::COL_ID_ACCOUNTNAME)) {
             if ((m_temp_view == VIEW_ACCOUNTS_OPEN_STR && AccountModel::status_id(account) != AccountModel::STATUS_ID_OPEN) ||
                 (m_temp_view == VIEW_ACCOUNTS_CLOSED_STR && AccountModel::status_id(account) == AccountModel::STATUS_ID_OPEN) ||
                 (m_temp_view == VIEW_ACCOUNTS_FAVORITES_STR && !AccountModel::FAVORITEACCT(account))) {
@@ -1044,7 +1045,7 @@ void mmGUIFrame::DoRecreateNavTreeControl(bool home_page)
                         // find all the accounts associated with this stock portfolio
                         // just to keep compatibility for legacy Shares account data
                         StockModel::Data_Set stocks = StockModel::instance().find(StockModel::HELDAT(account.ACCOUNTID));
-                        std::sort(stocks.begin(), stocks.end(), StockTable::SorterBySTOCKNAME());
+                        std::sort(stocks.begin(), stocks.end(), StockRow::SorterBySTOCKNAME());
 
                         // Put the names of the Stock_entry names as children of the stock account.
                         std::unordered_set<wxString> processedStockNames;
@@ -3214,9 +3215,9 @@ void mmGUIFrame::OnBudgetSetupDialog(wxCommandEvent& WXUNUSED(event))
     if (!m_db)
         return;
 
-    const auto a = BudgetPeriodModel::instance().get_all(BudgetPeriodModel::COL_BUDGETYEARNAME).to_json();
+    const auto a = BudgetPeriodModel::instance().get_all(BudgetPeriodCol::COL_ID_BUDGETYEARNAME).to_json();
     BudgetYearDialog(this).ShowModal();
-    const auto b = BudgetPeriodModel::instance().get_all(BudgetPeriodModel::COL_BUDGETYEARNAME).to_json();
+    const auto b = BudgetPeriodModel::instance().get_all(BudgetPeriodCol::COL_ID_BUDGETYEARNAME).to_json();
     if (a != b)
         DoRecreateNavTreeControl(true);
     setNavTreeSection(_t("Budget Planner"));
@@ -3904,7 +3905,7 @@ void mmGUIFrame::OnRates(wxCommandEvent& WXUNUSED(event))
 
 void mmGUIFrame::OnEditAccount(wxCommandEvent& /*event*/)
 {
-    const auto &accounts = AccountModel::instance().get_all(AccountModel::COL_ACCOUNTNAME);
+    const auto &accounts = AccountModel::instance().get_all(AccountCol::COL_ID_ACCOUNTNAME);
     if (accounts.empty()) {
         wxMessageBox(_t("No account available to edit!"), _t("Accounts"), wxOK | wxICON_WARNING);
         return;
@@ -3922,7 +3923,7 @@ void mmGUIFrame::OnEditAccount(wxCommandEvent& /*event*/)
 
 void mmGUIFrame::OnDeleteAccount(wxCommandEvent& /*event*/)
 {
-    const auto &accounts = AccountModel::instance().get_all(AccountModel::COL_ACCOUNTNAME);
+    const auto &accounts = AccountModel::instance().get_all(AccountCol::COL_ID_ACCOUNTNAME);
     if (accounts.empty()) {
         wxMessageBox(_t("No account available to delete!"), _t("Accounts"), wxOK | wxICON_WARNING);
         return;
@@ -4291,7 +4292,7 @@ void mmGUIFrame::OnChangeGUILanguage(wxCommandEvent& event)
 
 void mmGUIFrame::DoUpdateBudgetNavigation(wxTreeItemId& parent_item)
 {
-    const auto all_budgets = BudgetPeriodModel::instance().get_all(BudgetPeriodModel::COL_BUDGETYEARNAME);
+    const auto all_budgets = BudgetPeriodModel::instance().get_all(BudgetPeriodCol::COL_ID_BUDGETYEARNAME);
     if (!all_budgets.empty()) {
         std::map <wxString, int64> years;
 

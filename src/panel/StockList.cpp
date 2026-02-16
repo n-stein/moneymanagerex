@@ -507,22 +507,22 @@ void StockList::sortList()
     switch (getSortColId())
     {
     case StockList::LIST_ID_ID:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterBySTOCKID());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterBySTOCKID());
         break;
     case StockList::LIST_ID_DATE:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterByPURCHASEDATE());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterByPURCHASEDATE());
         break;
     case StockList::LIST_ID_NAME:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterBySTOCKNAME());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterBySTOCKNAME());
         break;
     case StockList::LIST_ID_SYMBOL:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterBySYMBOL());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterBySYMBOL());
         break;
     case StockList::LIST_ID_NUMBER:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterByNUMSHARES());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterByNUMSHARES());
         break;
     case StockList::LIST_ID_PRICE:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterByPURCHASEPRICE());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterByPURCHASEPRICE());
         break;
     case StockList::LIST_ID_VALUE:
         std::stable_sort(m_stocks.begin(), m_stocks.end()
@@ -546,7 +546,7 @@ void StockList::sortList()
             });
         break;
     case StockList::LIST_ID_CURRENT:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterByCURRENTPRICE());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterByCURRENTPRICE());
         break;
     case StockList::LIST_ID_CURRVALUE:
         std::stable_sort(m_stocks.begin(), m_stocks.end()
@@ -561,10 +561,10 @@ void StockList::sortList()
         //TODO
         break;
     case StockList::LIST_ID_COMMISSION:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterByCOMMISSION());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterByCOMMISSION());
         break;
     case StockList::LIST_ID_NOTES:
-        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterByNOTES());
+        std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterByNOTES());
         break;
     default:
         break;
@@ -581,7 +581,7 @@ void StockList::createSummary()
     m_marketVal = 0;
 
     std::sort(m_stocks.begin(), m_stocks.end());
-    std::stable_sort(m_stocks.begin(), m_stocks.end(), StockTable::SorterBySYMBOL());
+    std::stable_sort(m_stocks.begin(), m_stocks.end(), StockRow::SorterBySYMBOL());
 
     for (StockModel::Data stock : m_stocks) {
         if (stock.SYMBOL != prevSymbol) {

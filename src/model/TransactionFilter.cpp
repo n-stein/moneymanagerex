@@ -167,7 +167,7 @@ wxString TransactionFilter::getHTML()
             m_trans.push_back(full_tran);
     }
 
-    std::stable_sort(m_trans.begin(), m_trans.end(), TransactionTable::SorterByTRANSDATE());
+    std::stable_sort(m_trans.begin(), m_trans.end(), TransactionRow::SorterByTRANSDATE());
 
     const wxString extra_style = R"(
 table {

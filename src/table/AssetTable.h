@@ -6,289 +6,262 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      AssetTable.h
+ *
+ *      Interface to database table ASSETS_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct AssetTable : public TableBase
+// Columns in database table ASSETS_V1
+struct AssetCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_ASSETID = 0,
-        COL_STARTDATE,
-        COL_ASSETNAME,
-        COL_ASSETSTATUS,
-        COL_CURRENCYID,
-        COL_VALUECHANGEMODE,
-        COL_VALUE,
-        COL_VALUECHANGE,
-        COL_NOTES,
-        COL_VALUECHANGERATE,
-        COL_ASSETTYPE,
-        COL_size
+        COL_ID_ASSETID = 0,
+        COL_ID_STARTDATE,
+        COL_ID_ASSETNAME,
+        COL_ID_ASSETSTATUS,
+        COL_ID_CURRENCYID,
+        COL_ID_VALUECHANGEMODE,
+        COL_ID_VALUE,
+        COL_ID_VALUECHANGE,
+        COL_ID_NOTES,
+        COL_ID_VALUECHANGERATE,
+        COL_ID_ASSETTYPE,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct ASSETID : public TableOpV<int64>
     {
-        static wxString name() { return "ASSETID"; }
+        static COL_ID col_id() { return COL_ID_ASSETID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_ASSETID]; }
         explicit ASSETID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit ASSETID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct STARTDATE : public TableOpV<wxString>
     {
-        static wxString name() { return "STARTDATE"; }
+        static COL_ID col_id() { return COL_ID_STARTDATE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_STARTDATE]; }
         explicit STARTDATE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit STARTDATE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct ASSETNAME : public TableOpV<wxString>
     {
-        static wxString name() { return "ASSETNAME"; }
+        static COL_ID col_id() { return COL_ID_ASSETNAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_ASSETNAME]; }
         explicit ASSETNAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit ASSETNAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct ASSETSTATUS : public TableOpV<wxString>
     {
-        static wxString name() { return "ASSETSTATUS"; }
+        static COL_ID col_id() { return COL_ID_ASSETSTATUS; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_ASSETSTATUS]; }
         explicit ASSETSTATUS(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit ASSETSTATUS(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct CURRENCYID : public TableOpV<int64>
     {
-        static wxString name() { return "CURRENCYID"; }
+        static COL_ID col_id() { return COL_ID_CURRENCYID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CURRENCYID]; }
         explicit CURRENCYID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit CURRENCYID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct VALUECHANGEMODE : public TableOpV<wxString>
     {
-        static wxString name() { return "VALUECHANGEMODE"; }
+        static COL_ID col_id() { return COL_ID_VALUECHANGEMODE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_VALUECHANGEMODE]; }
         explicit VALUECHANGEMODE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit VALUECHANGEMODE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct VALUE : public TableOpV<double>
     {
-        static wxString name() { return "VALUE"; }
+        static COL_ID col_id() { return COL_ID_VALUE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_VALUE]; }
         explicit VALUE(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit VALUE(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct VALUECHANGE : public TableOpV<wxString>
     {
-        static wxString name() { return "VALUECHANGE"; }
+        static COL_ID col_id() { return COL_ID_VALUECHANGE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_VALUECHANGE]; }
         explicit VALUECHANGE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit VALUECHANGE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct NOTES : public TableOpV<wxString>
     {
-        static wxString name() { return "NOTES"; }
+        static COL_ID col_id() { return COL_ID_NOTES; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_NOTES]; }
         explicit NOTES(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit NOTES(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct VALUECHANGERATE : public TableOpV<double>
     {
-        static wxString name() { return "VALUECHANGERATE"; }
+        static COL_ID col_id() { return COL_ID_VALUECHANGERATE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_VALUECHANGERATE]; }
         explicit VALUECHANGERATE(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit VALUECHANGERATE(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct ASSETTYPE : public TableOpV<wxString>
     {
-        static wxString name() { return "ASSETTYPE"; }
+        static COL_ID col_id() { return COL_ID_ASSETTYPE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_ASSETTYPE]; }
         explicit ASSETTYPE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit ASSETTYPE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
+};
 
-    typedef ASSETID PRIMARY;
+// A single record in database table ASSETS_V1
+struct AssetRow
+{
+    using Col = AssetCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 ASSETID; // primary key
-        wxString STARTDATE;
-        wxString ASSETNAME;
-        wxString ASSETSTATUS;
-        int64 CURRENCYID;
-        wxString VALUECHANGEMODE;
-        double VALUE;
-        wxString VALUECHANGE;
-        wxString NOTES;
-        double VALUECHANGERATE;
-        wxString ASSETTYPE;
+    int64 ASSETID; // primary key
+    wxString STARTDATE;
+    wxString ASSETNAME;
+    wxString ASSETSTATUS;
+    int64 CURRENCYID;
+    wxString VALUECHANGEMODE;
+    double VALUE;
+    wxString VALUECHANGE;
+    wxString NOTES;
+    double VALUECHANGERATE;
+    wxString ASSETTYPE;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit AssetRow();
+    explicit AssetRow(wxSQLite3ResultSet& q);
+    AssetRow(const AssetRow& other) = default;
 
-        int64 id() const { return ASSETID; }
-        void id(const int64 id) { ASSETID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return ASSETID; }
+    void id(const int64 id) { ASSETID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const AssetRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    AssetRow& operator=(const AssetRow& other);
+    bool operator< (const AssetRow& other) const { return id() < other.id(); }
+    bool operator< (const AssetRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const ASSETID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::ASSETID& col)
     {
-        return data->ASSETID == op.m_value;
+        return ASSETID == col.m_value;
     }
 
-    static bool match(const Data* data, const STARTDATE& op)
+    bool match(const Col::STARTDATE& col)
     {
-        return data->STARTDATE.CmpNoCase(op.m_value) == 0;
+        return STARTDATE.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const ASSETNAME& op)
+    bool match(const Col::ASSETNAME& col)
     {
-        return data->ASSETNAME.CmpNoCase(op.m_value) == 0;
+        return ASSETNAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const ASSETSTATUS& op)
+    bool match(const Col::ASSETSTATUS& col)
     {
-        return data->ASSETSTATUS.CmpNoCase(op.m_value) == 0;
+        return ASSETSTATUS.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const CURRENCYID& op)
+    bool match(const Col::CURRENCYID& col)
     {
-        return data->CURRENCYID == op.m_value;
+        return CURRENCYID == col.m_value;
     }
 
-    static bool match(const Data* data, const VALUECHANGEMODE& op)
+    bool match(const Col::VALUECHANGEMODE& col)
     {
-        return data->VALUECHANGEMODE.CmpNoCase(op.m_value) == 0;
+        return VALUECHANGEMODE.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const VALUE& op)
+    bool match(const Col::VALUE& col)
     {
-        return data->VALUE == op.m_value;
+        return VALUE == col.m_value;
     }
 
-    static bool match(const Data* data, const VALUECHANGE& op)
+    bool match(const Col::VALUECHANGE& col)
     {
-        return data->VALUECHANGE.CmpNoCase(op.m_value) == 0;
+        return VALUECHANGE.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const NOTES& op)
+    bool match(const Col::NOTES& col)
     {
-        return data->NOTES.CmpNoCase(op.m_value) == 0;
+        return NOTES.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const VALUECHANGERATE& op)
+    bool match(const Col::VALUECHANGERATE& col)
     {
-        return data->VALUECHANGERATE == op.m_value;
+        return VALUECHANGERATE == col.m_value;
     }
 
-    static bool match(const Data* data, const ASSETTYPE& op)
+    bool match(const Col::ASSETTYPE& col)
     {
-        return data->ASSETTYPE.CmpNoCase(op.m_value) == 0;
+        return ASSETTYPE.CmpNoCase(col.m_value) == 0;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    AssetTable();
-    ~AssetTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && AssetTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
 
     struct SorterByASSETID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AssetRow& x, const AssetRow& y)
         {
             return x.ASSETID < y.ASSETID;
         }
     };
 
+    struct SorterBySTARTDATE
+    {
+        bool operator()(const AssetRow& x, const AssetRow& y)
+        {
+            return x.STARTDATE < y.STARTDATE;
+        }
+    };
+
     struct SorterByASSETNAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AssetRow& x, const AssetRow& y)
         {
             return x.ASSETNAME < y.ASSETNAME;
         }
@@ -296,47 +269,31 @@ struct AssetTable : public TableBase
 
     struct SorterByASSETSTATUS
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AssetRow& x, const AssetRow& y)
         {
             return x.ASSETSTATUS < y.ASSETSTATUS;
         }
     };
 
-    struct SorterByASSETTYPE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.ASSETTYPE < y.ASSETTYPE;
-        }
-    };
-
     struct SorterByCURRENCYID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AssetRow& x, const AssetRow& y)
         {
             return x.CURRENCYID < y.CURRENCYID;
         }
     };
 
-    struct SorterByNOTES
+    struct SorterByVALUECHANGEMODE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AssetRow& x, const AssetRow& y)
         {
-            return x.NOTES < y.NOTES;
-        }
-    };
-
-    struct SorterBySTARTDATE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.STARTDATE < y.STARTDATE;
+            return x.VALUECHANGEMODE < y.VALUECHANGEMODE;
         }
     };
 
     struct SorterByVALUE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AssetRow& x, const AssetRow& y)
         {
             return x.VALUE < y.VALUE;
         }
@@ -344,25 +301,55 @@ struct AssetTable : public TableBase
 
     struct SorterByVALUECHANGE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AssetRow& x, const AssetRow& y)
         {
             return x.VALUECHANGE < y.VALUECHANGE;
         }
     };
 
-    struct SorterByVALUECHANGEMODE
+    struct SorterByNOTES
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AssetRow& x, const AssetRow& y)
         {
-            return x.VALUECHANGEMODE < y.VALUECHANGEMODE;
+            return x.NOTES < y.NOTES;
         }
     };
 
     struct SorterByVALUECHANGERATE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AssetRow& x, const AssetRow& y)
         {
             return x.VALUECHANGERATE < y.VALUECHANGERATE;
         }
     };
+
+    struct SorterByASSETTYPE
+    {
+        bool operator()(const AssetRow& x, const AssetRow& y)
+        {
+            return x.ASSETTYPE < y.ASSETTYPE;
+        }
+    };
+};
+
+// Interface to database table ASSETS_V1
+struct AssetTable : public TableFactory<AssetRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using ASSETID = Col::ASSETID;
+    using STARTDATE = Col::STARTDATE;
+    using ASSETNAME = Col::ASSETNAME;
+    using ASSETSTATUS = Col::ASSETSTATUS;
+    using CURRENCYID = Col::CURRENCYID;
+    using VALUECHANGEMODE = Col::VALUECHANGEMODE;
+    using VALUE = Col::VALUE;
+    using VALUECHANGE = Col::VALUECHANGE;
+    using NOTES = Col::NOTES;
+    using VALUECHANGERATE = Col::VALUECHANGERATE;
+    using ASSETTYPE = Col::ASSETTYPE;
+
+    AssetTable();
+    ~AssetTable();
+
+    void ensure_data() override;
 };

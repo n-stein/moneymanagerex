@@ -100,7 +100,7 @@ void TagManager::CreateControls()
     this->SetSizer(boxSizer);
 
     //--------------------------
-    for (const auto& tag : TagModel::instance().get_all(TagTable::COL_TAGNAME))
+    for (const auto& tag : TagModel::instance().get_all(TagCol::COL_ID_TAGNAME))
         tagList_.Add(tag.TAGNAME);
 
     if (!isSelection_)

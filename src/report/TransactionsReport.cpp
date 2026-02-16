@@ -611,7 +611,7 @@ void TransactionsReport::Run(wxSharedPtr<TransactionFilterDialog>& dlg)
         else if (dlg.get()->mmIsRecordMatches<TransactionModel>(tran)) trans_.push_back(full_tran);
     }
 
-    std::stable_sort(trans_.begin(), trans_.end(), TransactionTable::SorterByTRANSDATE());
+    std::stable_sort(trans_.begin(), trans_.end(), TransactionRow::SorterByTRANSDATE());
     switch (dlg.get()->mmGetGroupBy())
     {
     case TransactionFilterDialog::GROUPBY_ACCOUNT:
@@ -624,16 +624,16 @@ void TransactionsReport::Run(wxSharedPtr<TransactionFilterDialog>& dlg)
         std::stable_sort(trans_.begin(), trans_.end(), TransactionModel::SorterByCATEGNAME());
         break;
     case TransactionFilterDialog::GROUPBY_TYPE:
-        std::stable_sort(trans_.begin(), trans_.end(), TransactionTable::SorterByTRANSCODE());
+        std::stable_sort(trans_.begin(), trans_.end(), TransactionRow::SorterByTRANSCODE());
         break;
     case TransactionFilterDialog::GROUPBY_DAY:
-        std::stable_sort(trans_.begin(), trans_.end(), TransactionTable::SorterByTRANSDATE());
+        std::stable_sort(trans_.begin(), trans_.end(), TransactionRow::SorterByTRANSDATE());
         break;
     case TransactionFilterDialog::GROUPBY_MONTH:
-        std::stable_sort(trans_.begin(), trans_.end(), TransactionTable::SorterByTRANSDATE());
+        std::stable_sort(trans_.begin(), trans_.end(), TransactionRow::SorterByTRANSDATE());
         break;
     case TransactionFilterDialog::GROUPBY_YEAR:
-        std::stable_sort(trans_.begin(), trans_.end(), TransactionTable::SorterByTRANSDATE());
+        std::stable_sort(trans_.begin(), trans_.end(), TransactionRow::SorterByTRANSDATE());
         break;
     }
 }

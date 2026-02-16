@@ -88,7 +88,7 @@ const wxString htmlWidgetStocks::getHTMLText()
     );
     if (!accounts.empty())
     {
-        std::stable_sort(accounts.begin(), accounts.end(), AccountTable::SorterByACCOUNTNAME());
+        std::stable_sort(accounts.begin(), accounts.end(), AccountRow::SorterByACCOUNTNAME());
 
         output = R"(<div class="shadow">)";
         output += "<table class ='sortable table'><col style='width: 50%'><col style='width: 12.5%'><col style='width: 12.5%'><col style='width: 12.5%'><col style='width: 12.5%'><thead><tr class='active'><th>\n";
@@ -290,7 +290,7 @@ const wxString htmlWidgetBillsAndDeposits::getHTMLText()
 
     //                    days, payee, description, amount, account, notes
     std::vector< std::tuple<int, wxString, wxString, double, const AccountModel::Data*, wxString> > bd_days;
-    for (const auto& entry : ScheduledModel::instance().get_all(ScheduledModel::COL_TRANSDATE))
+    for (const auto& entry : ScheduledModel::instance().get_all(ScheduledCol::COL_ID_TRANSDATE))
     {
         int daysPayment = ScheduledModel::getTransDateTime(&entry)
             .Subtract(today).GetDays();
@@ -579,7 +579,7 @@ const wxString htmlWidgetAssets::getHTMLText()
     if (asset_accounts.empty())
         return wxEmptyString;
 
-    std::stable_sort(asset_accounts.begin(), asset_accounts.end(), AccountTable::SorterByACCOUNTNAME());
+    std::stable_sort(asset_accounts.begin(), asset_accounts.end(), AccountRow::SorterByACCOUNTNAME());
 
     static const int MAX_ASSETS = 10;
     wxString output;
@@ -725,7 +725,7 @@ const wxString htmlWidgetAccounts::displayAccounts(double& tBalance, double& tRe
         AccountModel::ACCOUNTTYPE(NavigatorTypes::instance().type_name(type)),
         AccountModel::STATUS(OP_NE, AccountModel::STATUS_ID_CLOSED)
     );
-    std::stable_sort(accounts.begin(), accounts.end(), AccountTable::SorterByACCOUNTNAME());
+    std::stable_sort(accounts.begin(), accounts.end(), AccountRow::SorterByACCOUNTNAME());
     for (const auto& account : accounts)
     {
         CurrencyModel::Data* currency = AccountModel::currency(account);

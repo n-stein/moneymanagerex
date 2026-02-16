@@ -303,7 +303,7 @@ void mmUnivCSVDialog::CreateControls()
     FieldModel::Data_Set fields = FieldModel::instance().find(FieldModel::REFTYPE(TransactionModel::refTypeName));
     if (!fields.empty())
     {
-        std::sort(fields.begin(), fields.end(), FieldTable::SorterByDESCRIPTION());
+        std::sort(fields.begin(), fields.end(), FieldRow::SorterByDESCRIPTION());
         int customField = 1;    // Start of custom fields numbering
         for (const FieldModel::Data& entry : fields)
         {
@@ -1705,9 +1705,12 @@ void mmUnivCSVDialog::OnExport(wxCommandEvent& WXUNUSED(event))
     if (m_exportStocksCheckBox->GetValue()==false)
     {
         // Write transactions to file.
-        TransactionModel::Data_Set txns = TransactionModel::instance().find_or(TransactionModel::ACCOUNTID(fromAccountID), TransactionModel::TOACCOUNTID(fromAccountID));
+        TransactionModel::Data_Set txns = TransactionModel::instance().find_or(
+            TransactionModel::ACCOUNTID(fromAccountID),
+            TransactionModel::TOACCOUNTID(fromAccountID)
+        );
         std::sort(txns.begin(), txns.end());
-        std::stable_sort(txns.begin(), txns.end(), TransactionTable::SorterByTRANSDATE());
+        std::stable_sort(txns.begin(), txns.end(), TransactionRow::SorterByTRANSDATE());
 
         for (const auto& pBankTransaction : txns)
         {
@@ -1841,15 +1844,20 @@ void mmUnivCSVDialog::OnExport(wxCommandEvent& WXUNUSED(event))
     }
     else //Else if the user wants to export stocks
     {
-        StockModel::Data_Set txns = StockModel::instance().find(StockModel::HELDAT(fromAccountID));
+        StockModel::Data_Set txns = StockModel::instance().find(
+            StockModel::HELDAT(fromAccountID)
+        );
         std::sort(txns.begin(), txns.end());
-        std::stable_sort(txns.begin(), txns.end(), StockTable::SorterBySTOCKID());
+        std::stable_sort(txns.begin(), txns.end(), StockRow::SorterBySTOCKID());
 
+        AccountModel::Data* account = AccountModel::instance().cache_id(fromAccountID);
         for (const auto& pStockTrancsaction : txns)
         {
             //If the transaction happened between the dates that the user selected or if the user selected to export all the transactions regardless of date then the row is added to the preview
-            if (StockModel::PURCHASEDATE(pStockTrancsaction).IsBetween(m_date_picker_start->GetValue(),m_date_picker_end->GetValue()) || m_haveDatesCheckBox->GetValue()==false)
-            {
+            if (StockModel::PURCHASEDATE(pStockTrancsaction).IsBetween(
+                m_date_picker_start->GetValue(),
+                m_date_picker_end->GetValue()
+            ) || m_haveDatesCheckBox->GetValue()==false) {
                 pTxFile->AddNewLine();
 
                 for (const auto& it : csvFieldOrder_)
@@ -1898,10 +1906,10 @@ void mmUnivCSVDialog::OnExport(wxCommandEvent& WXUNUSED(event))
                         entry = std::to_wstring(pStockTrancsaction.COMMISSION);
                         break;
                     case UNIV_CSV_ACCOUNT:
-                        entry = StockModel::HELDAT(fromAccountID).name();
+                        entry = account->ACCOUNTNAME;
                         break;
                     case UNIV_CSV_CURRENCY:
-                        entry = AccountModel::currency(AccountModel::instance().cache_id(fromAccountID))->CURRENCY_SYMBOL;
+                        entry = AccountModel::currency(account)->CURRENCY_SYMBOL;
                         break;
                     default:
                         break;
@@ -2095,7 +2103,7 @@ void mmUnivCSVDialog::update_preview()
                 TransactionModel::Data_Set txns =
         TransactionModel::instance().find_or(TransactionModel::ACCOUNTID(fromAccountID), TransactionModel::TOACCOUNTID(fromAccountID));
                 std::sort(txns.begin(), txns.end());
-                std::stable_sort(txns.begin(), txns.end(), TransactionTable::SorterByTRANSDATE());
+                std::stable_sort(txns.begin(), txns.end(), TransactionRow::SorterByTRANSDATE());
                 for (const auto& pBankTransaction : txns)
                 {
                     if (TransactionModel::status_id(pBankTransaction) == TransactionModel::STATUS_ID_VOID || !pBankTransaction.DELETEDTIME.IsEmpty())
@@ -2246,10 +2254,13 @@ void mmUnivCSVDialog::update_preview()
             }
             else //Else if the user wants to export stocks
             {
-                StockModel::Data_Set txns = StockModel::instance().find(StockModel::HELDAT(fromAccountID));
+                StockModel::Data_Set txns = StockModel::instance().find(
+                    StockModel::HELDAT(fromAccountID)
+                );
                 std::sort(txns.begin(), txns.end());
-                std::stable_sort(txns.begin(), txns.end(), StockTable::SorterBySTOCKID());
+                std::stable_sort(txns.begin(), txns.end(), StockRow::SorterBySTOCKID());
 
+                AccountModel::Data* account = AccountModel::instance().cache_id(fromAccountID);
                 for (const auto& pStockTrancsaction : txns)
                 {
                     // If the transaction happened between the dates that the user selected or if the user selected to export all the transactions regardless of date then the row is added to the preview
@@ -2319,10 +2330,10 @@ void mmUnivCSVDialog::update_preview()
                                 text << inQuotes(commission, delimit);
                                 break;
                             case UNIV_CSV_ACCOUNT:
-                                text << inQuotes(StockTable::HELDAT::name(), delimit);
+                                text << inQuotes(account->ACCOUNTNAME, delimit);
                                 break;
                             case UNIV_CSV_CURRENCY:
-                                text << inQuotes(AccountModel::currency(AccountModel::instance().cache_id(fromAccountID))->CURRENCY_SYMBOL, delimit);
+                                text << inQuotes(AccountModel::currency(account)->CURRENCY_SYMBOL, delimit);
                                 break;
                             default:
                                 break;

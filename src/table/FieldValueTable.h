@@ -6,191 +6,141 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      FieldValueTable.h
+ *
+ *      Interface to database table CUSTOMFIELDDATA_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct FieldValueTable : public TableBase
+// Columns in database table CUSTOMFIELDDATA_V1
+struct FieldValueCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_FIELDATADID = 0,
-        COL_FIELDID,
-        COL_REFID,
-        COL_CONTENT,
-        COL_size
+        COL_ID_FIELDATADID = 0,
+        COL_ID_FIELDID,
+        COL_ID_REFID,
+        COL_ID_CONTENT,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct FIELDATADID : public TableOpV<int64>
     {
-        static wxString name() { return "FIELDATADID"; }
+        static COL_ID col_id() { return COL_ID_FIELDATADID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_FIELDATADID]; }
         explicit FIELDATADID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit FIELDATADID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct FIELDID : public TableOpV<int64>
     {
-        static wxString name() { return "FIELDID"; }
+        static COL_ID col_id() { return COL_ID_FIELDID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_FIELDID]; }
         explicit FIELDID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit FIELDID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct REFID : public TableOpV<int64>
     {
-        static wxString name() { return "REFID"; }
+        static COL_ID col_id() { return COL_ID_REFID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_REFID]; }
         explicit REFID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit REFID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct CONTENT : public TableOpV<wxString>
     {
-        static wxString name() { return "CONTENT"; }
+        static COL_ID col_id() { return COL_ID_CONTENT; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CONTENT]; }
         explicit CONTENT(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit CONTENT(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
+};
 
-    typedef FIELDATADID PRIMARY;
+// A single record in database table CUSTOMFIELDDATA_V1
+struct FieldValueRow
+{
+    using Col = FieldValueCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 FIELDATADID; // primary key
-        int64 FIELDID;
-        int64 REFID;
-        wxString CONTENT;
+    int64 FIELDATADID; // primary key
+    int64 FIELDID;
+    int64 REFID;
+    wxString CONTENT;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit FieldValueRow();
+    explicit FieldValueRow(wxSQLite3ResultSet& q);
+    FieldValueRow(const FieldValueRow& other) = default;
 
-        int64 id() const { return FIELDATADID; }
-        void id(const int64 id) { FIELDATADID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return FIELDATADID; }
+    void id(const int64 id) { FIELDATADID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const FieldValueRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    FieldValueRow& operator=(const FieldValueRow& other);
+    bool operator< (const FieldValueRow& other) const { return id() < other.id(); }
+    bool operator< (const FieldValueRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const FIELDATADID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::FIELDATADID& col)
     {
-        return data->FIELDATADID == op.m_value;
+        return FIELDATADID == col.m_value;
     }
 
-    static bool match(const Data* data, const FIELDID& op)
+    bool match(const Col::FIELDID& col)
     {
-        return data->FIELDID == op.m_value;
+        return FIELDID == col.m_value;
     }
 
-    static bool match(const Data* data, const REFID& op)
+    bool match(const Col::REFID& col)
     {
-        return data->REFID == op.m_value;
+        return REFID == col.m_value;
     }
 
-    static bool match(const Data* data, const CONTENT& op)
+    bool match(const Col::CONTENT& col)
     {
-        return data->CONTENT.CmpNoCase(op.m_value) == 0;
+        return CONTENT.CmpNoCase(col.m_value) == 0;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    FieldValueTable();
-    ~FieldValueTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && FieldValueTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-
-    struct SorterByCONTENT
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.CONTENT < y.CONTENT;
-        }
-    };
 
     struct SorterByFIELDATADID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const FieldValueRow& x, const FieldValueRow& y)
         {
             return x.FIELDATADID < y.FIELDATADID;
         }
@@ -198,7 +148,7 @@ struct FieldValueTable : public TableBase
 
     struct SorterByFIELDID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const FieldValueRow& x, const FieldValueRow& y)
         {
             return x.FIELDID < y.FIELDID;
         }
@@ -206,9 +156,32 @@ struct FieldValueTable : public TableBase
 
     struct SorterByREFID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const FieldValueRow& x, const FieldValueRow& y)
         {
             return x.REFID < y.REFID;
         }
     };
+
+    struct SorterByCONTENT
+    {
+        bool operator()(const FieldValueRow& x, const FieldValueRow& y)
+        {
+            return x.CONTENT < y.CONTENT;
+        }
+    };
+};
+
+// Interface to database table CUSTOMFIELDDATA_V1
+struct FieldValueTable : public TableFactory<FieldValueRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using FIELDATADID = Col::FIELDATADID;
+    using FIELDID = Col::FIELDID;
+    using REFID = Col::REFID;
+    using CONTENT = Col::CONTENT;
+
+    FieldValueTable();
+    ~FieldValueTable();
+
+    void ensure_data() override;
 };

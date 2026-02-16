@@ -6,155 +6,111 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      BudgetPeriodTable.h
+ *
+ *      Interface to database table BUDGETYEAR_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct BudgetPeriodTable : public TableBase
+// Columns in database table BUDGETYEAR_V1
+struct BudgetPeriodCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_BUDGETYEARID = 0,
-        COL_BUDGETYEARNAME,
-        COL_size
+        COL_ID_BUDGETYEARID = 0,
+        COL_ID_BUDGETYEARNAME,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct BUDGETYEARID : public TableOpV<int64>
     {
-        static wxString name() { return "BUDGETYEARID"; }
+        static COL_ID col_id() { return COL_ID_BUDGETYEARID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_BUDGETYEARID]; }
         explicit BUDGETYEARID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit BUDGETYEARID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct BUDGETYEARNAME : public TableOpV<wxString>
     {
-        static wxString name() { return "BUDGETYEARNAME"; }
+        static COL_ID col_id() { return COL_ID_BUDGETYEARNAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_BUDGETYEARNAME]; }
         explicit BUDGETYEARNAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit BUDGETYEARNAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
+};
 
-    typedef BUDGETYEARID PRIMARY;
+// A single record in database table BUDGETYEAR_V1
+struct BudgetPeriodRow
+{
+    using Col = BudgetPeriodCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 BUDGETYEARID; // primary key
-        wxString BUDGETYEARNAME;
+    int64 BUDGETYEARID; // primary key
+    wxString BUDGETYEARNAME;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit BudgetPeriodRow();
+    explicit BudgetPeriodRow(wxSQLite3ResultSet& q);
+    BudgetPeriodRow(const BudgetPeriodRow& other) = default;
 
-        int64 id() const { return BUDGETYEARID; }
-        void id(const int64 id) { BUDGETYEARID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return BUDGETYEARID; }
+    void id(const int64 id) { BUDGETYEARID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const BudgetPeriodRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    BudgetPeriodRow& operator=(const BudgetPeriodRow& other);
+    bool operator< (const BudgetPeriodRow& other) const { return id() < other.id(); }
+    bool operator< (const BudgetPeriodRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const BUDGETYEARID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::BUDGETYEARID& col)
     {
-        return data->BUDGETYEARID == op.m_value;
+        return BUDGETYEARID == col.m_value;
     }
 
-    static bool match(const Data* data, const BUDGETYEARNAME& op)
+    bool match(const Col::BUDGETYEARNAME& col)
     {
-        return data->BUDGETYEARNAME.CmpNoCase(op.m_value) == 0;
+        return BUDGETYEARNAME.CmpNoCase(col.m_value) == 0;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    BudgetPeriodTable();
-    ~BudgetPeriodTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && BudgetPeriodTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
 
     struct SorterByBUDGETYEARID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const BudgetPeriodRow& x, const BudgetPeriodRow& y)
         {
             return x.BUDGETYEARID < y.BUDGETYEARID;
         }
@@ -162,9 +118,22 @@ struct BudgetPeriodTable : public TableBase
 
     struct SorterByBUDGETYEARNAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const BudgetPeriodRow& x, const BudgetPeriodRow& y)
         {
             return x.BUDGETYEARNAME < y.BUDGETYEARNAME;
         }
     };
+};
+
+// Interface to database table BUDGETYEAR_V1
+struct BudgetPeriodTable : public TableFactory<BudgetPeriodRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using BUDGETYEARID = Col::BUDGETYEARID;
+    using BUDGETYEARNAME = Col::BUDGETYEARNAME;
+
+    BudgetPeriodTable();
+    ~BudgetPeriodTable();
+
+    void ensure_data() override;
 };

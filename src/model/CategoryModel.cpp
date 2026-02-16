@@ -97,7 +97,7 @@ CategoryModel::Data* CategoryModel::cache_key(const wxString& name, const int64 
 const std::map<wxString, int64> CategoryModel::all_categories(bool excludeHidden)
 {
     std::map<wxString, int64> full_categs;
-    for (const auto& c : instance().get_all(COL_CATEGID))
+    for (const auto& c : instance().get_all(Col::COL_ID_CATEGID))
     {
         if (excludeHidden && (c.ACTIVE == 0))
             continue;
@@ -121,7 +121,7 @@ CategoryModel::Data_Set CategoryModel::sub_tree(const Data* r)
 {
     Data_Set subtree;
     Data_Set subcategories = instance().find(PARENTID(r->CATEGID));
-    std::stable_sort(subcategories.begin(), subcategories.end(), CategoryTable::SorterByCATEGNAME());
+    std::stable_sort(subcategories.begin(), subcategories.end(), CategoryRow::SorterByCATEGNAME());
     for (const auto& subcategory : subcategories) {
         subtree.push_back(subcategory);
         Data_Set subtreecats = sub_tree(subcategory);

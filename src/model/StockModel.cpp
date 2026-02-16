@@ -120,7 +120,7 @@ wxString StockModel::lastPriceDate(const Data* entity)
     wxString dtStr = entity->PURCHASEDATE;
     StockHistoryModel::Data_Set histData = StockHistoryModel::instance().find(SYMBOL(entity->SYMBOL));
 
-    std::sort(histData.begin(), histData.end(), StockHistoryTable::SorterByDATE());
+    std::sort(histData.begin(), histData.end(), StockHistoryRow::SorterByDATE());
     if (!histData.empty())
         dtStr = histData.back().DATE;
 
@@ -140,7 +140,7 @@ double StockModel::getDailyBalanceAt(const AccountModel::Data *account, const wx
     {
         wxString precValueDate, nextValueDate;
         StockHistoryModel::Data_Set stock_hist = StockHistoryModel::instance().find(SYMBOL(stock.SYMBOL));
-        std::stable_sort(stock_hist.begin(), stock_hist.end(), StockHistoryTable::SorterByDATE());
+        std::stable_sort(stock_hist.begin(), stock_hist.end(), StockHistoryRow::SorterByDATE());
         std::reverse(stock_hist.begin(), stock_hist.end());
 
         double valueAtDate = 0.0,  precValue = 0.0, nextValue = 0.0;
@@ -231,7 +231,7 @@ double StockModel::RealGainLoss(const Data* r, bool to_base_curr)
         TransactionModel::Data* checking_entry = TransactionModel::instance().cache_id(trans.CHECKINGACCOUNTID);
         if (checking_entry->TRANSID > -1 && checking_entry->DELETEDTIME.IsEmpty()) checking_list.push_back(*checking_entry);
     }
-    std::stable_sort(checking_list.begin(), checking_list.end(), TransactionTable::SorterByTRANSDATE());
+    std::stable_sort(checking_list.begin(), checking_list.end(), TransactionRow::SorterByTRANSDATE());
 
     for (const auto &trans : checking_list)
     {
@@ -302,7 +302,7 @@ double StockModel::UnrealGainLoss(const Data* r, bool to_base_curr)
                 TransactionModel::Data* checking_entry = TransactionModel::instance().cache_id(trans.CHECKINGACCOUNTID);
                 if (checking_entry->TRANSID > -1 && checking_entry->DELETEDTIME.IsEmpty()) checking_list.push_back(*checking_entry);
             }
-            std::stable_sort(checking_list.begin(), checking_list.end(), TransactionTable::SorterByTRANSDATE());
+            std::stable_sort(checking_list.begin(), checking_list.end(), TransactionRow::SorterByTRANSDATE());
 
             for (const auto &trans : checking_list)
             {
@@ -338,7 +338,7 @@ void StockModel::UpdateCurrentPrice(const wxString& symbol, const double price)
         StockHistoryModel::Data_Set histData = StockHistoryModel::instance().find(StockHistoryModel::SYMBOL(symbol));
         if (!histData.empty())
         {
-            std::sort(histData.begin(), histData.end(), StockHistoryTable::SorterByDATE());
+            std::sort(histData.begin(), histData.end(), StockHistoryRow::SorterByDATE());
             current_price = histData.back().VALUE;
         }
     }
@@ -368,7 +368,7 @@ void StockModel::UpdatePosition(StockModel::Data* stock_entry)
         if (checking_entry->TRANSID > -1 && checking_entry->DELETEDTIME.IsEmpty() && TransactionModel::status_id(checking_entry->STATUS) != TransactionModel::STATUS_ID_VOID)
             checking_list.push_back(*checking_entry);
     }
-    std::stable_sort(checking_list.begin(), checking_list.end(), TransactionTable::SorterByTRANSDATE());
+    std::stable_sort(checking_list.begin(), checking_list.end(), TransactionRow::SorterByTRANSDATE());
     for (const auto &trans : checking_list)
     {
         TransactionShareModel::Data* share_entry = TransactionShareModel::ShareEntry(trans.TRANSID);

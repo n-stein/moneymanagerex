@@ -66,7 +66,7 @@ AccountModel& AccountModel::instance()
 wxArrayString AccountModel::all_checking_account_names(bool skip_closed)
 {
     wxArrayString accounts;
-    for (const auto &account : this->get_all(COL_ACCOUNTNAME))
+    for (const auto &account : this->get_all(Col::COL_ID_ACCOUNTNAME))
     {
         if (skip_closed && status_id(account) == STATUS_ID_CLOSED)
             continue;
@@ -82,7 +82,7 @@ wxArrayString AccountModel::all_checking_account_names(bool skip_closed)
 const std::map<wxString, int64> AccountModel::all_accounts(bool skip_closed)
 {
     std::map<wxString, int64> accounts;
-    for (const auto& account : this->get_all(COL_ACCOUNTNAME))
+    for (const auto& account : this->get_all(Col::COL_ID_ACCOUNTNAME))
     {
         if (skip_closed && status_id(account) == STATUS_ID_CLOSED)
             continue;
@@ -182,7 +182,7 @@ const TransactionModel::Data_Set AccountModel::transactionsByDateTimeId(const Da
     );
     std::sort(trans.begin(), trans.end());
     if (PreferencesModel::instance().UseTransDateTime())
-        std::stable_sort(trans.begin(), trans.end(), TransactionTable::SorterByTRANSDATE());
+        std::stable_sort(trans.begin(), trans.end(), TransactionRow::SorterByTRANSDATE());
     else
         std::stable_sort(trans.begin(), trans.end(), TransactionModel::SorterByTRANSDATE_DATE());
     return trans;
@@ -313,7 +313,7 @@ bool AccountModel::BoolOf(int64 value)
 const AccountModel::Data_Set AccountModel::FilterAccounts(const wxString& account_pattern, bool skip_closed)
 {
     Data_Set accounts;
-    for (auto &account : this->get_all(AccountModel::COL_ACCOUNTNAME))
+    for (auto &account : this->get_all(AccountCol::COL_ID_ACCOUNTNAME))
     {
         if (skip_closed && status_id(account) == STATUS_ID_CLOSED)
             continue;
@@ -336,7 +336,7 @@ void AccountModel::resetAccountType(wxString oldtype)
 
 void AccountModel::resetUnknownAccountTypes()
 {
-    for (const auto &account : this->get_all(COL_ACCOUNTNAME)) {
+    for (const auto &account : this->get_all(Col::COL_ID_ACCOUNTNAME)) {
         if (NavigatorTypes::instance().getTypeIdFromDBName(account.ACCOUNTTYPE, -1) == -1) {
             AccountModel::Data* adata = this->cache_key(account.ACCOUNTNAME);
             adata->ACCOUNTTYPE = "Checking";
@@ -348,7 +348,7 @@ void AccountModel::resetUnknownAccountTypes()
 wxArrayString AccountModel::getUsedAccountTypes(bool skip_closed)
 {
     wxArrayString usedTypes;
-    for (auto &account : this->get_all(AccountModel::COL_ACCOUNTTYPE))
+    for (auto &account : this->get_all(AccountCol::COL_ID_ACCOUNTTYPE))
     {
         if (skip_closed && status_id(account) == STATUS_ID_CLOSED)
             continue;

@@ -101,15 +101,17 @@ inline int ModelBase::reftype_id(const wxString& name, int default_id)
     return REFTYPE_CHOICES.findName(name, default_id);
 }
 
-template<class DB_TABLE>
-class Model : public ModelBase, public DB_TABLE
+template<typename TableType>
+class Model : public ModelBase, public TableType
 {
 public:
-    using DB_TABLE::save;
-    using DB_TABLE::remove;
-    using DB_TABLE::cache_id;
-    using DB_TABLE::get_id;
-    using DB_TABLE::get_all;
+    using Data = TableType::Row;
+    using Data_Set = TableType::RowA;
+    using TableType::save;
+    using TableType::remove;
+    using TableType::cache_id;
+    using TableType::get_id;
+    using TableType::get_all;
 
     template<typename... Args>
     /**
@@ -122,9 +124,9 @@ public:
     * Returns a Data_Set containing the addresses of the items found.
     * The Data_Set is empty when nothing found.
     */
-    const typename DB_TABLE::Data_Set find(const Args&... args)
+    const Data_Set find(const Args&... args)
     {
-        return this->find_by(this, true, args...);
+        return this->find_by(true, args...);
     }
 
     template<typename... Args>
@@ -138,12 +140,12 @@ public:
     * Returns a Data_Set containing the addresses of the items found.
     * The Data_Set is empty when nothing found.
     */
-    const typename DB_TABLE::Data_Set find_or(const Args&... args)
+    const Data_Set find_or(const Args&... args)
     {
-        return this->find_by(this, false, args...);
+        return this->find_by(false, args...);
     }
 
-    typename DB_TABLE::Data* cache_id(wxLongLong_t id)
+    Data* cache_id(wxLongLong_t id)
     {
         return this->cache_id(int64(id));
     }

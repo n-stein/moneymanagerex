@@ -477,7 +477,7 @@ void JournalList::sortTransactions(int col_id, bool ascend)
         sortBy(TransactionModel::SorterByPAYEENAME(), ascend);
         break;
     case JournalList::LIST_ID_STATUS:
-        sortBy(TransactionModel::SorterBySTATUS(), ascend);
+        sortBy(TransactionRow::SorterBySTATUS(), ascend);
         break;
     case JournalList::LIST_ID_CATEGORY:
         sortBy(TransactionModel::SorterByCATEGNAME(), ascend);
@@ -498,7 +498,7 @@ void JournalList::sortTransactions(int col_id, bool ascend)
         sortBy(TransactionModel::SorterByBALANCE(), ascend);
         break;
     case JournalList::LIST_ID_NOTES:
-        sortBy(TransactionModel::SorterByNOTES(), ascend);
+        sortBy(TransactionRow::SorterByNOTES(), ascend);
         break;
     case JournalList::LIST_ID_DATE:
         if (PreferencesModel::instance().TreatDateAsSN())
@@ -510,7 +510,7 @@ void JournalList::sortTransactions(int col_id, bool ascend)
         sortBy(TransactionModel::SorterByTRANSDATE_TIME(), ascend);
         break;
     case JournalList::LIST_ID_DELETEDTIME:
-        sortBy(TransactionModel::SorterByDELETEDTIME(), ascend);
+        sortBy(TransactionRow::SorterByDELETEDTIME(), ascend);
         break;
     case JournalList::LIST_ID_UDFC01:
         type = FieldModel::getUDFCType(ref_type, "UDFC01");
@@ -548,7 +548,7 @@ void JournalList::sortTransactions(int col_id, bool ascend)
             sortBy(SorterByUDFC05, ascend);
         break;
     case JournalList::LIST_ID_UPDATEDTIME:
-        sortBy(TransactionModel::SorterByLASTUPDATEDTIME(), ascend);
+        sortBy(TransactionRow::SorterByLASTUPDATEDTIME(), ascend);
         break;
     default:
         break;

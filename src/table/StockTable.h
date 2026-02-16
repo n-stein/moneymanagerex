@@ -6,345 +6,270 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      StockTable.h
+ *
+ *      Interface to database table STOCK_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct StockTable : public TableBase
+// Columns in database table STOCK_V1
+struct StockCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_STOCKID = 0,
-        COL_HELDAT,
-        COL_PURCHASEDATE,
-        COL_STOCKNAME,
-        COL_SYMBOL,
-        COL_NUMSHARES,
-        COL_PURCHASEPRICE,
-        COL_NOTES,
-        COL_CURRENTPRICE,
-        COL_VALUE,
-        COL_COMMISSION,
-        COL_size
+        COL_ID_STOCKID = 0,
+        COL_ID_HELDAT,
+        COL_ID_PURCHASEDATE,
+        COL_ID_STOCKNAME,
+        COL_ID_SYMBOL,
+        COL_ID_NUMSHARES,
+        COL_ID_PURCHASEPRICE,
+        COL_ID_NOTES,
+        COL_ID_CURRENTPRICE,
+        COL_ID_VALUE,
+        COL_ID_COMMISSION,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct STOCKID : public TableOpV<int64>
     {
-        static wxString name() { return "STOCKID"; }
+        static COL_ID col_id() { return COL_ID_STOCKID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_STOCKID]; }
         explicit STOCKID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit STOCKID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct HELDAT : public TableOpV<int64>
     {
-        static wxString name() { return "HELDAT"; }
+        static COL_ID col_id() { return COL_ID_HELDAT; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_HELDAT]; }
         explicit HELDAT(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit HELDAT(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct PURCHASEDATE : public TableOpV<wxString>
     {
-        static wxString name() { return "PURCHASEDATE"; }
+        static COL_ID col_id() { return COL_ID_PURCHASEDATE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_PURCHASEDATE]; }
         explicit PURCHASEDATE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit PURCHASEDATE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct STOCKNAME : public TableOpV<wxString>
     {
-        static wxString name() { return "STOCKNAME"; }
+        static COL_ID col_id() { return COL_ID_STOCKNAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_STOCKNAME]; }
         explicit STOCKNAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit STOCKNAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct SYMBOL : public TableOpV<wxString>
     {
-        static wxString name() { return "SYMBOL"; }
+        static COL_ID col_id() { return COL_ID_SYMBOL; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SYMBOL]; }
         explicit SYMBOL(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit SYMBOL(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct NUMSHARES : public TableOpV<double>
     {
-        static wxString name() { return "NUMSHARES"; }
+        static COL_ID col_id() { return COL_ID_NUMSHARES; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_NUMSHARES]; }
         explicit NUMSHARES(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit NUMSHARES(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct PURCHASEPRICE : public TableOpV<double>
     {
-        static wxString name() { return "PURCHASEPRICE"; }
+        static COL_ID col_id() { return COL_ID_PURCHASEPRICE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_PURCHASEPRICE]; }
         explicit PURCHASEPRICE(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit PURCHASEPRICE(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct NOTES : public TableOpV<wxString>
     {
-        static wxString name() { return "NOTES"; }
+        static COL_ID col_id() { return COL_ID_NOTES; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_NOTES]; }
         explicit NOTES(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit NOTES(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct CURRENTPRICE : public TableOpV<double>
     {
-        static wxString name() { return "CURRENTPRICE"; }
+        static COL_ID col_id() { return COL_ID_CURRENTPRICE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CURRENTPRICE]; }
         explicit CURRENTPRICE(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit CURRENTPRICE(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct VALUE : public TableOpV<double>
     {
-        static wxString name() { return "VALUE"; }
+        static COL_ID col_id() { return COL_ID_VALUE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_VALUE]; }
         explicit VALUE(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit VALUE(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct COMMISSION : public TableOpV<double>
     {
-        static wxString name() { return "COMMISSION"; }
+        static COL_ID col_id() { return COL_ID_COMMISSION; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_COMMISSION]; }
         explicit COMMISSION(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit COMMISSION(OP op, const double &v): TableOpV<double>(op, v) {}
     };
+};
 
-    typedef STOCKID PRIMARY;
+// A single record in database table STOCK_V1
+struct StockRow
+{
+    using Col = StockCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 STOCKID; // primary key
-        int64 HELDAT;
-        wxString PURCHASEDATE;
-        wxString STOCKNAME;
-        wxString SYMBOL;
-        double NUMSHARES;
-        double PURCHASEPRICE;
-        wxString NOTES;
-        double CURRENTPRICE;
-        double VALUE;
-        double COMMISSION;
+    int64 STOCKID; // primary key
+    int64 HELDAT;
+    wxString PURCHASEDATE;
+    wxString STOCKNAME;
+    wxString SYMBOL;
+    double NUMSHARES;
+    double PURCHASEPRICE;
+    wxString NOTES;
+    double CURRENTPRICE;
+    double VALUE;
+    double COMMISSION;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit StockRow();
+    explicit StockRow(wxSQLite3ResultSet& q);
+    StockRow(const StockRow& other) = default;
 
-        int64 id() const { return STOCKID; }
-        void id(const int64 id) { STOCKID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return STOCKID; }
+    void id(const int64 id) { STOCKID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const StockRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    StockRow& operator=(const StockRow& other);
+    bool operator< (const StockRow& other) const { return id() < other.id(); }
+    bool operator< (const StockRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const STOCKID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::STOCKID& col)
     {
-        return data->STOCKID == op.m_value;
+        return STOCKID == col.m_value;
     }
 
-    static bool match(const Data* data, const HELDAT& op)
+    bool match(const Col::HELDAT& col)
     {
-        return data->HELDAT == op.m_value;
+        return HELDAT == col.m_value;
     }
 
-    static bool match(const Data* data, const PURCHASEDATE& op)
+    bool match(const Col::PURCHASEDATE& col)
     {
-        return data->PURCHASEDATE.CmpNoCase(op.m_value) == 0;
+        return PURCHASEDATE.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const STOCKNAME& op)
+    bool match(const Col::STOCKNAME& col)
     {
-        return data->STOCKNAME.CmpNoCase(op.m_value) == 0;
+        return STOCKNAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const SYMBOL& op)
+    bool match(const Col::SYMBOL& col)
     {
-        return data->SYMBOL.CmpNoCase(op.m_value) == 0;
+        return SYMBOL.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const NUMSHARES& op)
+    bool match(const Col::NUMSHARES& col)
     {
-        return data->NUMSHARES == op.m_value;
+        return NUMSHARES == col.m_value;
     }
 
-    static bool match(const Data* data, const PURCHASEPRICE& op)
+    bool match(const Col::PURCHASEPRICE& col)
     {
-        return data->PURCHASEPRICE == op.m_value;
+        return PURCHASEPRICE == col.m_value;
     }
 
-    static bool match(const Data* data, const NOTES& op)
+    bool match(const Col::NOTES& col)
     {
-        return data->NOTES.CmpNoCase(op.m_value) == 0;
+        return NOTES.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const CURRENTPRICE& op)
+    bool match(const Col::CURRENTPRICE& col)
     {
-        return data->CURRENTPRICE == op.m_value;
+        return CURRENTPRICE == col.m_value;
     }
 
-    static bool match(const Data* data, const VALUE& op)
+    bool match(const Col::VALUE& col)
     {
-        return data->VALUE == op.m_value;
+        return VALUE == col.m_value;
     }
 
-    static bool match(const Data* data, const COMMISSION& op)
+    bool match(const Col::COMMISSION& col)
     {
-        return data->COMMISSION == op.m_value;
+        return COMMISSION == col.m_value;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    StockTable();
-    ~StockTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && StockTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-
-    struct SorterByCOMMISSION
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.COMMISSION < y.COMMISSION;
-        }
-    };
-
-    struct SorterByCURRENTPRICE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.CURRENTPRICE < y.CURRENTPRICE;
-        }
-    };
-
-    struct SorterByHELDAT
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.HELDAT < y.HELDAT;
-        }
-    };
-
-    struct SorterByNOTES
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.NOTES < y.NOTES;
-        }
-    };
-
-    struct SorterByNUMSHARES
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.NUMSHARES < y.NUMSHARES;
-        }
-    };
-
-    struct SorterByPURCHASEDATE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.PURCHASEDATE < y.PURCHASEDATE;
-        }
-    };
-
-    struct SorterByPURCHASEPRICE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.PURCHASEPRICE < y.PURCHASEPRICE;
-        }
-    };
 
     struct SorterBySTOCKID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const StockRow& x, const StockRow& y)
         {
             return x.STOCKID < y.STOCKID;
         }
     };
 
+    struct SorterByHELDAT
+    {
+        bool operator()(const StockRow& x, const StockRow& y)
+        {
+            return x.HELDAT < y.HELDAT;
+        }
+    };
+
+    struct SorterByPURCHASEDATE
+    {
+        bool operator()(const StockRow& x, const StockRow& y)
+        {
+            return x.PURCHASEDATE < y.PURCHASEDATE;
+        }
+    };
+
     struct SorterBySTOCKNAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const StockRow& x, const StockRow& y)
         {
             return x.STOCKNAME < y.STOCKNAME;
         }
@@ -352,17 +277,79 @@ struct StockTable : public TableBase
 
     struct SorterBySYMBOL
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const StockRow& x, const StockRow& y)
         {
             return x.SYMBOL < y.SYMBOL;
         }
     };
 
+    struct SorterByNUMSHARES
+    {
+        bool operator()(const StockRow& x, const StockRow& y)
+        {
+            return x.NUMSHARES < y.NUMSHARES;
+        }
+    };
+
+    struct SorterByPURCHASEPRICE
+    {
+        bool operator()(const StockRow& x, const StockRow& y)
+        {
+            return x.PURCHASEPRICE < y.PURCHASEPRICE;
+        }
+    };
+
+    struct SorterByNOTES
+    {
+        bool operator()(const StockRow& x, const StockRow& y)
+        {
+            return x.NOTES < y.NOTES;
+        }
+    };
+
+    struct SorterByCURRENTPRICE
+    {
+        bool operator()(const StockRow& x, const StockRow& y)
+        {
+            return x.CURRENTPRICE < y.CURRENTPRICE;
+        }
+    };
+
     struct SorterByVALUE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const StockRow& x, const StockRow& y)
         {
             return x.VALUE < y.VALUE;
         }
     };
+
+    struct SorterByCOMMISSION
+    {
+        bool operator()(const StockRow& x, const StockRow& y)
+        {
+            return x.COMMISSION < y.COMMISSION;
+        }
+    };
+};
+
+// Interface to database table STOCK_V1
+struct StockTable : public TableFactory<StockRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using STOCKID = Col::STOCKID;
+    using HELDAT = Col::HELDAT;
+    using PURCHASEDATE = Col::PURCHASEDATE;
+    using STOCKNAME = Col::STOCKNAME;
+    using SYMBOL = Col::SYMBOL;
+    using NUMSHARES = Col::NUMSHARES;
+    using PURCHASEPRICE = Col::PURCHASEPRICE;
+    using NOTES = Col::NOTES;
+    using CURRENTPRICE = Col::CURRENTPRICE;
+    using VALUE = Col::VALUE;
+    using COMMISSION = Col::COMMISSION;
+
+    StockTable();
+    ~StockTable();
+
+    void ensure_data() override;
 };

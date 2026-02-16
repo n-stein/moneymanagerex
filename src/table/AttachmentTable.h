@@ -6,205 +6,180 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      AttachmentTable.h
+ *
+ *      Interface to database table ATTACHMENT_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct AttachmentTable : public TableBase
+// Columns in database table ATTACHMENT_V1
+struct AttachmentCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_ATTACHMENTID = 0,
-        COL_REFTYPE,
-        COL_REFID,
-        COL_DESCRIPTION,
-        COL_FILENAME,
-        COL_size
+        COL_ID_ATTACHMENTID = 0,
+        COL_ID_REFTYPE,
+        COL_ID_REFID,
+        COL_ID_DESCRIPTION,
+        COL_ID_FILENAME,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct ATTACHMENTID : public TableOpV<int64>
     {
-        static wxString name() { return "ATTACHMENTID"; }
+        static COL_ID col_id() { return COL_ID_ATTACHMENTID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_ATTACHMENTID]; }
         explicit ATTACHMENTID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit ATTACHMENTID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct REFTYPE : public TableOpV<wxString>
     {
-        static wxString name() { return "REFTYPE"; }
+        static COL_ID col_id() { return COL_ID_REFTYPE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_REFTYPE]; }
         explicit REFTYPE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit REFTYPE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct REFID : public TableOpV<int64>
     {
-        static wxString name() { return "REFID"; }
+        static COL_ID col_id() { return COL_ID_REFID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_REFID]; }
         explicit REFID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit REFID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct DESCRIPTION : public TableOpV<wxString>
     {
-        static wxString name() { return "DESCRIPTION"; }
+        static COL_ID col_id() { return COL_ID_DESCRIPTION; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_DESCRIPTION]; }
         explicit DESCRIPTION(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit DESCRIPTION(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct FILENAME : public TableOpV<wxString>
     {
-        static wxString name() { return "FILENAME"; }
+        static COL_ID col_id() { return COL_ID_FILENAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_FILENAME]; }
         explicit FILENAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit FILENAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
+};
 
-    typedef ATTACHMENTID PRIMARY;
+// A single record in database table ATTACHMENT_V1
+struct AttachmentRow
+{
+    using Col = AttachmentCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 ATTACHMENTID; // primary key
-        wxString REFTYPE;
-        int64 REFID;
-        wxString DESCRIPTION;
-        wxString FILENAME;
+    int64 ATTACHMENTID; // primary key
+    wxString REFTYPE;
+    int64 REFID;
+    wxString DESCRIPTION;
+    wxString FILENAME;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit AttachmentRow();
+    explicit AttachmentRow(wxSQLite3ResultSet& q);
+    AttachmentRow(const AttachmentRow& other) = default;
 
-        int64 id() const { return ATTACHMENTID; }
-        void id(const int64 id) { ATTACHMENTID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return ATTACHMENTID; }
+    void id(const int64 id) { ATTACHMENTID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const AttachmentRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    AttachmentRow& operator=(const AttachmentRow& other);
+    bool operator< (const AttachmentRow& other) const { return id() < other.id(); }
+    bool operator< (const AttachmentRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const ATTACHMENTID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::ATTACHMENTID& col)
     {
-        return data->ATTACHMENTID == op.m_value;
+        return ATTACHMENTID == col.m_value;
     }
 
-    static bool match(const Data* data, const REFTYPE& op)
+    bool match(const Col::REFTYPE& col)
     {
-        return data->REFTYPE.CmpNoCase(op.m_value) == 0;
+        return REFTYPE.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const REFID& op)
+    bool match(const Col::REFID& col)
     {
-        return data->REFID == op.m_value;
+        return REFID == col.m_value;
     }
 
-    static bool match(const Data* data, const DESCRIPTION& op)
+    bool match(const Col::DESCRIPTION& col)
     {
-        return data->DESCRIPTION.CmpNoCase(op.m_value) == 0;
+        return DESCRIPTION.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const FILENAME& op)
+    bool match(const Col::FILENAME& col)
     {
-        return data->FILENAME.CmpNoCase(op.m_value) == 0;
+        return FILENAME.CmpNoCase(col.m_value) == 0;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    AttachmentTable();
-    ~AttachmentTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && AttachmentTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
 
     struct SorterByATTACHMENTID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AttachmentRow& x, const AttachmentRow& y)
         {
             return x.ATTACHMENTID < y.ATTACHMENTID;
         }
     };
 
+    struct SorterByREFTYPE
+    {
+        bool operator()(const AttachmentRow& x, const AttachmentRow& y)
+        {
+            return x.REFTYPE < y.REFTYPE;
+        }
+    };
+
+    struct SorterByREFID
+    {
+        bool operator()(const AttachmentRow& x, const AttachmentRow& y)
+        {
+            return x.REFID < y.REFID;
+        }
+    };
+
     struct SorterByDESCRIPTION
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AttachmentRow& x, const AttachmentRow& y)
         {
             return x.DESCRIPTION < y.DESCRIPTION;
         }
@@ -212,25 +187,25 @@ struct AttachmentTable : public TableBase
 
     struct SorterByFILENAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const AttachmentRow& x, const AttachmentRow& y)
         {
             return x.FILENAME < y.FILENAME;
         }
     };
+};
 
-    struct SorterByREFID
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.REFID < y.REFID;
-        }
-    };
+// Interface to database table ATTACHMENT_V1
+struct AttachmentTable : public TableFactory<AttachmentRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using ATTACHMENTID = Col::ATTACHMENTID;
+    using REFTYPE = Col::REFTYPE;
+    using REFID = Col::REFID;
+    using DESCRIPTION = Col::DESCRIPTION;
+    using FILENAME = Col::FILENAME;
 
-    struct SorterByREFTYPE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.REFTYPE < y.REFTYPE;
-        }
-    };
+    AttachmentTable();
+    ~AttachmentTable();
+
+    void ensure_data() override;
 };

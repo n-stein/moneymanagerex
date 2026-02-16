@@ -155,7 +155,7 @@ const TransactionModel::Data_Set TransactionModel::allByDateTimeId()
     auto trans = TransactionModel::instance().get_all();
     std::sort(trans.begin(), trans.end());
     if (PreferencesModel::instance().UseTransDateTime())
-        std::stable_sort(trans.begin(), trans.end(), TransactionTable::SorterByTRANSDATE());
+        std::stable_sort(trans.begin(), trans.end(), TransactionRow::SorterByTRANSDATE());
     else
         std::stable_sort(trans.begin(), trans.end(), TransactionModel::SorterByTRANSDATE_DATE());
     return trans;

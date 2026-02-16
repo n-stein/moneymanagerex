@@ -461,7 +461,7 @@ void ReportPanel::CreateControls()
             int64 sel_id = m_rb->getDateSelection();
             wxString sel_name;
             for (const auto& e : BudgetPeriodModel::instance().get_all(
-                BudgetPeriodModel::COL_BUDGETYEARNAME
+                BudgetPeriodCol::COL_ID_BUDGETYEARNAME
             )) {
                 const wxString& name = e.BUDGETYEARNAME;
 

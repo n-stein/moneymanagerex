@@ -6,311 +6,261 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      CurrencyTable.h
+ *
+ *      Interface to database table CURRENCYFORMATS_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct CurrencyTable : public TableBase
+// Columns in database table CURRENCYFORMATS_V1
+struct CurrencyCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_CURRENCYID = 0,
-        COL_CURRENCYNAME,
-        COL_PFX_SYMBOL,
-        COL_SFX_SYMBOL,
-        COL_DECIMAL_POINT,
-        COL_GROUP_SEPARATOR,
-        COL_UNIT_NAME,
-        COL_CENT_NAME,
-        COL_SCALE,
-        COL_BASECONVRATE,
-        COL_CURRENCY_SYMBOL,
-        COL_CURRENCY_TYPE,
-        COL_size
+        COL_ID_CURRENCYID = 0,
+        COL_ID_CURRENCYNAME,
+        COL_ID_PFX_SYMBOL,
+        COL_ID_SFX_SYMBOL,
+        COL_ID_DECIMAL_POINT,
+        COL_ID_GROUP_SEPARATOR,
+        COL_ID_UNIT_NAME,
+        COL_ID_CENT_NAME,
+        COL_ID_SCALE,
+        COL_ID_BASECONVRATE,
+        COL_ID_CURRENCY_SYMBOL,
+        COL_ID_CURRENCY_TYPE,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct CURRENCYID : public TableOpV<int64>
     {
-        static wxString name() { return "CURRENCYID"; }
+        static COL_ID col_id() { return COL_ID_CURRENCYID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CURRENCYID]; }
         explicit CURRENCYID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit CURRENCYID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct CURRENCYNAME : public TableOpV<wxString>
     {
-        static wxString name() { return "CURRENCYNAME"; }
+        static COL_ID col_id() { return COL_ID_CURRENCYNAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CURRENCYNAME]; }
         explicit CURRENCYNAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit CURRENCYNAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct PFX_SYMBOL : public TableOpV<wxString>
     {
-        static wxString name() { return "PFX_SYMBOL"; }
+        static COL_ID col_id() { return COL_ID_PFX_SYMBOL; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_PFX_SYMBOL]; }
         explicit PFX_SYMBOL(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit PFX_SYMBOL(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct SFX_SYMBOL : public TableOpV<wxString>
     {
-        static wxString name() { return "SFX_SYMBOL"; }
+        static COL_ID col_id() { return COL_ID_SFX_SYMBOL; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SFX_SYMBOL]; }
         explicit SFX_SYMBOL(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit SFX_SYMBOL(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct DECIMAL_POINT : public TableOpV<wxString>
     {
-        static wxString name() { return "DECIMAL_POINT"; }
+        static COL_ID col_id() { return COL_ID_DECIMAL_POINT; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_DECIMAL_POINT]; }
         explicit DECIMAL_POINT(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit DECIMAL_POINT(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct GROUP_SEPARATOR : public TableOpV<wxString>
     {
-        static wxString name() { return "GROUP_SEPARATOR"; }
+        static COL_ID col_id() { return COL_ID_GROUP_SEPARATOR; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_GROUP_SEPARATOR]; }
         explicit GROUP_SEPARATOR(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit GROUP_SEPARATOR(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct UNIT_NAME : public TableOpV<wxString>
     {
-        static wxString name() { return "UNIT_NAME"; }
+        static COL_ID col_id() { return COL_ID_UNIT_NAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_UNIT_NAME]; }
         explicit UNIT_NAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit UNIT_NAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct CENT_NAME : public TableOpV<wxString>
     {
-        static wxString name() { return "CENT_NAME"; }
+        static COL_ID col_id() { return COL_ID_CENT_NAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CENT_NAME]; }
         explicit CENT_NAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit CENT_NAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct SCALE : public TableOpV<int64>
     {
-        static wxString name() { return "SCALE"; }
+        static COL_ID col_id() { return COL_ID_SCALE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SCALE]; }
         explicit SCALE(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit SCALE(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct BASECONVRATE : public TableOpV<double>
     {
-        static wxString name() { return "BASECONVRATE"; }
+        static COL_ID col_id() { return COL_ID_BASECONVRATE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_BASECONVRATE]; }
         explicit BASECONVRATE(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit BASECONVRATE(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct CURRENCY_SYMBOL : public TableOpV<wxString>
     {
-        static wxString name() { return "CURRENCY_SYMBOL"; }
+        static COL_ID col_id() { return COL_ID_CURRENCY_SYMBOL; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CURRENCY_SYMBOL]; }
         explicit CURRENCY_SYMBOL(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit CURRENCY_SYMBOL(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct CURRENCY_TYPE : public TableOpV<wxString>
     {
-        static wxString name() { return "CURRENCY_TYPE"; }
+        static COL_ID col_id() { return COL_ID_CURRENCY_TYPE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CURRENCY_TYPE]; }
         explicit CURRENCY_TYPE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit CURRENCY_TYPE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
+};
 
-    typedef CURRENCYID PRIMARY;
+// A single record in database table CURRENCYFORMATS_V1
+struct CurrencyRow
+{
+    using Col = CurrencyCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 CURRENCYID; // primary key
-        wxString CURRENCYNAME;
-        wxString PFX_SYMBOL;
-        wxString SFX_SYMBOL;
-        wxString DECIMAL_POINT;
-        wxString GROUP_SEPARATOR;
-        wxString UNIT_NAME;
-        wxString CENT_NAME;
-        int64 SCALE;
-        double BASECONVRATE;
-        wxString CURRENCY_SYMBOL;
-        wxString CURRENCY_TYPE;
+    int64 CURRENCYID; // primary key
+    wxString CURRENCYNAME;
+    wxString PFX_SYMBOL;
+    wxString SFX_SYMBOL;
+    wxString DECIMAL_POINT;
+    wxString GROUP_SEPARATOR;
+    wxString UNIT_NAME;
+    wxString CENT_NAME;
+    int64 SCALE;
+    double BASECONVRATE;
+    wxString CURRENCY_SYMBOL;
+    wxString CURRENCY_TYPE;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit CurrencyRow();
+    explicit CurrencyRow(wxSQLite3ResultSet& q);
+    CurrencyRow(const CurrencyRow& other) = default;
 
-        int64 id() const { return CURRENCYID; }
-        void id(const int64 id) { CURRENCYID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return CURRENCYID; }
+    void id(const int64 id) { CURRENCYID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const CurrencyRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    CurrencyRow& operator=(const CurrencyRow& other);
+    bool operator< (const CurrencyRow& other) const { return id() < other.id(); }
+    bool operator< (const CurrencyRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const CURRENCYID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::CURRENCYID& col)
     {
-        return data->CURRENCYID == op.m_value;
+        return CURRENCYID == col.m_value;
     }
 
-    static bool match(const Data* data, const CURRENCYNAME& op)
+    bool match(const Col::CURRENCYNAME& col)
     {
-        return data->CURRENCYNAME.CmpNoCase(op.m_value) == 0;
+        return CURRENCYNAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const PFX_SYMBOL& op)
+    bool match(const Col::PFX_SYMBOL& col)
     {
-        return data->PFX_SYMBOL.CmpNoCase(op.m_value) == 0;
+        return PFX_SYMBOL.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const SFX_SYMBOL& op)
+    bool match(const Col::SFX_SYMBOL& col)
     {
-        return data->SFX_SYMBOL.CmpNoCase(op.m_value) == 0;
+        return SFX_SYMBOL.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const DECIMAL_POINT& op)
+    bool match(const Col::DECIMAL_POINT& col)
     {
-        return data->DECIMAL_POINT.CmpNoCase(op.m_value) == 0;
+        return DECIMAL_POINT.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const GROUP_SEPARATOR& op)
+    bool match(const Col::GROUP_SEPARATOR& col)
     {
-        return data->GROUP_SEPARATOR.CmpNoCase(op.m_value) == 0;
+        return GROUP_SEPARATOR.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const UNIT_NAME& op)
+    bool match(const Col::UNIT_NAME& col)
     {
-        return data->UNIT_NAME.CmpNoCase(op.m_value) == 0;
+        return UNIT_NAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const CENT_NAME& op)
+    bool match(const Col::CENT_NAME& col)
     {
-        return data->CENT_NAME.CmpNoCase(op.m_value) == 0;
+        return CENT_NAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const SCALE& op)
+    bool match(const Col::SCALE& col)
     {
-        return data->SCALE == op.m_value;
+        return SCALE == col.m_value;
     }
 
-    static bool match(const Data* data, const BASECONVRATE& op)
+    bool match(const Col::BASECONVRATE& col)
     {
-        return data->BASECONVRATE == op.m_value;
+        return BASECONVRATE == col.m_value;
     }
 
-    static bool match(const Data* data, const CURRENCY_SYMBOL& op)
+    bool match(const Col::CURRENCY_SYMBOL& col)
     {
-        return data->CURRENCY_SYMBOL.CmpNoCase(op.m_value) == 0;
+        return CURRENCY_SYMBOL.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const CURRENCY_TYPE& op)
+    bool match(const Col::CURRENCY_TYPE& col)
     {
-        return data->CURRENCY_TYPE.CmpNoCase(op.m_value) == 0;
+        return CURRENCY_TYPE.CmpNoCase(col.m_value) == 0;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    CurrencyTable();
-    ~CurrencyTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && CurrencyTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-
-    struct SorterByBASECONVRATE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.BASECONVRATE < y.BASECONVRATE;
-        }
-    };
-
-    struct SorterByCENT_NAME
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.CENT_NAME < y.CENT_NAME;
-        }
-    };
 
     struct SorterByCURRENCYID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
             return x.CURRENCYID < y.CURRENCYID;
         }
@@ -318,31 +268,31 @@ struct CurrencyTable : public TableBase
 
     struct SorterByCURRENCYNAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
             return wxGetTranslation(x.CURRENCYNAME) < wxGetTranslation(y.CURRENCYNAME);
         }
     };
 
-    struct SorterByCURRENCY_SYMBOL
+    struct SorterByPFX_SYMBOL
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
-            return x.CURRENCY_SYMBOL < y.CURRENCY_SYMBOL;
+            return x.PFX_SYMBOL < y.PFX_SYMBOL;
         }
     };
 
-    struct SorterByCURRENCY_TYPE
+    struct SorterBySFX_SYMBOL
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
-            return x.CURRENCY_TYPE < y.CURRENCY_TYPE;
+            return x.SFX_SYMBOL < y.SFX_SYMBOL;
         }
     };
 
     struct SorterByDECIMAL_POINT
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
             return x.DECIMAL_POINT < y.DECIMAL_POINT;
         }
@@ -350,41 +300,80 @@ struct CurrencyTable : public TableBase
 
     struct SorterByGROUP_SEPARATOR
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
             return x.GROUP_SEPARATOR < y.GROUP_SEPARATOR;
         }
     };
 
-    struct SorterByPFX_SYMBOL
+    struct SorterByUNIT_NAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
-            return x.PFX_SYMBOL < y.PFX_SYMBOL;
+            return x.UNIT_NAME < y.UNIT_NAME;
+        }
+    };
+
+    struct SorterByCENT_NAME
+    {
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
+        {
+            return x.CENT_NAME < y.CENT_NAME;
         }
     };
 
     struct SorterBySCALE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
             return x.SCALE < y.SCALE;
         }
     };
 
-    struct SorterBySFX_SYMBOL
+    struct SorterByBASECONVRATE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
-            return x.SFX_SYMBOL < y.SFX_SYMBOL;
+            return x.BASECONVRATE < y.BASECONVRATE;
         }
     };
 
-    struct SorterByUNIT_NAME
+    struct SorterByCURRENCY_SYMBOL
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
         {
-            return x.UNIT_NAME < y.UNIT_NAME;
+            return x.CURRENCY_SYMBOL < y.CURRENCY_SYMBOL;
         }
     };
+
+    struct SorterByCURRENCY_TYPE
+    {
+        bool operator()(const CurrencyRow& x, const CurrencyRow& y)
+        {
+            return x.CURRENCY_TYPE < y.CURRENCY_TYPE;
+        }
+    };
+};
+
+// Interface to database table CURRENCYFORMATS_V1
+struct CurrencyTable : public TableFactory<CurrencyRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using CURRENCYID = Col::CURRENCYID;
+    using CURRENCYNAME = Col::CURRENCYNAME;
+    using PFX_SYMBOL = Col::PFX_SYMBOL;
+    using SFX_SYMBOL = Col::SFX_SYMBOL;
+    using DECIMAL_POINT = Col::DECIMAL_POINT;
+    using GROUP_SEPARATOR = Col::GROUP_SEPARATOR;
+    using UNIT_NAME = Col::UNIT_NAME;
+    using CENT_NAME = Col::CENT_NAME;
+    using SCALE = Col::SCALE;
+    using BASECONVRATE = Col::BASECONVRATE;
+    using CURRENCY_SYMBOL = Col::CURRENCY_SYMBOL;
+    using CURRENCY_TYPE = Col::CURRENCY_TYPE;
+
+    CurrencyTable();
+    ~CurrencyTable();
+
+    void ensure_data() override;
 };

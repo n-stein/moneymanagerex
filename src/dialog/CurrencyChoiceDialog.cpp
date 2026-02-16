@@ -126,7 +126,7 @@ void CurrencyChoiceDialog::fillControls()
     }
 
     bool skip_unused = !cbShowAll_->IsChecked();
-    for (const auto& currency : CurrencyModel::instance().get_all(CurrencyModel::COL_CURRENCYNAME))
+    for (const auto& currency : CurrencyModel::instance().get_all(CurrencyCol::COL_ID_CURRENCYNAME))
     {
         int64 currencyID = currency.CURRENCYID;
 
@@ -593,7 +593,7 @@ void CurrencyChoiceDialog::ShowCurrencyHistory()
     CurrencyModel::Data* currency = CurrencyModel::instance().cache_id(m_currency_id);
     CurrencyHistoryModel::Data_Set histData = CurrencyHistoryModel::instance()
         .find(CurrencyHistoryModel::CURRENCYID(m_currency_id));
-    std::stable_sort(histData.begin(), histData.end(), CurrencyHistoryTable::SorterByCURRDATE());
+    std::stable_sort(histData.begin(), histData.end(), CurrencyHistoryRow::SorterByCURRDATE());
     std::reverse(histData.begin(), histData.end());
     if (!histData.empty())
     {

@@ -179,7 +179,7 @@ wxArrayString ReportModel::allGroupNames()
 {
     wxArrayString groups;
     wxString PreviousGroup;
-    for (const auto &report : this->get_all(COL_GROUPNAME))
+    for (const auto &report : this->get_all(Col::COL_ID_GROUPNAME))
     {
         if (report.GROUPNAME != PreviousGroup)
         {

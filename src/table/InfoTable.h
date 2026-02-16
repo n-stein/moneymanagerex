@@ -6,169 +6,126 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      InfoTable.h
+ *
+ *      Interface to database table INFOTABLE_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct InfoTable : public TableBase
+// Columns in database table INFOTABLE_V1
+struct InfoCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_INFOID = 0,
-        COL_INFONAME,
-        COL_INFOVALUE,
-        COL_size
+        COL_ID_INFOID = 0,
+        COL_ID_INFONAME,
+        COL_ID_INFOVALUE,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct INFOID : public TableOpV<int64>
     {
-        static wxString name() { return "INFOID"; }
+        static COL_ID col_id() { return COL_ID_INFOID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_INFOID]; }
         explicit INFOID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit INFOID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct INFONAME : public TableOpV<wxString>
     {
-        static wxString name() { return "INFONAME"; }
+        static COL_ID col_id() { return COL_ID_INFONAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_INFONAME]; }
         explicit INFONAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit INFONAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct INFOVALUE : public TableOpV<wxString>
     {
-        static wxString name() { return "INFOVALUE"; }
+        static COL_ID col_id() { return COL_ID_INFOVALUE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_INFOVALUE]; }
         explicit INFOVALUE(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit INFOVALUE(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
+};
 
-    typedef INFOID PRIMARY;
+// A single record in database table INFOTABLE_V1
+struct InfoRow
+{
+    using Col = InfoCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 INFOID; // primary key
-        wxString INFONAME;
-        wxString INFOVALUE;
+    int64 INFOID; // primary key
+    wxString INFONAME;
+    wxString INFOVALUE;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit InfoRow();
+    explicit InfoRow(wxSQLite3ResultSet& q);
+    InfoRow(const InfoRow& other) = default;
 
-        int64 id() const { return INFOID; }
-        void id(const int64 id) { INFOID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return INFOID; }
+    void id(const int64 id) { INFOID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const InfoRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    InfoRow& operator=(const InfoRow& other);
+    bool operator< (const InfoRow& other) const { return id() < other.id(); }
+    bool operator< (const InfoRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const INFOID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::INFOID& col)
     {
-        return data->INFOID == op.m_value;
+        return INFOID == col.m_value;
     }
 
-    static bool match(const Data* data, const INFONAME& op)
+    bool match(const Col::INFONAME& col)
     {
-        return data->INFONAME.CmpNoCase(op.m_value) == 0;
+        return INFONAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const INFOVALUE& op)
+    bool match(const Col::INFOVALUE& col)
     {
-        return data->INFOVALUE.CmpNoCase(op.m_value) == 0;
+        return INFOVALUE.CmpNoCase(col.m_value) == 0;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    InfoTable();
-    ~InfoTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && InfoTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
 
     struct SorterByINFOID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const InfoRow& x, const InfoRow& y)
         {
             return x.INFOID < y.INFOID;
         }
@@ -176,7 +133,7 @@ struct InfoTable : public TableBase
 
     struct SorterByINFONAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const InfoRow& x, const InfoRow& y)
         {
             return x.INFONAME < y.INFONAME;
         }
@@ -184,9 +141,23 @@ struct InfoTable : public TableBase
 
     struct SorterByINFOVALUE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const InfoRow& x, const InfoRow& y)
         {
             return x.INFOVALUE < y.INFOVALUE;
         }
     };
+};
+
+// Interface to database table INFOTABLE_V1
+struct InfoTable : public TableFactory<InfoRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using INFOID = Col::INFOID;
+    using INFONAME = Col::INFONAME;
+    using INFOVALUE = Col::INFOVALUE;
+
+    InfoTable();
+    ~InfoTable();
+
+    void ensure_data() override;
 };

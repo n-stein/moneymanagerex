@@ -83,7 +83,7 @@ CurrencyTable::CURRENCY_TYPE CurrencyModel::CURRENCY_TYPE(OP op, TYPE_ID currenc
 const wxArrayString CurrencyModel::all_currency_names()
 {
     wxArrayString c;
-    for (const auto&i : get_all(COL_CURRENCYNAME))
+    for (const auto&i : get_all(Col::COL_ID_CURRENCYNAME))
         c.Add(i.CURRENCYNAME);
     return c;
 }
@@ -92,7 +92,7 @@ const wxArrayString CurrencyModel::all_currency_names()
 const std::map<wxString, int64> CurrencyModel::all_currency()
 {
     std::map<wxString, int64> currencies;
-    for (const auto& curr : this->get_all(COL_CURRENCYNAME))
+    for (const auto& curr : this->get_all(Col::COL_ID_CURRENCYNAME))
     {
         currencies[curr.CURRENCYNAME] = curr.CURRENCYID;
     }
@@ -102,7 +102,7 @@ const std::map<wxString, int64> CurrencyModel::all_currency()
 const wxArrayString CurrencyModel::all_currency_symbols()
 {
     wxArrayString c;
-    for (const auto&i : get_all(COL_CURRENCY_SYMBOL))
+    for (const auto&i : get_all(Col::COL_ID_CURRENCY_SYMBOL))
         c.Add(i.CURRENCY_SYMBOL);
     return c;
 }

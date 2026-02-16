@@ -558,7 +558,7 @@ void mmExportTransaction::getCustomFieldsJSON(PrettyWriter<StringBuffer>& json_w
 
         //Settings
         FieldModel::Data_Set custom_fields = FieldModel::instance().find(
-            FieldModel::FieldTable::REFTYPE(RefType)
+            FieldTable::REFTYPE(RefType)
         );
 
         if (!custom_fields.empty()) {

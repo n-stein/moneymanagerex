@@ -92,7 +92,7 @@ void ReportBase::setAccounts(int selection, const wxString& type_name)
     {
         wxArrayString accounts;
         auto a = AccountModel::instance().get_all();
-        std::stable_sort(a.begin(), a.end(), AccountTable::SorterByACCOUNTNAME());
+        std::stable_sort(a.begin(), a.end(), AccountRow::SorterByACCOUNTNAME());
         for (const auto& item : a) {
             if (m_only_active && item.STATUS != AccountModel::STATUS_NAME_OPEN)
                 continue;

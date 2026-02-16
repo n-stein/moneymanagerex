@@ -6,28 +6,92 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      CurrencyTable.cpp
+ *
+ *      Implementation of the interface to database table CURRENCYFORMATS_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
+#include "_TableFactory.tpp"
 #include "CurrencyTable.h"
 
-CurrencyTable::Data::Data()
+template class TableFactory<CurrencyRow>;
+
+// List of column names in database table CURRENCYFORMATS_V1,
+// in the order of CurrencyCol::COL_ID.
+const wxArrayString CurrencyCol::COL_NAME_A = {
+    "CURRENCYID",
+    "CURRENCYNAME",
+    "PFX_SYMBOL",
+    "SFX_SYMBOL",
+    "DECIMAL_POINT",
+    "GROUP_SEPARATOR",
+    "UNIT_NAME",
+    "CENT_NAME",
+    "SCALE",
+    "BASECONVRATE",
+    "CURRENCY_SYMBOL",
+    "CURRENCY_TYPE"
+};
+
+const CurrencyCol::COL_ID CurrencyCol::PRIMARY_ID = COL_ID_CURRENCYID;
+const wxString CurrencyCol::PRIMARY_NAME = COL_NAME_A[COL_ID_CURRENCYID];
+
+CurrencyRow::CurrencyRow()
 {
     CURRENCYID = -1;
     SCALE = -1;
     BASECONVRATE = 0.0;
 }
 
-CurrencyTable::Data::Data(wxSQLite3ResultSet& q)
+CurrencyRow::CurrencyRow(wxSQLite3ResultSet& q)
+{
+    from_select_result(q);
+}
+
+bool CurrencyRow::equals(const CurrencyRow* r) const
+{
+    if ( CURRENCYID != r->CURRENCYID) return false;
+    if (!CURRENCYNAME.IsSameAs(r->CURRENCYNAME)) return false;
+    if (!PFX_SYMBOL.IsSameAs(r->PFX_SYMBOL)) return false;
+    if (!SFX_SYMBOL.IsSameAs(r->SFX_SYMBOL)) return false;
+    if (!DECIMAL_POINT.IsSameAs(r->DECIMAL_POINT)) return false;
+    if (!GROUP_SEPARATOR.IsSameAs(r->GROUP_SEPARATOR)) return false;
+    if (!UNIT_NAME.IsSameAs(r->UNIT_NAME)) return false;
+    if (!CENT_NAME.IsSameAs(r->CENT_NAME)) return false;
+    if ( SCALE != r->SCALE) return false;
+    if ( BASECONVRATE != r->BASECONVRATE) return false;
+    if (!CURRENCY_SYMBOL.IsSameAs(r->CURRENCY_SYMBOL)) return false;
+    if (!CURRENCY_TYPE.IsSameAs(r->CURRENCY_TYPE)) return false;
+
+    return true;
+}
+
+// Bind a Row record to database statement.
+// Use the id argument instead of the row id.
+void CurrencyRow::to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const
+{
+    stmt.Bind(1, CURRENCYNAME);
+    stmt.Bind(2, PFX_SYMBOL);
+    stmt.Bind(3, SFX_SYMBOL);
+    stmt.Bind(4, DECIMAL_POINT);
+    stmt.Bind(5, GROUP_SEPARATOR);
+    stmt.Bind(6, UNIT_NAME);
+    stmt.Bind(7, CENT_NAME);
+    stmt.Bind(8, SCALE);
+    stmt.Bind(9, BASECONVRATE);
+    stmt.Bind(10, CURRENCY_SYMBOL);
+    stmt.Bind(11, CURRENCY_TYPE);
+    stmt.Bind(12, id);
+}
+
+void CurrencyRow::from_select_result(wxSQLite3ResultSet& q)
 {
     CURRENCYID = q.GetInt64(0);
     CURRENCYNAME = q.GetString(1);
@@ -43,86 +107,60 @@ CurrencyTable::Data::Data(wxSQLite3ResultSet& q)
     CURRENCY_TYPE = q.GetString(11);
 }
 
-bool CurrencyTable::Data::equals(const CurrencyTable::Data* r) const
-{
-    if (CURRENCYID != r->CURRENCYID) return false;
-    if (!CURRENCYNAME.IsSameAs(r->CURRENCYNAME)) return false;
-    if (!PFX_SYMBOL.IsSameAs(r->PFX_SYMBOL)) return false;
-    if (!SFX_SYMBOL.IsSameAs(r->SFX_SYMBOL)) return false;
-    if (!DECIMAL_POINT.IsSameAs(r->DECIMAL_POINT)) return false;
-    if (!GROUP_SEPARATOR.IsSameAs(r->GROUP_SEPARATOR)) return false;
-    if (!UNIT_NAME.IsSameAs(r->UNIT_NAME)) return false;
-    if (!CENT_NAME.IsSameAs(r->CENT_NAME)) return false;
-    if (SCALE != r->SCALE) return false;
-    if (BASECONVRATE != r->BASECONVRATE) return false;
-    if (!CURRENCY_SYMBOL.IsSameAs(r->CURRENCY_SYMBOL)) return false;
-    if (!CURRENCY_TYPE.IsSameAs(r->CURRENCY_TYPE)) return false;
-
-    return true;
-}
-
-CurrencyTable::Data& CurrencyTable::Data::operator=(const CurrencyTable::Data& other)
-{
-    if (this == &other) return *this;
-
-    CURRENCYID = other.CURRENCYID;
-    CURRENCYNAME = other.CURRENCYNAME;
-    PFX_SYMBOL = other.PFX_SYMBOL;
-    SFX_SYMBOL = other.SFX_SYMBOL;
-    DECIMAL_POINT = other.DECIMAL_POINT;
-    GROUP_SEPARATOR = other.GROUP_SEPARATOR;
-    UNIT_NAME = other.UNIT_NAME;
-    CENT_NAME = other.CENT_NAME;
-    SCALE = other.SCALE;
-    BASECONVRATE = other.BASECONVRATE;
-    CURRENCY_SYMBOL = other.CURRENCY_SYMBOL;
-    CURRENCY_TYPE = other.CURRENCY_TYPE;
-
-    return *this;
-}
-
 // Return the data record as a json string
-wxString CurrencyTable::Data::to_json() const
+wxString CurrencyRow::to_json() const
 {
     StringBuffer json_buffer;
     PrettyWriter<StringBuffer> json_writer(json_buffer);
+
     json_writer.StartObject();			
-    this->as_json(json_writer);
+    as_json(json_writer);
     json_writer.EndObject();
 
     return json_buffer.GetString();
 }
 
 // Add the field data as json key:value pairs
-void CurrencyTable::Data::as_json(PrettyWriter<StringBuffer>& json_writer) const
+void CurrencyRow::as_json(PrettyWriter<StringBuffer>& json_writer) const
 {
     json_writer.Key("CURRENCYID");
-    json_writer.Int64(this->CURRENCYID.GetValue());
+    json_writer.Int64(CURRENCYID.GetValue());
+
     json_writer.Key("CURRENCYNAME");
-    json_writer.String(this->CURRENCYNAME.utf8_str());
+    json_writer.String(CURRENCYNAME.utf8_str());
+
     json_writer.Key("PFX_SYMBOL");
-    json_writer.String(this->PFX_SYMBOL.utf8_str());
+    json_writer.String(PFX_SYMBOL.utf8_str());
+
     json_writer.Key("SFX_SYMBOL");
-    json_writer.String(this->SFX_SYMBOL.utf8_str());
+    json_writer.String(SFX_SYMBOL.utf8_str());
+
     json_writer.Key("DECIMAL_POINT");
-    json_writer.String(this->DECIMAL_POINT.utf8_str());
+    json_writer.String(DECIMAL_POINT.utf8_str());
+
     json_writer.Key("GROUP_SEPARATOR");
-    json_writer.String(this->GROUP_SEPARATOR.utf8_str());
+    json_writer.String(GROUP_SEPARATOR.utf8_str());
+
     json_writer.Key("UNIT_NAME");
-    json_writer.String(this->UNIT_NAME.utf8_str());
+    json_writer.String(UNIT_NAME.utf8_str());
+
     json_writer.Key("CENT_NAME");
-    json_writer.String(this->CENT_NAME.utf8_str());
+    json_writer.String(CENT_NAME.utf8_str());
+
     json_writer.Key("SCALE");
-    json_writer.Int64(this->SCALE.GetValue());
+    json_writer.Int64(SCALE.GetValue());
+
     json_writer.Key("BASECONVRATE");
-    json_writer.Double(this->BASECONVRATE);
+    json_writer.Double(BASECONVRATE);
+
     json_writer.Key("CURRENCY_SYMBOL");
-    json_writer.String(this->CURRENCY_SYMBOL.utf8_str());
+    json_writer.String(CURRENCY_SYMBOL.utf8_str());
+
     json_writer.Key("CURRENCY_TYPE");
-    json_writer.String(this->CURRENCY_TYPE.utf8_str());
+    json_writer.String(CURRENCY_TYPE.utf8_str());
 }
 
-row_t CurrencyTable::Data::to_row_t() const
+row_t CurrencyRow::to_row_t() const
 {
     row_t row;
 
@@ -142,7 +180,7 @@ row_t CurrencyTable::Data::to_row_t() const
     return row;
 }
 
-void CurrencyTable::Data::to_template(html_template& t) const
+void CurrencyRow::to_template(html_template& t) const
 {
     t(L"CURRENCYID") = CURRENCYID.GetValue();
     t(L"CURRENCYNAME") = CURRENCYNAME;
@@ -158,80 +196,52 @@ void CurrencyTable::Data::to_template(html_template& t) const
     t(L"CURRENCY_TYPE") = CURRENCY_TYPE;
 }
 
-void CurrencyTable::Data::destroy()
+CurrencyRow& CurrencyRow::operator=(const CurrencyRow& other)
 {
-    delete this;
+    if (this == &other) return *this;
+
+    CURRENCYID = other.CURRENCYID;
+    CURRENCYNAME = other.CURRENCYNAME;
+    PFX_SYMBOL = other.PFX_SYMBOL;
+    SFX_SYMBOL = other.SFX_SYMBOL;
+    DECIMAL_POINT = other.DECIMAL_POINT;
+    GROUP_SEPARATOR = other.GROUP_SEPARATOR;
+    UNIT_NAME = other.UNIT_NAME;
+    CENT_NAME = other.CENT_NAME;
+    SCALE = other.SCALE;
+    BASECONVRATE = other.BASECONVRATE;
+    CURRENCY_SYMBOL = other.CURRENCY_SYMBOL;
+    CURRENCY_TYPE = other.CURRENCY_TYPE;
+
+    return *this;
 }
 
-// Return the data records as a json array string
-wxString CurrencyTable::Data_Set::to_json() const
-{
-    StringBuffer json_buffer;
-    PrettyWriter<StringBuffer> json_writer(json_buffer);
-
-    json_writer.StartArray();
-    for (const auto & item: *this) {
-        json_writer.StartObject();
-        item.as_json(json_writer);
-        json_writer.EndObject();
-    }
-    json_writer.EndArray();
-
-    return json_buffer.GetString();
-}
-
-CurrencyTable::CurrencyTable() :
-    fake_(new Data())
+CurrencyTable::CurrencyTable()
 {
     m_table_name = "CURRENCYFORMATS_V1";
-    m_query_select = "SELECT CURRENCYID, CURRENCYNAME, PFX_SYMBOL, SFX_SYMBOL, DECIMAL_POINT, GROUP_SEPARATOR, UNIT_NAME, CENT_NAME, SCALE, BASECONVRATE, CURRENCY_SYMBOL, CURRENCY_TYPE FROM CURRENCYFORMATS_V1 ";
+
+    m_create_query = "CREATE TABLE CURRENCYFORMATS_V1(CURRENCYID integer primary key, CURRENCYNAME TEXT COLLATE NOCASE NOT NULL UNIQUE, PFX_SYMBOL TEXT, SFX_SYMBOL TEXT, DECIMAL_POINT TEXT, GROUP_SEPARATOR TEXT, UNIT_NAME TEXT COLLATE NOCASE, CENT_NAME TEXT COLLATE NOCASE, SCALE integer, BASECONVRATE numeric, CURRENCY_SYMBOL TEXT COLLATE NOCASE NOT NULL UNIQUE, CURRENCY_TYPE TEXT NOT NULL /* Fiat, Crypto */)";
+
+    m_drop_query = "DROP TABLE IF EXISTS CURRENCYFORMATS_V1";
+
+    m_index_query_a = {
+        "CREATE INDEX IF NOT EXISTS IDX_CURRENCYFORMATS_SYMBOL ON CURRENCYFORMATS_V1(CURRENCY_SYMBOL)"
+    };
+
+    m_insert_query = "INSERT INTO CURRENCYFORMATS_V1(CURRENCYNAME, PFX_SYMBOL, SFX_SYMBOL, DECIMAL_POINT, GROUP_SEPARATOR, UNIT_NAME, CENT_NAME, SCALE, BASECONVRATE, CURRENCY_SYMBOL, CURRENCY_TYPE, CURRENCYID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    m_update_query = "UPDATE CURRENCYFORMATS_V1 SET CURRENCYNAME = ?, PFX_SYMBOL = ?, SFX_SYMBOL = ?, DECIMAL_POINT = ?, GROUP_SEPARATOR = ?, UNIT_NAME = ?, CENT_NAME = ?, SCALE = ?, BASECONVRATE = ?, CURRENCY_SYMBOL = ?, CURRENCY_TYPE = ? WHERE CURRENCYID = ?";
+
+    m_delete_query = "DELETE FROM CURRENCYFORMATS_V1 WHERE CURRENCYID = ?";
+
+    m_select_query = "SELECT CURRENCYID, CURRENCYNAME, PFX_SYMBOL, SFX_SYMBOL, DECIMAL_POINT, GROUP_SEPARATOR, UNIT_NAME, CENT_NAME, SCALE, BASECONVRATE, CURRENCY_SYMBOL, CURRENCY_TYPE FROM CURRENCYFORMATS_V1";
 }
 
 // Destructor: clears any data records stored in memory
 CurrencyTable::~CurrencyTable()
 {
-    delete this->fake_;
+    delete fake_;
     destroy_cache();
-}
-
-// Remove all records stored in memory (cache) for the table
-void CurrencyTable::destroy_cache()
-{
-    std::for_each(m_cache.begin(), m_cache.end(), std::mem_fn(&Data::destroy));
-    m_cache.clear();
-    m_cache_index.clear(); // no memory release since it just stores pointer and the according objects are in cache
-}
-
-// Creates the database table if the table does not exist
-bool CurrencyTable::ensure_table()
-{
-    if (!table_exists()) {
-        try {
-            m_db->ExecuteUpdate("CREATE TABLE CURRENCYFORMATS_V1(CURRENCYID integer primary key, CURRENCYNAME TEXT COLLATE NOCASE NOT NULL UNIQUE, PFX_SYMBOL TEXT, SFX_SYMBOL TEXT, DECIMAL_POINT TEXT, GROUP_SEPARATOR TEXT, UNIT_NAME TEXT COLLATE NOCASE, CENT_NAME TEXT COLLATE NOCASE, SCALE integer, BASECONVRATE numeric, CURRENCY_SYMBOL TEXT COLLATE NOCASE NOT NULL UNIQUE, CURRENCY_TYPE TEXT NOT NULL /* Fiat, Crypto */)");
-            this->ensure_data();
-        }
-        catch(const wxSQLite3Exception &e) {
-            wxLogError("CURRENCYFORMATS_V1: Exception %s", e.GetMessage().utf8_str());
-            return false;
-        }
-    }
-
-    this->ensure_index();
-
-    return true;
-}
-
-bool CurrencyTable::ensure_index()
-{
-    try {
-        m_db->ExecuteUpdate("CREATE INDEX IF NOT EXISTS IDX_CURRENCYFORMATS_SYMBOL ON CURRENCYFORMATS_V1(CURRENCY_SYMBOL)");
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("CURRENCYFORMATS_V1: Exception %s", e.GetMessage().utf8_str());
-        return false;
-    }
-
-    return true;
 }
 
 void CurrencyTable::ensure_data()
@@ -406,258 +416,4 @@ void CurrencyTable::ensure_data()
     m_db->ExecuteUpdate(wxString::Format("INSERT INTO CURRENCYFORMATS_V1 VALUES ('167', '%s', 'ZK', '', '.', ',', '', '', '100', '1', 'ZMW', 'Fiat')", _("Zambian kwacha")));
     m_db->ExecuteUpdate(wxString::Format("INSERT INTO CURRENCYFORMATS_V1 VALUES ('168', '%s', 'ZWL', '', '.', ',', '', '', '100', '1', 'ZWL', 'Fiat')", _("Zimbabwean dollar (2009)")));
     m_db->Commit();
-}
-
-// Returns the column name as a string
-wxString CurrencyTable::column_to_name(const CurrencyTable::COLUMN col)
-{
-    switch(col) {
-        case COL_CURRENCYID: return "CURRENCYID";
-        case COL_CURRENCYNAME: return "CURRENCYNAME";
-        case COL_PFX_SYMBOL: return "PFX_SYMBOL";
-        case COL_SFX_SYMBOL: return "SFX_SYMBOL";
-        case COL_DECIMAL_POINT: return "DECIMAL_POINT";
-        case COL_GROUP_SEPARATOR: return "GROUP_SEPARATOR";
-        case COL_UNIT_NAME: return "UNIT_NAME";
-        case COL_CENT_NAME: return "CENT_NAME";
-        case COL_SCALE: return "SCALE";
-        case COL_BASECONVRATE: return "BASECONVRATE";
-        case COL_CURRENCY_SYMBOL: return "CURRENCY_SYMBOL";
-        case COL_CURRENCY_TYPE: return "CURRENCY_TYPE";
-        default: break;
-    }
-
-    return "UNKNOWN";
-}
-
-// Returns the column number from the given column name
-CurrencyTable::COLUMN CurrencyTable::name_to_column(const wxString& name)
-{
-    if (name == "CURRENCYID") return COL_CURRENCYID;
-    else if (name == "CURRENCYNAME") return COL_CURRENCYNAME;
-    else if (name == "PFX_SYMBOL") return COL_PFX_SYMBOL;
-    else if (name == "SFX_SYMBOL") return COL_SFX_SYMBOL;
-    else if (name == "DECIMAL_POINT") return COL_DECIMAL_POINT;
-    else if (name == "GROUP_SEPARATOR") return COL_GROUP_SEPARATOR;
-    else if (name == "UNIT_NAME") return COL_UNIT_NAME;
-    else if (name == "CENT_NAME") return COL_CENT_NAME;
-    else if (name == "SCALE") return COL_SCALE;
-    else if (name == "BASECONVRATE") return COL_BASECONVRATE;
-    else if (name == "CURRENCY_SYMBOL") return COL_CURRENCY_SYMBOL;
-    else if (name == "CURRENCY_TYPE") return COL_CURRENCY_TYPE;
-
-    return COLUMN(-1);
-}
-
-// Create a new Data record and add to memory table (cache)
-CurrencyTable::Data* CurrencyTable::create()
-{
-    Data* entity = new Data();
-    m_cache.push_back(entity);
-    return entity;
-}
-
-// Create a copy of the Data record and add to memory table (cache)
-CurrencyTable::Data* CurrencyTable::clone(const CurrencyTable::Data* e)
-{
-    Data* entity = create();
-    *entity = *e;
-    entity->id(-1);
-    return entity;
-}
-
-// Save the Data record to the database table.
-// Either create a new record or update the existing record.
-// Remove old record from the memory table (cache).
-bool CurrencyTable::save(CurrencyTable::Data* entity)
-{
-    wxString sql = wxEmptyString;
-    if (entity->id() <= 0) {
-        //  new & insert
-        sql = "INSERT INTO CURRENCYFORMATS_V1(CURRENCYNAME, PFX_SYMBOL, SFX_SYMBOL, DECIMAL_POINT, GROUP_SEPARATOR, UNIT_NAME, CENT_NAME, SCALE, BASECONVRATE, CURRENCY_SYMBOL, CURRENCY_TYPE, CURRENCYID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    }
-    else {
-        sql = "UPDATE CURRENCYFORMATS_V1 SET CURRENCYNAME = ?, PFX_SYMBOL = ?, SFX_SYMBOL = ?, DECIMAL_POINT = ?, GROUP_SEPARATOR = ?, UNIT_NAME = ?, CENT_NAME = ?, SCALE = ?, BASECONVRATE = ?, CURRENCY_SYMBOL = ?, CURRENCY_TYPE = ? WHERE CURRENCYID = ?";
-    }
-
-    try {
-        wxSQLite3Statement stmt = m_db->PrepareStatement(sql);
-
-        stmt.Bind(1, entity->CURRENCYNAME);
-        stmt.Bind(2, entity->PFX_SYMBOL);
-        stmt.Bind(3, entity->SFX_SYMBOL);
-        stmt.Bind(4, entity->DECIMAL_POINT);
-        stmt.Bind(5, entity->GROUP_SEPARATOR);
-        stmt.Bind(6, entity->UNIT_NAME);
-        stmt.Bind(7, entity->CENT_NAME);
-        stmt.Bind(8, entity->SCALE);
-        stmt.Bind(9, entity->BASECONVRATE);
-        stmt.Bind(10, entity->CURRENCY_SYMBOL);
-        stmt.Bind(11, entity->CURRENCY_TYPE);
-        stmt.Bind(12, entity->id() > 0 ? entity->CURRENCYID : newId());
-
-        stmt.ExecuteUpdate();
-        stmt.Finalize();
-
-        if (entity->id() > 0) {
-            // existent
-            for (Cache::iterator it = m_cache.begin(); it != m_cache.end(); ++ it) {
-                Data* e = *it;
-                if (e->id() == entity->id())
-                    // update in place
-                    *e = *entity;
-            }
-        }
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("CURRENCYFORMATS_V1: Exception %s, %s", e.GetMessage().utf8_str(), entity->to_json());
-        return false;
-    }
-
-    if (entity->id() <= 0) {
-        entity->id(m_db->GetLastRowId());
-        m_cache_index.insert(std::make_pair(entity->id(), entity));
-    }
-    return true;
-}
-
-// Remove the Data record from the database and the memory table (cache)
-bool CurrencyTable::remove(const int64 id)
-{
-    if (id <= 0) return false;
-    try {
-        wxString sql = "DELETE FROM CURRENCYFORMATS_V1 WHERE CURRENCYID = ?";
-        wxSQLite3Statement stmt = m_db->PrepareStatement(sql);
-        stmt.Bind(1, id);
-        stmt.ExecuteUpdate();
-        stmt.Finalize();
-
-        Cache c;
-        for (Cache::iterator it = m_cache.begin(); it != m_cache.end(); ++ it) {
-            Data* entity = *it;
-            if (entity->id() == id) {
-                m_cache_index.erase(entity->id());
-                delete entity;
-            }
-            else {
-                c.push_back(entity);
-            }
-        }
-        m_cache.clear();
-        m_cache.swap(c);
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("CURRENCYFORMATS_V1: Exception %s", e.GetMessage().utf8_str());
-        return false;
-    }
-
-    return true;
-}
-
-// Remove the Data record from the database and the memory table (cache)
-bool CurrencyTable::remove(CurrencyTable::Data* entity)
-{
-    if (remove(entity->id())) {
-        entity->id(-1);
-        return true;
-    }
-
-    return false;
-}
-
-// Search the memory table (Cache) for the data record.
-// If not found in memory, search the database and update the cache.
-CurrencyTable::Data* CurrencyTable::cache_id(const int64 id)
-{
-    if (id <= 0) {
-        ++m_skip;
-        return nullptr;
-    }
-
-    if (auto it = m_cache_index.find(id); it != m_cache_index.end()) {
-        ++m_hit;
-        return it->second;
-    }
-
-    ++m_miss;
-    Data* entity = nullptr;
-    wxString where = wxString::Format(" WHERE %s = ?", PRIMARY::name().utf8_str());
-    try {
-        wxSQLite3Statement stmt = m_db->PrepareStatement(this->m_query_select + where);
-        stmt.Bind(1, id);
-
-        wxSQLite3ResultSet q = stmt.ExecuteQuery();
-        if(q.NextRow()) {
-            entity = new Data(q);
-            m_cache.push_back(entity);
-            m_cache_index.insert(std::make_pair(id, entity));
-        }
-        stmt.Finalize();
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("%s: Exception %s", m_table_name.utf8_str(), e.GetMessage().utf8_str());
-    }
-
-    if (!entity) {
-        entity = fake_;
-        // wxLogError("%s: %d not found", m_table_name.utf8_str(), id);
-    }
-
-    return entity;
-}
-
-// Search the database for the data record, bypassing the cache.
-CurrencyTable::Data* CurrencyTable::get_id(const int64 id)
-{
-    if (id <= 0) {
-        ++m_skip;
-        return nullptr;
-    }
-
-    Data* entity = nullptr;
-    wxString where = wxString::Format(" WHERE %s = ?", PRIMARY::name().utf8_str());
-    try {
-        wxSQLite3Statement stmt = m_db->PrepareStatement(this->m_query_select + where);
-        stmt.Bind(1, id);
-
-        wxSQLite3ResultSet q = stmt.ExecuteQuery();
-        if (q.NextRow()) {
-            entity = new Data(q);
-        }
-        stmt.Finalize();
-    }
-    catch (const wxSQLite3Exception &e) {
-        wxLogError("%s: Exception %s", m_table_name.utf8_str(), e.GetMessage().utf8_str());
-    }
-
-    if (!entity) {
-        entity = fake_;
-        // wxLogError("%s: %d not found", m_table_name.utf8_str(), id);
-    }
-
-    return entity;
-}
-
-// Return a list of Data records (Data_Set) derived directly from the database.
-// The Data_Set is sorted based on the column number.
-const CurrencyTable::Data_Set CurrencyTable::get_all(const COLUMN col, const bool asc)
-{
-    Data_Set result;
-    try {
-        wxSQLite3ResultSet q = m_db->ExecuteQuery(col == COLUMN(0) ? this->m_query_select
-            : this->m_query_select + " ORDER BY " + column_to_name(col) + " COLLATE NOCASE " + (asc ? " ASC " : " DESC ")
-        );
-
-        while(q.NextRow()) {
-            Data entity(q);
-            result.push_back(std::move(entity));
-        }
-
-        q.Finalize();
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("%s: Exception %s", m_table_name.utf8_str(), e.GetMessage().utf8_str());
-    }
-
-    return result;
 }

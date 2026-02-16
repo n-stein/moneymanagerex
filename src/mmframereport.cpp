@@ -253,8 +253,8 @@ void mmGUIFrame::DoUpdateGRMNavigation(wxTreeItemId& parent_item)
     /*GRM Reports*/
     auto records = ReportModel::instance().find(ReportModel::ACTIVE(OP_EQ, 1));
     //Sort by group name and report name
-    std::sort(records.begin(), records.end(), ReportTable::SorterByREPORTNAME());
-    std::stable_sort(records.begin(), records.end(), ReportTable::SorterByGROUPNAME());
+    std::sort(records.begin(), records.end(), ReportRow::SorterByREPORTNAME());
+    std::stable_sort(records.begin(), records.end(), ReportRow::SorterByGROUPNAME());
 
     wxTreeItemId group;
     wxString group_name;

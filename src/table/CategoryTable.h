@@ -6,191 +6,141 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      CategoryTable.h
+ *
+ *      Interface to database table CATEGORY_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct CategoryTable : public TableBase
+// Columns in database table CATEGORY_V1
+struct CategoryCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_CATEGID = 0,
-        COL_CATEGNAME,
-        COL_ACTIVE,
-        COL_PARENTID,
-        COL_size
+        COL_ID_CATEGID = 0,
+        COL_ID_CATEGNAME,
+        COL_ID_ACTIVE,
+        COL_ID_PARENTID,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct CATEGID : public TableOpV<int64>
     {
-        static wxString name() { return "CATEGID"; }
+        static COL_ID col_id() { return COL_ID_CATEGID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CATEGID]; }
         explicit CATEGID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit CATEGID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct CATEGNAME : public TableOpV<wxString>
     {
-        static wxString name() { return "CATEGNAME"; }
+        static COL_ID col_id() { return COL_ID_CATEGNAME; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CATEGNAME]; }
         explicit CATEGNAME(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit CATEGNAME(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
 
     struct ACTIVE : public TableOpV<int64>
     {
-        static wxString name() { return "ACTIVE"; }
+        static COL_ID col_id() { return COL_ID_ACTIVE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_ACTIVE]; }
         explicit ACTIVE(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit ACTIVE(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct PARENTID : public TableOpV<int64>
     {
-        static wxString name() { return "PARENTID"; }
+        static COL_ID col_id() { return COL_ID_PARENTID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_PARENTID]; }
         explicit PARENTID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit PARENTID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
+};
 
-    typedef CATEGID PRIMARY;
+// A single record in database table CATEGORY_V1
+struct CategoryRow
+{
+    using Col = CategoryCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 CATEGID; // primary key
-        wxString CATEGNAME;
-        int64 ACTIVE;
-        int64 PARENTID;
+    int64 CATEGID; // primary key
+    wxString CATEGNAME;
+    int64 ACTIVE;
+    int64 PARENTID;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit CategoryRow();
+    explicit CategoryRow(wxSQLite3ResultSet& q);
+    CategoryRow(const CategoryRow& other) = default;
 
-        int64 id() const { return CATEGID; }
-        void id(const int64 id) { CATEGID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return CATEGID; }
+    void id(const int64 id) { CATEGID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const CategoryRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    CategoryRow& operator=(const CategoryRow& other);
+    bool operator< (const CategoryRow& other) const { return id() < other.id(); }
+    bool operator< (const CategoryRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const CATEGID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::CATEGID& col)
     {
-        return data->CATEGID == op.m_value;
+        return CATEGID == col.m_value;
     }
 
-    static bool match(const Data* data, const CATEGNAME& op)
+    bool match(const Col::CATEGNAME& col)
     {
-        return data->CATEGNAME.CmpNoCase(op.m_value) == 0;
+        return CATEGNAME.CmpNoCase(col.m_value) == 0;
     }
 
-    static bool match(const Data* data, const ACTIVE& op)
+    bool match(const Col::ACTIVE& col)
     {
-        return data->ACTIVE == op.m_value;
+        return ACTIVE == col.m_value;
     }
 
-    static bool match(const Data* data, const PARENTID& op)
+    bool match(const Col::PARENTID& col)
     {
-        return data->PARENTID == op.m_value;
+        return PARENTID == col.m_value;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    CategoryTable();
-    ~CategoryTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && CategoryTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-
-    struct SorterByACTIVE
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.ACTIVE < y.ACTIVE;
-        }
-    };
 
     struct SorterByCATEGID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CategoryRow& x, const CategoryRow& y)
         {
             return x.CATEGID < y.CATEGID;
         }
@@ -198,18 +148,41 @@ struct CategoryTable : public TableBase
 
     struct SorterByCATEGNAME
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CategoryRow& x, const CategoryRow& y)
         {
             // Locale case-insensitive
             return std::wcscoll(x.CATEGNAME.Lower().wc_str(), y.CATEGNAME.Lower().wc_str()) < 0;
         }
     };
 
+    struct SorterByACTIVE
+    {
+        bool operator()(const CategoryRow& x, const CategoryRow& y)
+        {
+            return x.ACTIVE < y.ACTIVE;
+        }
+    };
+
     struct SorterByPARENTID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const CategoryRow& x, const CategoryRow& y)
         {
             return x.PARENTID < y.PARENTID;
         }
     };
+};
+
+// Interface to database table CATEGORY_V1
+struct CategoryTable : public TableFactory<CategoryRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using CATEGID = Col::CATEGID;
+    using CATEGNAME = Col::CATEGNAME;
+    using ACTIVE = Col::ACTIVE;
+    using PARENTID = Col::PARENTID;
+
+    CategoryTable();
+    ~CategoryTable();
+
+    void ensure_data() override;
 };

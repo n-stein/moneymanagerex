@@ -55,7 +55,7 @@ PayeeModel& PayeeModel::instance()
 const PayeeModel::Data_Set PayeeModel::FilterPayees(const wxString& payee_pattern, bool includeInActive)
 {
     Data_Set payees;
-    for (auto &payee : this->get_all(PayeeModel::COL_PAYEENAME))
+    for (auto &payee : this->get_all(PayeeCol::COL_ID_PAYEENAME))
     {
         if (payee.PAYEENAME.Lower().Matches(payee_pattern.Lower().Append("*")) &&
             (includeInActive || payee.ACTIVE == 1)) {
@@ -95,7 +95,7 @@ bool PayeeModel::remove(int64 id)
 const wxArrayString PayeeModel::all_payee_names()
 {
     wxArrayString payees;
-    for (const auto &payee: this->get_all(COL_PAYEENAME))
+    for (const auto &payee: this->get_all(Col::COL_ID_PAYEENAME))
     {
         payees.Add(payee.PAYEENAME);
     }

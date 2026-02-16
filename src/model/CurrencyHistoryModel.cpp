@@ -164,7 +164,7 @@ double CurrencyHistoryModel::getLastRate(const int64& currencyID)
         return CurrencyModel::instance().cache_id(currencyID)->BASECONVRATE;
 
     CurrencyHistoryModel::Data_Set histData = CurrencyHistoryModel::instance().find(CurrencyHistoryModel::CURRENCYID(currencyID));
-    std::stable_sort(histData.begin(), histData.end(), CurrencyHistoryTable::SorterByCURRDATE());
+    std::stable_sort(histData.begin(), histData.end(), CurrencyHistoryRow::SorterByCURRDATE());
 
     if (!histData.empty())
         return histData.back().CURRVALUE;

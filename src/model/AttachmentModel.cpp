@@ -54,7 +54,7 @@ AttachmentModel& AttachmentModel::instance()
 const AttachmentModel::Data_Set AttachmentModel::FilterAttachments(const wxString& RefType, const int64 RefId)
 {
     Data_Set attachments;
-    for (const Data& attachment : get_all(COL_DESCRIPTION)) {
+    for (const Data& attachment : get_all(Col::COL_ID_DESCRIPTION)) {
         if (attachment.REFTYPE.Lower().Matches(RefType.Lower().Append("*")) && attachment.REFID == RefId)
             attachments.push_back(attachment);
     }
@@ -101,7 +101,7 @@ wxArrayString AttachmentModel::allDescriptions()
 {
     wxArrayString descriptions;
     wxString PreviousDescription;
-    for (const auto &attachment : this->get_all(COL_DESCRIPTION))
+    for (const auto &attachment : this->get_all(Col::COL_ID_DESCRIPTION))
     {
         if (attachment.DESCRIPTION != PreviousDescription)
         {

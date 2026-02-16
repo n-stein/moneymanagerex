@@ -158,6 +158,8 @@ add_executable(${MMEX_EXE} WIN32 MACOSX_BUNDLE
     table/UsageTable.h
     table/_TableBase.cpp
     table/_TableBase.h
+    table/_TableFactory.h
+    table/_TableFactory.tpp
     table/_TableUpgrade.h
 
     db/dbcheck.cpp

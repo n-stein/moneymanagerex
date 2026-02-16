@@ -16,8 +16,8 @@ import codecs
 # {{{ const
 
 # existing files
-base_class_name = 'TableBase'
-base_file_basename = '_TableBase'
+base_basename = '_TableBase'
+factory_basename = '_TableFactory'
 
 # generated files
 tables_sql_filename = 'tables_en.sql'
@@ -130,9 +130,8 @@ def translation_for(s):
 
 # https://github.com/django/django/blob/master/django/db/backends/sqlite3/introspection.py
 def get_table_a(cursor):
-    "Returns a list of table (name, sql) in database."
-    # Skip the sqlite_sequence system table used for autoincrement key
-    # generation.
+    "Return a list of table (name, sql) in a database."
+    # Skip the sqlite_sequence system table used for key autoincrement.
     cursor.execute("""
         SELECT name, sql FROM sqlite_master
         WHERE type='table' AND NOT name='sqlite_sequence'
@@ -141,12 +140,11 @@ def get_table_a(cursor):
 
 
 # }}}
-# {{{ def get_table_index_a(cursor, table_name)
+# {{{ def get_index_a(cursor, table_name)
 
-def get_table_index_a(cursor, table_name):
-    "Returns a list of index (name, sql) for table_name."
-    # Skip the sqlite_sequence system table used for autoincrement key
-    # generation.
+def get_index_a(cursor, table_name):
+    "Return a list of index (name, sql) for a table."
+    # Skip the sqlite_autoindex_* system index.
     cursor.execute("""
         SELECT name, sql FROM sqlite_master
         WHERE type='index' AND name NOT LIKE 'sqlite_autoindex_%%' AND tbl_name = '%s'
@@ -154,10 +152,10 @@ def get_table_index_a(cursor, table_name):
     return [(row[0], row[1]) for row in cursor.fetchall()]
 
 # }}}
-# {{{ def get_table_field_a(cursor, table_name)
+# {{{ def get_field_a(cursor, table_name)
 
-def get_table_field_a(cursor, table_name):
-    "Returns a list of field (cid, name, type, null_ok, pk) for table_name."
+def get_field_a(cursor, table_name):
+    "Return a list of field (cid, name, type, null_ok, pk) for a table."
     cursor.execute('PRAGMA table_info(%s)' % table_name)
     # cid, name, type, notnull, dflt_value, pk
     return [{
@@ -165,14 +163,14 @@ def get_table_field_a(cursor, table_name):
         'name'    : field[1],
         'type'    : field[2].upper(),
         'null_ok' : not field[3],
-        'pk'      : field[5]     # undocumented
+        'pk'      : field[5],     # undocumented
     } for field in cursor.fetchall()]
 
 # }}}
-# {{{ def get_table_data_a(cursor, table_name)
+# {{{ def get_data_a(cursor, table_name)
 
-def get_table_data_a(cursor, table_name):
-    "Returns a list of row data in table_name."
+def get_data_a(cursor, table_name):
+    "Return a list of row data in a table."
     cursor.execute("select * from %s" % table_name)
     return cursor.fetchall()
 
@@ -181,7 +179,7 @@ def get_table_data_a(cursor, table_name):
 # {{{ class Table
 
 class Table:
-    """ Class: Defines the database table in SQLite3"""
+    """ Defines a database table in SQLite3"""
     # {{{ def __init__(self, cursor, table_name_, table_sql_)
 
     def __init__(self, cursor, table_name_, table_sql_):
@@ -194,12 +192,12 @@ class Table:
         self.class_name = self.class_basename + 'Table'
         self.file_basename = self.class_name
 
-        self.index_a = get_table_index_a(cursor, self.table_name)
-        self.field_a = get_table_field_a(cursor, self.table_name)
-        self.data_a = get_table_data_a(cursor, self.table_name)
+        self.index_a = get_index_a(cursor, self.table_name)
+        self.field_a = get_field_a(cursor, self.table_name)
+        self.data_a = get_data_a(cursor, self.table_name)
 
-        self.field_name_a = [field['name'] for field in self.field_a]
-        self.primay_key = [field['name'] for field in self.field_a if field['pk']][0]
+        self.field_pk = [f for f in self.field_a if f['pk']][0]
+        self.field_other_a = [f for f in self.field_a if not f['pk']]
 
     # }}}
     # {{{ def generate_table_h(self, header)
@@ -207,175 +205,229 @@ class Table:
     def generate_table_h(self, header):
         """ Generate .h file for the table class"""
 
+        # short names
+        dt = self.table_name
+        cb = self.class_basename
+        cc = self.class_basename + 'Col'
+        cr = self.class_basename + 'Row'
+        ct = self.class_name
+        fa = self.field_a
+        fp = self.field_pk
+        fo = self.field_other_a
+
         # {{{ include
 
         code = '''
 #pragma once
 
 #include "%s.h"
-''' % base_file_basename
+''' % factory_basename
 
         # }}}
-        # {{{ struct (self.class_name) ...
+        # {{{ struct *Col ...
 
         code += '''
-struct %s : public %s
-{
-    struct Data;
-''' % (self.class_name, base_class_name)
+// Columns in database table %s
+struct %s
+{''' % (dt, cc)
 
         # }}}
-        # {{{ enum COLUMN
+        # {{{ enum COL_ID
 
         code += '''
-    enum COLUMN
+    enum COL_ID
     {
-        COL_%s = 0''' % self.primay_key.upper()
+        COL_ID_%s = 0''' % fp['name'].upper()
 
-        for field in self.field_a:
-            if field['pk']:
-                continue
+        for f in fo:
             code += ''',
-        COL_%s''' % field['name'].upper()
+        COL_ID_%s''' % f['name'].upper()
 
         code += ''',
-        COL_size
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 '''
 
         # }}}
-        for field in self.field_a:
-            # {{{ struct (field)
+        # {{{ struct (COLUMN_NAME)
 
+        for f in fa:
             code += '''
     struct %s : public TableOpV<%s>
     {
-        static wxString name() { return "%s"; }
+        static COL_ID col_id() { return COL_ID_%s; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_%s]; }
         explicit %s(const %s &v): TableOpV<%s>(OP_EQ, v) {}
         explicit %s(OP op, const %s &v): TableOpV<%s>(op, v) {}
     };
-''' % (field['name'], dbtype_ctype[field['type']], field['name'],
-            field['name'], dbtype_ctype[field['type']], dbtype_ctype[field['type']],
-            field['name'], dbtype_ctype[field['type']], dbtype_ctype[field['type']])
-
-            # }}}
-        # {{{ typedef PRIMARY
-
-        code += '''
-    typedef %s PRIMARY;
-''' % self.primay_key
+''' % (
+                f['name'].upper(), dbtype_ctype[f['type']],
+                f['name'].upper(),
+                f['name'].upper(),
+                f['name'], dbtype_ctype[f['type']], dbtype_ctype[f['type']],
+                f['name'], dbtype_ctype[f['type']], dbtype_ctype[f['type']]
+            )
 
         # }}}
-        # {{{ struct Data
+        # {{{ ... struct *Col
 
-        code += '''
-    // Data is a single record in the database table
-    struct Data
-    {'''
-
-        for field in self.field_a:
-            code += '''
-        %s %s;%s''' % (
-            dbtype_ctype[field['type']],
-            field['name'], field['pk'] and ' // primary key' or '')
-        code += '''
+        code += '''};
 '''
-
-        code += '''
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
-'''
-
-        code += '''
-        int64 id() const { return %s; }
-        void id(const int64 id) { %s = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
-''' % (self.primay_key, self.primay_key)
-
-        code += '''
-        Data& operator=(const Data& other);
-
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-'''
-
         # }}}
-        # {{{ struct Data_Set
+
+        # {{{ struct *Row ...
 
         code += '''
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-'''
-
-        # }}}
-        # {{{ static methods
-
-        code += '''
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
-'''
-        code += '''
-    template<typename C>
-    static bool match(const Data* r, const C&)
-    {
-        return false;
-    }
-'''
-
-        for field in self.field_a:
-            ftype = dbtype_ctype[field['type']]
-            if ftype == 'wxString':
-                code += '''
-    static bool match(const Data* data, const %s& op)
-    {
-        return data->%s.CmpNoCase(op.m_value) == 0;
-    }
-''' % (field['name'], field['name'])
-            else:
-                code += '''
-    static bool match(const Data* data, const %s& op)
-    {
-        return data->%s == op.m_value;
-    }
-''' % (field['name'], field['name'])
-
-        code += '''
-    template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
-    {
-        return (match(data, arg1) && ... && match(data, args));
-    }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-'''
+// A single record in database table %s
+struct %s
+{
+    using Col = %s;
+    using COL_ID = Col::COL_ID;
+''' % (dt, cr, cc)
 
         # }}}
         # {{{ member variables
 
         code += '''
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
+    %s %s; // primary key''' % (dbtype_ctype[fp['type']], fp['name'])
+
+        for f in fo:
+            code += '''
+    %s %s;''' % (
+                dbtype_ctype[f['type']], f['name']
+            )
+
+        code += '''
+'''
+
+        # }}}
+        # {{{ instance methods
+
+        code += '''
+    explicit %s();
+    explicit %s(wxSQLite3ResultSet& q);
+    %s(const %s& other) = default;
+''' % (cr, cr, cr, cr)
+
+        code += '''
+    int64 id() const { return %s; }
+    void id(const int64 id) { %s = id; }
+    void destroy() { delete this; }
+
+    bool equals(const %s* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
+''' % (fp['name'], fp['name'], cr)
+
+        code += '''
+    %s& operator=(const %s& other);
+    bool operator< (const %s& other) const { return id() < other.id(); }
+    bool operator< (const %s* other) const { return id() < other->id(); }
+''' % (cr, cr, cr, cr)
+
+        # }}}
+        # {{{ match
+
+        code += '''
+    template<typename C>
+    bool match(const C&)
+    {
+        return false;
+    }
+
+    // TODO: check if col.m_operator == OP_EQ
+'''
+
+        for f in fa:
+            ftype = dbtype_ctype[f['type']]
+            if ftype == 'wxString':
+                code += '''
+    bool match(const Col::%s& col)
+    {
+        return %s.CmpNoCase(col.m_value) == 0;
+    }
+''' % (f['name'], f['name'])
+            else:
+                code += '''
+    bool match(const Col::%s& col)
+    {
+        return %s == col.m_value;
+    }
+''' % (f['name'], f['name'])
+
+        code += '''
+    template<typename Arg1, typename... Args>
+    bool match(const Arg1& arg1, const Args&... args)
+    {
+        return (match(arg1) && ... && match(args));
+    }
+'''
+
+        # }}}
+        # {{{ SorterBy
+
+        for f in fa:
+            code += '''
+    struct SorterBy%s
+    {
+        bool operator()(const %s& x, const %s& y)
+        {''' % (f['name'], cr, cr)
+
+            if f['name'] in ['ACCOUNTNAME', 'CATEGNAME', 'PAYEENAME', 'SUBCATEGNAME']:
+                code += '''
+            // Locale case-insensitive
+            return std::wcscoll(x.%s.Lower().wc_str(), y.%s.Lower().wc_str()) < 0;
+''' % (f['name'], f['name'])
+
+            elif f['name'] in ['CURRENCYNAME']:
+                code += '''
+            return wxGetTranslation(x.%s) < wxGetTranslation(y.%s);
+''' % (f['name'], f['name'])
+
+            else:
+                code += '''
+            return x.%s < y.%s;
+''' % (f['name'], f['name'])
+
+            code += '''        }
+    };
+'''
+
+        # }}}
+        # {{{ ... struct *Row
+
+        code += '''};
+'''
+        # }}}
+
+        # {{{ struct *Table ...
+
+        code += '''
+// Interface to database table %s
+struct %s : public TableFactory<%s>
+{''' % (dt, ct, cr)
+
+        # }}}
+        # {{{ using (COLUMN_NAME)
+
+        code += '''
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.'''
+
+        for f in fa:
+            code += '''
+    using %s = Col::%s;''' % (f['name'].upper(), f['name'].upper())
+
+        code += '''
 '''
 
         # }}}
@@ -384,84 +436,24 @@ struct %s : public %s
         code += '''
     %s();
     ~%s();
-''' % (self.class_name, self.class_name)
 
-        code += '''
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-'''
+    void ensure_data() override;
+''' % (ct, ct)
 
         # }}}
-        # {{{ search_cache, cache_id, get_id, get_all
-
-        code += '''
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && %s::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-''' % self.class_name
-
-        # }}}
-        # {{{ SorterBy
-
-        for field_name in sorted(self.field_name_a):
-            code += '''
-    struct SorterBy%s
-    {
-        bool operator()(const Data& x, const Data& y)
-        {''' % field_name
-
-            if field_name in ['ACCOUNTNAME', 'CATEGNAME', 'PAYEENAME', 'SUBCATEGNAME']:
-                code += '''
-            // Locale case-insensitive
-            return std::wcscoll(x.%s.Lower().wc_str(), y.%s.Lower().wc_str()) < 0;
-''' % (field_name, field_name)
-
-            elif field_name in ['CURRENCYNAME']:
-                code += '''
-            return wxGetTranslation(x.%s) < wxGetTranslation(y.%s);
-''' % (field_name, field_name)
-
-            else:
-                code += '''
-            return x.%s < y.%s;
-''' % (field_name, field_name)
-
-            code += '''        }
-    };
-'''
-
-        # }}}
-        # {{{ ... struct (self.class_name)
+        # {{{ ... struct *Table
 
         code += '''};
 '''
         # }}}
 
         file_name = self.file_basename + '.h'
-        print ('Generate %s (source code for %s)' % (file_name, self.table_name))
+        print ('Generate %s (source code for %s)' % (file_name, dt))
         rfp = codecs.open(file_name, 'w', 'utf-8-sig')
-        rfp.write(header)
+        rfp.write(header
+            .replace('@file', file_name)
+            .replace('@brief', 'Interface to database table %s' % dt)
+        )
         rfp.write(code)
         rfp.close()
 
@@ -471,60 +463,90 @@ struct %s : public %s
     def generate_table_cpp(self, header):
         """ Generate .cpp file for the table class"""
 
+        # short names
+        dt = self.table_name
+        cb = self.class_basename
+        cc = self.class_basename + 'Col'
+        cr = self.class_basename + 'Row'
+        ct = self.class_name
+        fa = self.field_a
+        fp = self.field_pk
+        fo = self.field_other_a
+
         # {{{ include
 
         code = '''
+#include "%s.tpp"
 #include "%s.h"
-''' % self.file_basename
-
-        # }}}
-        # {{{ Data::Data
+''' % (factory_basename, self.file_basename)
 
         code += '''
-%s::Data::Data()
-{''' % self.class_name
+template class TableFactory<%s>;
+''' % cr
 
-        for field in self.field_a:
-            ftype = dbtype_ctype[field['type']]
+        # }}}
+        # {{{ *Col
+
+        code += '''
+// List of column names in database table %s,
+// in the order of %s::COL_ID.
+const wxArrayString %s::COL_NAME_A = {
+    "%s"%s
+};
+
+const %s::COL_ID %s::PRIMARY_ID = COL_ID_%s;
+const wxString %s::PRIMARY_NAME = COL_NAME_A[COL_ID_%s];
+''' % (
+            dt, cc,
+            cc,
+            fp['name'], ''.join([',\n    "' + f['name'] + '"' for f in fo]),
+            cc, cc, fp['name'].upper(),
+            cc, fp['name'].upper()
+        )
+
+        # }}}
+
+        # {{{ *Row::*Row
+
+        code += '''
+%s::%s()
+{''' % (cr, cr)
+
+        for f in fa:
+            ftype = dbtype_ctype[f['type']]
             if ftype == 'wxString':
                 continue
             elif ftype == 'double':
                 code += '''
-    %s = 0.0;''' % field['name']
+    %s = 0.0;''' % f['name']
             elif ftype == 'int64':
                 code += '''
-    %s = -1;''' % field['name']
+    %s = -1;''' % f['name']
 
         code += '''
 }
 
-%s::Data::Data(wxSQLite3ResultSet& q)
-{''' % self.class_name
-
-        for field in self.field_a:
-            func = dbtype_function[field['type']]
-            code += '''
-    %s = q.%s(%d);''' % (field['name'], func, field['cid'])
-
-        code += '''
+%s::%s(wxSQLite3ResultSet& q)
+{
+    from_select_result(q);
 }
-'''
+''' % (cr, cr)
 
         # }}}
-        # {{{ Data::equals
+        # {{{ *Row::equals
 
         code += '''
-bool %s::Data::equals(const %s::Data* r) const
-{''' % (self.class_name, self.class_name)
+bool %s::equals(const %s* r) const
+{''' % (cr, cr)
 
-        for field in self.field_a:
-            ftype = dbtype_ctype[field['type']]
+        for f in fa:
+            ftype = dbtype_ctype[f['type']]
             if ftype == 'int64' or ftype == 'double':
                 code += '''
-    if (%s != r->%s) return false;''' % (field['name'], field['name'])
+    if ( %s != r->%s) return false;''' % (f['name'], f['name'])
             elif ftype == 'wxString':
                 code += '''
-    if (!%s.IsSameAs(r->%s)) return false;''' % (field['name'], field['name'])
+    if (!%s.IsSameAs(r->%s)) return false;''' % (f['name'], f['name'])
 
         code += '''
 
@@ -533,79 +555,96 @@ bool %s::Data::equals(const %s::Data* r) const
 '''
 
         # }}}
-        # {{{ Data::operator=
+        # {{{ *Row::to_insert_stmt, *Row::from_select_result
 
         code += '''
-%s::Data& %s::Data::operator=(const %s::Data& other)
-{
-    if (this == &other) return *this;
-''' % (self.class_name, self.class_name, self.class_name)
+// Bind a Row record to database statement.
+// Use the id argument instead of the row id.
+void %s::to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const
+{''' % cr
 
-        for field in self.field_a:
+        for i, f in enumerate(fo):
             code += '''
-    %s = other.%s;''' % (field['name'], field['name'])
+    stmt.Bind(%d, %s);''' % (i+1, f['name'])
 
         code += '''
+    stmt.Bind(%d, id);
+}
+''' % len(fa)
 
-    return *this;
+        code += '''
+void %s::from_select_result(wxSQLite3ResultSet& q)
+{''' % cr
+
+        for f in fa:
+            code += '''
+    %s = q.%s(%d);''' % (f['name'], dbtype_function[f['type']], f['cid'])
+
+        code += '''
 }
 '''
 
         # }}}
-        # {{{ Data::to_json, Data::as_json
+        # {{{ *Row::to_json, *Row::as_json
 
         code += '''
 // Return the data record as a json string
-wxString %s::Data::to_json() const
+wxString %s::to_json() const
 {
     StringBuffer json_buffer;
     PrettyWriter<StringBuffer> json_writer(json_buffer);
+
     json_writer.StartObject();			
-    this->as_json(json_writer);
+    as_json(json_writer);
     json_writer.EndObject();
 
     return json_buffer.GetString();
 }
-''' % self.class_name
+''' % cr
 
         code += '''
 // Add the field data as json key:value pairs
-void %s::Data::as_json(PrettyWriter<StringBuffer>& json_writer) const
-{''' % self.class_name
+void %s::as_json(PrettyWriter<StringBuffer>& json_writer) const
+{''' % cr
 
-        for field in self.field_a:
-            type = dbtype_ctype[field['type']]
+        for f in fa:
+            type = dbtype_ctype[f['type']]
             if type == 'int64':
                 code += '''
     json_writer.Key("%s");
-    json_writer.Int64(this->%s.GetValue());''' % (field['name'], field['name'])
+    json_writer.Int64(%s.GetValue());
+''' % (f['name'], f['name'])
             elif type == 'double':
                 code += '''
     json_writer.Key("%s");
-    json_writer.Double(this->%s);''' % (field['name'], field['name'])
+    json_writer.Double(%s);
+''' % (f['name'], f['name'])
             elif type == 'wxString':
                 code += '''
     json_writer.Key("%s");
-    json_writer.String(this->%s.utf8_str());''' % (field['name'], field['name'])
+    json_writer.String(%s.utf8_str());
+''' % (f['name'], f['name'])
             else:
                 assert "Field type Error"
 
-        code += '''
-}
+        code += '''}
 '''
 
         # }}}
-        # {{{ Data::to_row_t, Data::to_template
+        # {{{ *Row::to_row_t, *Row::to_template
 
         code += '''
-row_t %s::Data::to_row_t() const
+row_t %s::to_row_t() const
 {
     row_t row;
-''' % self.class_name
+''' % cr
 
-        for field in self.field_a:
+        for f in fa:
             code += '''
-    row(L"%s") = %s;''' % (field['name'], field['name'] + '.GetValue()' if field['type'] == 'INTEGER' else field['name'])
+    row(L"%s") = %s%s;''' % (
+            f['name'],
+            f['name'], '.GetValue()' if f['type'] == 'INTEGER' else ''
+        )
 
         code += '''
 
@@ -614,137 +653,123 @@ row_t %s::Data::to_row_t() const
 '''
 
         code += '''
-void %s::Data::to_template(html_template& t) const
-{''' % self.class_name
+void %s::to_template(html_template& t) const
+{''' % cr
 
-        for field in self.field_a:
+        for f in fa:
             code += '''
-    t(L"%s") = %s;''' % (field['name'], field['name'] + '.GetValue()' if field['type'] == 'INTEGER' else field['name'])
+    t(L"%s") = %s%s;''' % (
+            f['name'],
+            f['name'], '.GetValue()' if f['type'] == 'INTEGER' else ''
+        )
 
         code += '''
 }
 '''
 
         # }}}
-        # {{{ Data::destroy
+        # {{{ *Row::operator=
 
         code += '''
-void %s::Data::destroy()
+%s& %s::operator=(const %s& other)
 {
-    delete this;
+    if (this == &other) return *this;
+''' % (cr, cr, cr)
+
+        for f in fa:
+            code += '''
+    %s = other.%s;''' % (f['name'], f['name'])
+
+        code += '''
+
+    return *this;
 }
-''' % self.class_name
+'''
 
         # }}}
-        # {{{ Data_Set::to_json
 
-        code += '''
-// Return the data records as a json array string
-wxString %s::Data_Set::to_json() const
-{
-    StringBuffer json_buffer;
-    PrettyWriter<StringBuffer> json_writer(json_buffer);
+        # {{{ *Table:*Table
 
-    json_writer.StartArray();
-    for (const auto & item: *this) {
-        json_writer.StartObject();
-        item.as_json(json_writer);
-        json_writer.EndObject();
-    }
-    json_writer.EndArray();
+        create_query = self.table_sql.replace('\n', '')
+        drop_query = 'DROP TABLE IF EXISTS %s' % dt
 
-    return json_buffer.GetString();
-}
-''' % self.class_name
-
-    # }}}
-
-        # {{{ (self.class_name)
-
-        code += '''
-%s::%s() :
-    fake_(new Data())
-{
-    m_table_name = "%s";
-    m_query_select = "SELECT %s FROM %s ";
-}
-''' % (self.class_name, self.class_name, self.table_name, ', '.join([field['name'] for field in self.field_a]), self.table_name)
-
-        code += '''
-// Destructor: clears any data records stored in memory
-%s::~%s()
-{
-    delete this->fake_;
-    destroy_cache();
-}
-''' % (self.class_name, self.class_name)
-
-        # }}}
-        # {{{ destroy_cache
-
-        code += '''
-// Remove all records stored in memory (cache) for the table
-void %s::destroy_cache()
-{
-    std::for_each(m_cache.begin(), m_cache.end(), std::mem_fn(&Data::destroy));
-    m_cache.clear();
-    m_cache_index.clear(); // no memory release since it just stores pointer and the according objects are in cache
-}
-''' % self.class_name
-
-        # }}}
-        # {{{ ensure, ensure_index, ensure_data
-
-        code += '''
-// Creates the database table if the table does not exist
-bool %s::ensure_table()
-{
-    if (!table_exists()) {
-        try {
-            m_db->ExecuteUpdate("%s");
-            this->ensure_data();
-        }
-        catch(const wxSQLite3Exception &e) {
-            wxLogError("%s: Exception %%s", e.GetMessage().utf8_str());
-            return false;
-        }
-    }
-
-    this->ensure_index();
-
-    return true;
-}
-''' % (self.class_name, self.table_sql.replace('\n', ''), self.table_name)
-
-        code += '''
-bool %s::ensure_index()
-{
-    try {''' % self.class_name
-
+        index_query_a = ''
         for index_name, index_sql in self.index_a:
             index_sql_tokens = index_sql.split()
             index_sql_tokens.insert(2, 'IF')
             index_sql_tokens.insert(3, 'NOT')
             index_sql_tokens.insert(4, 'EXISTS')
             index_ensure_sql = ' '.join(index_sql_tokens)
-            code += '''
-        m_db->ExecuteUpdate("%s");''' % (index_ensure_sql.replace('\n', ''))
+            if index_query_a:
+                index_query_a += ','
+            index_query_a += '''
+        "''' + index_ensure_sql.replace('\n', '') + '"'
+
+        insert_query = 'INSERT INTO %s(%s, %s) VALUES(%s)' % (
+            dt,
+            ', '.join([f['name'] for f in fo]), fp['name'],
+            ', '.join(['?' for f in fa])
+        )
+        update_query = 'UPDATE %s SET %s WHERE %s = ?' % (
+            dt,
+            ', '.join([f['name'] + ' = ?' for f in fo]),
+            fp['name']
+        )
+        delete_query = 'DELETE FROM %s WHERE %s = ?' % (
+            dt, fp['name']
+        )
+        select_query = 'SELECT %s FROM %s' % (
+            ', '.join([f['name'] for f in fa]), dt
+        )
 
         code += '''
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("%s: Exception %%s", e.GetMessage().utf8_str());
-        return false;
-    }
+%s::%s()
+{
+    m_table_name = "%s";
 
-    return true;
+    m_create_query = "%s";
+
+    m_drop_query = "%s";
+
+    m_index_query_a = {%s
+    };
+
+    m_insert_query = "%s";
+
+    m_update_query = "%s";
+
+    m_delete_query = "%s";
+
+    m_select_query = "%s";
 }
-''' % self.table_name
+''' % (
+            ct, ct,
+            dt,
+            create_query,
+            drop_query,
+            index_query_a,
+            insert_query,
+            update_query,
+            delete_query,
+            select_query
+        )
+
+        code += '''
+// Destructor: clears any data records stored in memory
+%s::~%s()
+{
+    delete fake_;
+    destroy_cache();
+}
+''' % (ct, ct)
+
+        # }}}
+        # {{{ ensure_data
 
         code += '''
 void %s::ensure_data()
 {
-    m_db->Begin();''' % self.class_name
+    m_db->Begin();''' % ct
 
         rf1, rf2, rf3 = '', '', ''
         for r in self.data_a:
@@ -752,7 +777,7 @@ void %s::ensure_data()
             rf3 = ', '.join([translation_for(i) for i in r if is_trans(i)])
             if rf2.find('%s') >= 0:
                 rf3 = ', ' + rf3
-            rf1 = '"INSERT INTO %s VALUES (%s)"%s' % (self.table_name, rf2, rf3)
+            rf1 = '"INSERT INTO %s VALUES (%s)"%s' % (dt, rf2, rf3)
             if rf2.find('%s') >= 0:
                 rf1 = 'wxString::Format(' + rf1 + ')'
             code += '''
@@ -764,291 +789,14 @@ void %s::ensure_data()
 '''
 
         # }}}
-        # {{{ column_to_name, name_to_column
-
-        code += '''
-// Returns the column name as a string
-wxString %s::column_to_name(const %s::COLUMN col)
-{
-    switch(col) {
-        case COL_%s: return "%s";''' % (self.class_name, self.class_name, self.primay_key.upper(), self.primay_key)
-
-        for col_i0, col_name in enumerate([field['name'] for field in self.field_a if not field['pk']]):
-            code += '''
-        case COL_%s: return "%s";''' % (col_name.upper(), col_name)
-
-        code += '''
-        default: break;
-    }
-
-    return "UNKNOWN";
-}
-'''
-
-        code += '''
-// Returns the column number from the given column name
-%s::COLUMN %s::name_to_column(const wxString& name)
-{
-    if (name == "%s") return COL_%s;''' % (self.class_name, self.class_name, self.primay_key, self.primay_key.upper())
-
-        for col_i0, col_name in enumerate([field['name'] for field in self.field_a if not field['pk']]):
-            code += '''
-    else if (name == "%s") return COL_%s;''' %(col_name, col_name.upper())
-
-        code += '''
-
-    return COLUMN(-1);
-}
-'''
-
-        # }}}
-        # {{{ create, clone
-
-        code += '''
-// Create a new Data record and add to memory table (cache)
-%s::Data* %s::create()
-{
-    Data* entity = new Data();
-    m_cache.push_back(entity);
-    return entity;
-}
-
-// Create a copy of the Data record and add to memory table (cache)
-%s::Data* %s::clone(const %s::Data* e)
-{
-    Data* entity = create();
-    *entity = *e;
-    entity->id(-1);
-    return entity;
-}
-''' % (self.class_name, self.class_name, self.class_name, self.class_name, self.class_name)
-
-        # }}}
-        # {{{ save
-
-        code += '''
-// Save the Data record to the database table.
-// Either create a new record or update the existing record.
-// Remove old record from the memory table (cache).
-bool %s::save(%s::Data* entity)
-{
-    wxString sql = wxEmptyString;
-    if (entity->id() <= 0) {
-        //  new & insert
-        sql = "INSERT INTO %s(%s, %s) VALUES(%s)";
-    }''' % (self.class_name, self.class_name, self.table_name, ', '.join([field['name']\
-            for field in self.field_a if not field['pk']]), self.primay_key,
-            ', '.join(['?' for field in self.field_a]))
-
-        code += '''
-    else {
-        sql = "UPDATE %s SET %s WHERE %s = ?";
-    }
-
-    try {
-        wxSQLite3Statement stmt = m_db->PrepareStatement(sql);
-''' % (self.table_name, ', '.join([field['name'] + ' = ?'\
-    for field in self.field_a if not field['pk']]), self.primay_key)
-
-        for col_i0, col_name in enumerate([field['name'] for field in self.field_a if not field['pk']]):
-            code += '''
-        stmt.Bind(%d, entity->%s);'''% (col_i0+1, col_name)
-
-        code += '''
-        stmt.Bind(%d, entity->id() > 0 ? entity->%s : newId());
-
-        stmt.ExecuteUpdate();
-        stmt.Finalize();
-
-        if (entity->id() > 0) {
-            // existent
-            for (Cache::iterator it = m_cache.begin(); it != m_cache.end(); ++ it) {
-                Data* e = *it;
-                if (e->id() == entity->id())
-                    // update in place
-                    *e = *entity;
-            }
-        }
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("%s: Exception %%s, %%s", e.GetMessage().utf8_str(), entity->to_json());
-        return false;
-    }
-
-    if (entity->id() <= 0) {
-        entity->id(m_db->GetLastRowId());
-        m_cache_index.insert(std::make_pair(entity->id(), entity));
-    }
-    return true;
-}
-''' % (len(self.field_a), self.primay_key, self.table_name)
-
-        # }}}
-        # {{{ remove
-
-        code += '''
-// Remove the Data record from the database and the memory table (cache)
-bool %s::remove(const int64 id)
-{
-    if (id <= 0) return false;
-    try {
-        wxString sql = "DELETE FROM %s WHERE %s = ?";
-        wxSQLite3Statement stmt = m_db->PrepareStatement(sql);
-        stmt.Bind(1, id);
-        stmt.ExecuteUpdate();
-        stmt.Finalize();
-
-        Cache c;
-        for (Cache::iterator it = m_cache.begin(); it != m_cache.end(); ++ it) {
-            Data* entity = *it;
-            if (entity->id() == id) {
-                m_cache_index.erase(entity->id());
-                delete entity;
-            }
-            else {
-                c.push_back(entity);
-            }
-        }
-        m_cache.clear();
-        m_cache.swap(c);
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("%s: Exception %%s", e.GetMessage().utf8_str());
-        return false;
-    }
-
-    return true;
-}
-''' % (self.class_name, self.table_name, self.primay_key, self.table_name)
-
-        code += '''
-// Remove the Data record from the database and the memory table (cache)
-bool %s::remove(%s::Data* entity)
-{
-    if (remove(entity->id())) {
-        entity->id(-1);
-        return true;
-    }
-
-    return false;
-}
-''' % (self.class_name, self.class_name)
-
-        # }}}
-        # {{{ cache_id, get_id
-
-        code += '''
-// Search the memory table (Cache) for the data record.
-// If not found in memory, search the database and update the cache.
-%s::Data* %s::cache_id(const int64 id)
-{
-    if (id <= 0) {
-        ++m_skip;
-        return nullptr;
-    }
-
-    if (auto it = m_cache_index.find(id); it != m_cache_index.end()) {
-        ++m_hit;
-        return it->second;
-    }
-
-    ++m_miss;
-    Data* entity = nullptr;
-    wxString where = wxString::Format(" WHERE %%s = ?", PRIMARY::name().utf8_str());
-    try {
-        wxSQLite3Statement stmt = m_db->PrepareStatement(this->m_query_select + where);
-        stmt.Bind(1, id);
-
-        wxSQLite3ResultSet q = stmt.ExecuteQuery();
-        if(q.NextRow()) {
-            entity = new Data(q);
-            m_cache.push_back(entity);
-            m_cache_index.insert(std::make_pair(id, entity));
-        }
-        stmt.Finalize();
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("%%s: Exception %%s", m_table_name.utf8_str(), e.GetMessage().utf8_str());
-    }
-
-    if (!entity) {
-        entity = fake_;
-        // wxLogError("%%s: %%d not found", m_table_name.utf8_str(), id);
-    }
-
-    return entity;
-}
-''' % (self.class_name, self.class_name)
-
-        code += '''
-// Search the database for the data record, bypassing the cache.
-%s::Data* %s::get_id(const int64 id)
-{
-    if (id <= 0) {
-        ++m_skip;
-        return nullptr;
-    }
-
-    Data* entity = nullptr;
-    wxString where = wxString::Format(" WHERE %%s = ?", PRIMARY::name().utf8_str());
-    try {
-        wxSQLite3Statement stmt = m_db->PrepareStatement(this->m_query_select + where);
-        stmt.Bind(1, id);
-
-        wxSQLite3ResultSet q = stmt.ExecuteQuery();
-        if (q.NextRow()) {
-            entity = new Data(q);
-        }
-        stmt.Finalize();
-    }
-    catch (const wxSQLite3Exception &e) {
-        wxLogError("%%s: Exception %%s", m_table_name.utf8_str(), e.GetMessage().utf8_str());
-    }
-
-    if (!entity) {
-        entity = fake_;
-        // wxLogError("%%s: %%d not found", m_table_name.utf8_str(), id);
-    }
-
-    return entity;
-}
-''' % (self.class_name, self.class_name)
-
-        # }}}
-        # {{{ get_all
-
-        code += '''
-// Return a list of Data records (Data_Set) derived directly from the database.
-// The Data_Set is sorted based on the column number.
-const %s::Data_Set %s::get_all(const COLUMN col, const bool asc)
-{
-    Data_Set result;
-    try {
-        wxSQLite3ResultSet q = m_db->ExecuteQuery(col == COLUMN(0) ? this->m_query_select
-            : this->m_query_select + " ORDER BY " + column_to_name(col) + " COLLATE NOCASE " + (asc ? " ASC " : " DESC ")
-        );
-
-        while(q.NextRow()) {
-            Data entity(q);
-            result.push_back(std::move(entity));
-        }
-
-        q.Finalize();
-    }
-    catch(const wxSQLite3Exception &e) {
-        wxLogError("%%s: Exception %%s", m_table_name.utf8_str(), e.GetMessage().utf8_str());
-    }
-
-    return result;
-}
-''' % (self.class_name, self.class_name)
-
-        # }}}
 
         file_name = self.file_basename + '.cpp'
-        print ('Generate %s (source code for %s)' % (file_name, self.table_name))
+        print ('Generate %s (source code for %s)' % (file_name, dt))
         rfp = codecs.open(file_name, 'w', 'utf-8-sig')
-        rfp.write(header)
+        rfp.write(header
+            .replace('@file', file_name)
+            .replace('@brief', 'Implementation of the interface to database table %s' % dt)
+        )
         rfp.write(code)
         rfp.close()
 
@@ -1071,7 +819,10 @@ const %s::Data_Set %s::get_all(const COLUMN col, const bool asc)
             if not only_unicode or not is_ascii(values):
                 code += '''
 INSERT OR IGNORE INTO %s (CURRENCYNAME, CURRENCY_SYMBOL) VALUES ('%s', '%s');
-UPDATE OR IGNORE %s SET %s WHERE CURRENCY_SYMBOL='%s';''' % (self.table_name, row['CURRENCYNAME'].replace('_tr_', ''), row['CURRENCY_SYMBOL'], self.table_name, values, row['CURRENCY_SYMBOL'])
+UPDATE OR IGNORE %s SET %s WHERE CURRENCY_SYMBOL='%s';''' % (
+    self.table_name, row['CURRENCYNAME'].replace('_tr_', ''), row['CURRENCY_SYMBOL'],
+    self.table_name, values, row['CURRENCY_SYMBOL']
+)
 
         code += '''
 '''
@@ -1098,9 +849,9 @@ if __name__ == '__main__':
  *
  *      @file
  *
- *      @author [%s]
- *
  *      @brief
+ *
+ *      @author [%s]
  *
  *      Revision History:
  *          AUTO GENERATED at %s.

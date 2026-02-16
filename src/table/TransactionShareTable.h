@@ -6,243 +6,187 @@
  *      Copyright: (c) 2022      Mark Whalley (mark@ipx.co.uk)
  *      Copyright: (c) 2026      George Ef (george.a.ef@gmail.com)
  *
- *      @file
+ *      TransactionShareTable.h
+ *
+ *      Interface to database table SHAREINFO_V1
  *
  *      @author [sqlite2cpp.py]
  *
- *      @brief
- *
  *      Revision History:
- *          AUTO GENERATED at 2026-02-15 02:44:45.846505.
+ *          AUTO GENERATED at 2026-02-16 15:07:22.405413.
  *          DO NOT EDIT!
  */
 //=============================================================================
 
 #pragma once
 
-#include "_TableBase.h"
+#include "_TableFactory.h"
 
-struct TransactionShareTable : public TableBase
+// Columns in database table SHAREINFO_V1
+struct TransactionShareCol
 {
-    struct Data;
-
-    enum COLUMN
+    enum COL_ID
     {
-        COL_SHAREINFOID = 0,
-        COL_CHECKINGACCOUNTID,
-        COL_SHARENUMBER,
-        COL_SHAREPRICE,
-        COL_SHARECOMMISSION,
-        COL_SHARELOT,
-        COL_size
+        COL_ID_SHAREINFOID = 0,
+        COL_ID_CHECKINGACCOUNTID,
+        COL_ID_SHARENUMBER,
+        COL_ID_SHAREPRICE,
+        COL_ID_SHARECOMMISSION,
+        COL_ID_SHARELOT,
+        COL_ID_size
     };
+
+    static const wxArrayString COL_NAME_A;
+    static const COL_ID PRIMARY_ID;
+    static const wxString PRIMARY_NAME;
+
+    static wxString col_name(COL_ID col_id) { return COL_NAME_A[col_id]; }
 
     struct SHAREINFOID : public TableOpV<int64>
     {
-        static wxString name() { return "SHAREINFOID"; }
+        static COL_ID col_id() { return COL_ID_SHAREINFOID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SHAREINFOID]; }
         explicit SHAREINFOID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit SHAREINFOID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct CHECKINGACCOUNTID : public TableOpV<int64>
     {
-        static wxString name() { return "CHECKINGACCOUNTID"; }
+        static COL_ID col_id() { return COL_ID_CHECKINGACCOUNTID; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_CHECKINGACCOUNTID]; }
         explicit CHECKINGACCOUNTID(const int64 &v): TableOpV<int64>(OP_EQ, v) {}
         explicit CHECKINGACCOUNTID(OP op, const int64 &v): TableOpV<int64>(op, v) {}
     };
 
     struct SHARENUMBER : public TableOpV<double>
     {
-        static wxString name() { return "SHARENUMBER"; }
+        static COL_ID col_id() { return COL_ID_SHARENUMBER; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SHARENUMBER]; }
         explicit SHARENUMBER(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit SHARENUMBER(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct SHAREPRICE : public TableOpV<double>
     {
-        static wxString name() { return "SHAREPRICE"; }
+        static COL_ID col_id() { return COL_ID_SHAREPRICE; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SHAREPRICE]; }
         explicit SHAREPRICE(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit SHAREPRICE(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct SHARECOMMISSION : public TableOpV<double>
     {
-        static wxString name() { return "SHARECOMMISSION"; }
+        static COL_ID col_id() { return COL_ID_SHARECOMMISSION; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SHARECOMMISSION]; }
         explicit SHARECOMMISSION(const double &v): TableOpV<double>(OP_EQ, v) {}
         explicit SHARECOMMISSION(OP op, const double &v): TableOpV<double>(op, v) {}
     };
 
     struct SHARELOT : public TableOpV<wxString>
     {
-        static wxString name() { return "SHARELOT"; }
+        static COL_ID col_id() { return COL_ID_SHARELOT; }
+        static wxString col_name() { return COL_NAME_A[COL_ID_SHARELOT]; }
         explicit SHARELOT(const wxString &v): TableOpV<wxString>(OP_EQ, v) {}
         explicit SHARELOT(OP op, const wxString &v): TableOpV<wxString>(op, v) {}
     };
+};
 
-    typedef SHAREINFOID PRIMARY;
+// A single record in database table SHAREINFO_V1
+struct TransactionShareRow
+{
+    using Col = TransactionShareCol;
+    using COL_ID = Col::COL_ID;
 
-    // Data is a single record in the database table
-    struct Data
-    {
-        int64 SHAREINFOID; // primary key
-        int64 CHECKINGACCOUNTID;
-        double SHARENUMBER;
-        double SHAREPRICE;
-        double SHARECOMMISSION;
-        wxString SHARELOT;
+    int64 SHAREINFOID; // primary key
+    int64 CHECKINGACCOUNTID;
+    double SHARENUMBER;
+    double SHAREPRICE;
+    double SHARECOMMISSION;
+    wxString SHARELOT;
 
-        explicit Data();
-        explicit Data(wxSQLite3ResultSet& q);
-        Data(const Data& other) = default;
+    explicit TransactionShareRow();
+    explicit TransactionShareRow(wxSQLite3ResultSet& q);
+    TransactionShareRow(const TransactionShareRow& other) = default;
 
-        int64 id() const { return SHAREINFOID; }
-        void id(const int64 id) { SHAREINFOID = id; }
-        bool equals(const Data* r) const;
-        wxString to_json() const;
-        void as_json(PrettyWriter<StringBuffer>& json_writer) const;
-        row_t to_row_t() const;
-        void to_template(html_template& t) const;
-        void destroy();
+    int64 id() const { return SHAREINFOID; }
+    void id(const int64 id) { SHAREINFOID = id; }
+    void destroy() { delete this; }
 
-        Data& operator=(const Data& other);
+    bool equals(const TransactionShareRow* r) const;
+    void to_insert_stmt(wxSQLite3Statement& stmt, int64 id) const;
+    void from_select_result(wxSQLite3ResultSet& q);
+    wxString to_json() const;
+    void as_json(PrettyWriter<StringBuffer>& json_writer) const;
+    row_t to_row_t() const;
+    void to_template(html_template& t) const;
 
-        auto operator < (const Data& other) const
-        {
-            return id() < other.id();
-        }
-
-        auto operator < (const Data* other) const
-        {
-            return id() < other->id();
-        }
-    };
-
-    // A container to hold list of Data records for the table
-    struct Data_Set : public std::vector<Data>
-    {
-        wxString to_json() const;
-    };
-
-    static wxString column_to_name(const COLUMN col);
-    static COLUMN name_to_column(const wxString& name);
+    TransactionShareRow& operator=(const TransactionShareRow& other);
+    bool operator< (const TransactionShareRow& other) const { return id() < other.id(); }
+    bool operator< (const TransactionShareRow* other) const { return id() < other->id(); }
 
     template<typename C>
-    static bool match(const Data* r, const C&)
+    bool match(const C&)
     {
         return false;
     }
 
-    static bool match(const Data* data, const SHAREINFOID& op)
+    // TODO: check if col.m_operator == OP_EQ
+
+    bool match(const Col::SHAREINFOID& col)
     {
-        return data->SHAREINFOID == op.m_value;
+        return SHAREINFOID == col.m_value;
     }
 
-    static bool match(const Data* data, const CHECKINGACCOUNTID& op)
+    bool match(const Col::CHECKINGACCOUNTID& col)
     {
-        return data->CHECKINGACCOUNTID == op.m_value;
+        return CHECKINGACCOUNTID == col.m_value;
     }
 
-    static bool match(const Data* data, const SHARENUMBER& op)
+    bool match(const Col::SHARENUMBER& col)
     {
-        return data->SHARENUMBER == op.m_value;
+        return SHARENUMBER == col.m_value;
     }
 
-    static bool match(const Data* data, const SHAREPRICE& op)
+    bool match(const Col::SHAREPRICE& col)
     {
-        return data->SHAREPRICE == op.m_value;
+        return SHAREPRICE == col.m_value;
     }
 
-    static bool match(const Data* data, const SHARECOMMISSION& op)
+    bool match(const Col::SHARECOMMISSION& col)
     {
-        return data->SHARECOMMISSION == op.m_value;
+        return SHARECOMMISSION == col.m_value;
     }
 
-    static bool match(const Data* data, const SHARELOT& op)
+    bool match(const Col::SHARELOT& col)
     {
-        return data->SHARELOT.CmpNoCase(op.m_value) == 0;
+        return SHARELOT.CmpNoCase(col.m_value) == 0;
     }
 
     template<typename Arg1, typename... Args>
-    static bool match(const Data* data, const Arg1& arg1, const Args&... args)
+    bool match(const Arg1& arg1, const Args&... args)
     {
-        return (match(data, arg1) && ... && match(data, args));
+        return (match(arg1) && ... && match(args));
     }
-
-    // TODO: in the above match() functions, check if op.m_operator == OP_EQ
-
-    // A container to hold a list of Data record pointers for the table in memory
-    typedef std::vector<Data*> Cache;
-    typedef std::map<int64, Data*> CacheIndex;
-    Cache m_cache;
-    CacheIndex m_cache_index;
-    Data* fake_; // in case the entity not found
-
-    TransactionShareTable();
-    ~TransactionShareTable();
-
-    size_t num_columns() const { return COL_size; }
-    void destroy_cache();
-    bool ensure_table();
-    bool ensure_index();
-    void ensure_data();
-    Data* create();
-    Data* clone(const Data* e);
-    bool save(Data* entity);
-    bool remove(const int64 id);
-    bool remove(Data* entity);
-
-    template<typename... Args>
-    Data* search_cache(const Args& ... args)
-    {
-        for (auto& [_, item] : m_cache_index) {
-            if (item->id() > 0 && TransactionShareTable::match(item, args...)) {
-                ++m_hit;
-                return item;
-            }
-        }
-        ++m_miss;
-        return 0;
-    }
-
-    Data* cache_id(const int64 id);
-    Data* get_id(const int64 id);
-    const Data_Set get_all(const COLUMN col = COLUMN(0), const bool asc = true);
-
-    struct SorterByCHECKINGACCOUNTID
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.CHECKINGACCOUNTID < y.CHECKINGACCOUNTID;
-        }
-    };
-
-    struct SorterBySHARECOMMISSION
-    {
-        bool operator()(const Data& x, const Data& y)
-        {
-            return x.SHARECOMMISSION < y.SHARECOMMISSION;
-        }
-    };
 
     struct SorterBySHAREINFOID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TransactionShareRow& x, const TransactionShareRow& y)
         {
             return x.SHAREINFOID < y.SHAREINFOID;
         }
     };
 
-    struct SorterBySHARELOT
+    struct SorterByCHECKINGACCOUNTID
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TransactionShareRow& x, const TransactionShareRow& y)
         {
-            return x.SHARELOT < y.SHARELOT;
+            return x.CHECKINGACCOUNTID < y.CHECKINGACCOUNTID;
         }
     };
 
     struct SorterBySHARENUMBER
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TransactionShareRow& x, const TransactionShareRow& y)
         {
             return x.SHARENUMBER < y.SHARENUMBER;
         }
@@ -250,9 +194,42 @@ struct TransactionShareTable : public TableBase
 
     struct SorterBySHAREPRICE
     {
-        bool operator()(const Data& x, const Data& y)
+        bool operator()(const TransactionShareRow& x, const TransactionShareRow& y)
         {
             return x.SHAREPRICE < y.SHAREPRICE;
         }
     };
+
+    struct SorterBySHARECOMMISSION
+    {
+        bool operator()(const TransactionShareRow& x, const TransactionShareRow& y)
+        {
+            return x.SHARECOMMISSION < y.SHARECOMMISSION;
+        }
+    };
+
+    struct SorterBySHARELOT
+    {
+        bool operator()(const TransactionShareRow& x, const TransactionShareRow& y)
+        {
+            return x.SHARELOT < y.SHARELOT;
+        }
+    };
+};
+
+// Interface to database table SHAREINFO_V1
+struct TransactionShareTable : public TableFactory<TransactionShareRow>
+{
+    // Use Col::(COLUMN_NAME) until model provides similar functionality based on Data.
+    using SHAREINFOID = Col::SHAREINFOID;
+    using CHECKINGACCOUNTID = Col::CHECKINGACCOUNTID;
+    using SHARENUMBER = Col::SHARENUMBER;
+    using SHAREPRICE = Col::SHAREPRICE;
+    using SHARECOMMISSION = Col::SHARECOMMISSION;
+    using SHARELOT = Col::SHARELOT;
+
+    TransactionShareTable();
+    ~TransactionShareTable();
+
+    void ensure_data() override;
 };
