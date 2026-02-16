@@ -41,7 +41,7 @@ void TableFactory<RowType>::destroy_cache()
 
 // Create a new Row record and add to memory table (cache)
 template<typename RowType>
-TableFactory<RowType>::Row* TableFactory<RowType>::create()
+typename TableFactory<RowType>::Row* TableFactory<RowType>::create()
 {
     Row* r = new Row();
     m_cache.push_back(r);
