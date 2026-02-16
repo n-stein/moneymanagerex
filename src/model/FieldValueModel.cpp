@@ -55,7 +55,7 @@ FieldValueModel::Data* FieldValueModel::cache_key(int64 FieldID, int64 RefID)
 {
     FieldValueModel::Data_Set items = this->find(FIELDID(FieldID), REFID(RefID));
     if (!items.empty())
-        return this->cache_id(items[0].FIELDATADID);
+        return this->get_id(items[0].FIELDATADID);
     return nullptr;
 }
 

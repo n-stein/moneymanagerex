@@ -245,16 +245,16 @@ void TransactionDialog::dataToControls()
     //Account
     if (!skip_account_init_)
     {
-        AccountModel::Data* acc = AccountModel::instance().cache_id(m_journal_data.ACCOUNTID);
+        AccountModel::Data* acc = AccountModel::instance().get_id(m_journal_data.ACCOUNTID);
         if (acc)
         {
             cbAccount_->ChangeValue(acc->ACCOUNTNAME);
-            m_textAmount->SetCurrency(CurrencyModel::instance().cache_id(acc->CURRENCYID));
+            m_textAmount->SetCurrency(CurrencyModel::instance().get_id(acc->CURRENCYID));
         }
-        AccountModel::Data* to_acc = AccountModel::instance().cache_id(m_journal_data.TOACCOUNTID);
+        AccountModel::Data* to_acc = AccountModel::instance().get_id(m_journal_data.TOACCOUNTID);
         if (to_acc) {
             cbToAccount_->ChangeValue(to_acc->ACCOUNTNAME);
-            toTextAmount_->SetCurrency(CurrencyModel::instance().cache_id(to_acc->CURRENCYID));
+            toTextAmount_->SetCurrency(CurrencyModel::instance().get_id(to_acc->CURRENCYID));
         }
 
         skip_account_init_ = true;
@@ -315,7 +315,7 @@ void TransactionDialog::dataToControls()
                     TransactionModel::ACCOUNTID(OP_EQ, accountID));
 
                 if (!transactions.empty()) {
-                    PayeeModel::Data* payee = PayeeModel::instance().cache_id(transactions.back().PAYEEID);
+                    PayeeModel::Data* payee = PayeeModel::instance().get_id(transactions.back().PAYEEID);
                     cbPayee_->ChangeValue(payee->PAYEENAME);
                 }
             }
@@ -335,7 +335,7 @@ void TransactionDialog::dataToControls()
             }
             else
             {
-                PayeeModel::Data* payee = PayeeModel::instance().cache_id(m_journal_data.PAYEEID);
+                PayeeModel::Data* payee = PayeeModel::instance().get_id(m_journal_data.PAYEEID);
                 if (payee)
                     cbPayee_->ChangeValue(payee->PAYEENAME);
             }
@@ -696,7 +696,7 @@ bool TransactionDialog::ValidateData()
         return false;
     }
     m_journal_data.ACCOUNTID = cbAccount_->mmGetId();
-    const AccountModel::Data* account = AccountModel::instance().cache_id(m_journal_data.ACCOUNTID);
+    const AccountModel::Data* account = AccountModel::instance().get_id(m_journal_data.ACCOUNTID);
 
     if (m_journal_data.TRANSDATE < account->INITIALDATE)
     {
@@ -915,7 +915,7 @@ void TransactionDialog::OnFocusChange(wxChildFocusEvent& event)
     }
     else
     {
-        const AccountModel::Data* to_account = AccountModel::instance().cache_id(cbToAccount_->mmGetId());
+        const AccountModel::Data* to_account = AccountModel::instance().get_id(cbToAccount_->mmGetId());
         if (to_account)
             m_journal_data.TOACCOUNTID = to_account->ACCOUNTID;
     }
@@ -981,7 +981,7 @@ void TransactionDialog::OnComboKey(wxKeyEvent& event)
                 if (dlg.getRefreshRequested())
                     cbPayee_->mmDoReInitialize();
                 int64 payee_id = dlg.getPayeeId();
-                PayeeModel::Data* payee = PayeeModel::instance().cache_id(payee_id);
+                PayeeModel::Data* payee = PayeeModel::instance().get_id(payee_id);
                 if (payee) {
                     cbPayee_->ChangeValue(payee->PAYEENAME);
                     cbPayee_->SetInsertionPointEnd();
@@ -1058,7 +1058,7 @@ void TransactionDialog::SetCategoryForPayee(const PayeeModel::Data *payee)
         && (!CategoryModel::is_hidden(payee->CATEGID)))
     {
         // if payee has memory of last category used then display last category for payee
-        CategoryModel::Data *category = CategoryModel::instance().cache_id(payee->CATEGID);
+        CategoryModel::Data *category = CategoryModel::instance().get_id(payee->CATEGID);
         if (category)
         {
             m_journal_data.CATEGID = payee->CATEGID;
@@ -1242,8 +1242,8 @@ void TransactionDialog::OnOk(wxCommandEvent& event)
     if (!m_advanced)
         m_journal_data.TOTRANSAMOUNT = m_journal_data.TRANSAMOUNT;
 
-    if (m_transfer && !m_advanced && (AccountModel::currency(AccountModel::instance().cache_id(m_journal_data.ACCOUNTID))
-        != AccountModel::currency(AccountModel::instance().cache_id(m_journal_data.TOACCOUNTID))))
+    if (m_transfer && !m_advanced && (AccountModel::currency(AccountModel::instance().get_id(m_journal_data.ACCOUNTID))
+        != AccountModel::currency(AccountModel::instance().get_id(m_journal_data.TOACCOUNTID))))
     {
         wxMessageDialog msgDlg( this
             , _t("The two accounts have different currencies, but no advanced transaction is defined. Is this correct?")
@@ -1254,7 +1254,7 @@ void TransactionDialog::OnOk(wxCommandEvent& event)
     }
 
     TransactionModel::Data *r = (m_mode == MODE_EDIT) ?
-        TransactionModel::instance().cache_id(m_journal_data.TRANSID) :
+        TransactionModel::instance().get_id(m_journal_data.TRANSID) :
         TransactionModel::instance().create();
 
     TransactionModel::putDataToTransaction(r, m_journal_data);
@@ -1350,7 +1350,7 @@ void TransactionDialog::SetTooltips()
         mmToolTip(bSplit_, _t("Use split Categories"));
     else {
         const CurrencyModel::Data* currency = CurrencyModel::GetBaseCurrency();
-        const AccountModel::Data* account = AccountModel::instance().cache_id(m_journal_data.ACCOUNTID);
+        const AccountModel::Data* account = AccountModel::instance().get_id(m_journal_data.ACCOUNTID);
         if (account)
             currency = AccountModel::currency(account);
 

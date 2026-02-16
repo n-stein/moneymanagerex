@@ -477,9 +477,9 @@ wxString ScheduledPanel::getItem(long item, int col_id)
             }
             else
                 return value;
-            AccountModel::Data* account = AccountModel::instance().cache_id(accountid);
+            AccountModel::Data* account = AccountModel::instance().get_id(accountid);
             CurrencyModel::Data* currency = account ?
-                CurrencyModel::instance().cache_id(account->CURRENCYID) : nullptr;
+                CurrencyModel::instance().get_id(account->CURRENCYID) : nullptr;
             if (currency)
                 value = CurrencyModel::toCurrency(transamount, currency);
             if (!value.IsEmpty() && TransactionModel::status_id(bill.STATUS) == TransactionModel::STATUS_ID_VOID)
@@ -499,9 +499,9 @@ wxString ScheduledPanel::getItem(long item, int col_id)
             }
             else
                 return value;
-            AccountModel::Data* account = AccountModel::instance().cache_id(accountid);
+            AccountModel::Data* account = AccountModel::instance().get_id(accountid);
             CurrencyModel::Data* currency = account ?
-                CurrencyModel::instance().cache_id(account->CURRENCYID) : nullptr;
+                CurrencyModel::instance().get_id(account->CURRENCYID) : nullptr;
             if (currency)
                 value = CurrencyModel::toCurrency(transamount, currency);
             if (!value.IsEmpty() && TransactionModel::status_id(bill.STATUS) == TransactionModel::STATUS_ID_VOID)
@@ -945,7 +945,7 @@ void ScheduledList::OnSetUserColour(wxCommandEvent& event)
 
     ScheduledModel::instance().Savepoint();
 
-    ScheduledModel::Data* item = ScheduledModel::instance().cache_id(id);
+    ScheduledModel::Data* item = ScheduledModel::instance().get_id(id);
     if (item)
     {
         item->COLOR = user_color_id;

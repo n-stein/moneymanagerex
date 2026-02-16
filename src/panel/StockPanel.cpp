@@ -66,7 +66,7 @@ bool StockPanel::Create(wxWindow *parent
     strLastUpdate_ = InfoModel::instance().getString("STOCKS_LAST_REFRESH_DATETIME", "");
     this->windowsFreezeThaw();
 
-    AccountModel::Data *account = AccountModel::instance().cache_id(m_account_id);
+    AccountModel::Data *account = AccountModel::instance().get_id(m_account_id);
     if (account)
         m_currency = AccountModel::currency(account);
     else
@@ -287,7 +287,7 @@ void StockPanel::LoadStockTransactions(wxListCtrl* listCtrl, wxString symbol, in
     }
 
     for (const auto& trans : stock_list) {
-        auto* checking_entry = TransactionModel::instance().cache_id(trans.CHECKINGACCOUNTID);
+        auto* checking_entry = TransactionModel::instance().get_id(trans.CHECKINGACCOUNTID);
         if (checking_entry && checking_entry->DELETEDTIME.IsEmpty()) {
             checking_list.push_back(*checking_entry);
         }
@@ -327,7 +327,7 @@ void StockPanel::BindListEvents(wxListCtrl* listCtrl)
 {
     listCtrl->Bind(wxEVT_LIST_ITEM_ACTIVATED, [listCtrl, this](wxListEvent& event) {
         long index = event.GetIndex();
-        auto* txn = TransactionModel::instance().cache_id(event.GetData());
+        auto* txn = TransactionModel::instance().get_id(event.GetData());
         if (!txn) return;
 
         auto link = TransactionLinkModel::TranslinkRecord(txn->TRANSID);
@@ -342,8 +342,8 @@ void StockPanel::BindListEvents(wxListCtrl* listCtrl)
 
         // Re-sort the list
         listCtrl->SortItems([](wxIntPtr item1, wxIntPtr item2, wxIntPtr) -> int {
-            auto date1 = TransactionModel::getTransDateTime(TransactionModel::instance().cache_id(item1));
-            auto date2 = TransactionModel::getTransDateTime(TransactionModel::instance().cache_id(item2));
+            auto date1 = TransactionModel::getTransDateTime(TransactionModel::instance().get_id(item1));
+            auto date2 = TransactionModel::getTransDateTime(TransactionModel::instance().get_id(item2));
             return date1.IsEarlierThan(date2) ? -1 : (date1.IsLaterThan(date2) ? 1 : 0);
         }, 0);
     });
@@ -389,7 +389,7 @@ wxString StockPanel::GetPanelTitle(const AccountModel::Data& account) const
 
 wxString StockPanel::BuildPage() const
 {
-    const AccountModel::Data* account = AccountModel::instance().cache_id(m_account_id);
+    const AccountModel::Data* account = AccountModel::instance().get_id(m_account_id);
     return m_lc->BuildPage((account ? GetPanelTitle(*account) : ""));
 }
 
@@ -416,7 +416,7 @@ void StockPanel::updateHeader()
     wxString lbl;
 
     if (m_account_id > -1) {
-        const AccountModel::Data* account = AccountModel::instance().cache_id(m_account_id);
+        const AccountModel::Data* account = AccountModel::instance().get_id(m_account_id);
         if (account) {
             header_text_->SetLabelText(GetPanelTitle(*account));
             cashBalance = AccountModel::balance(account);
@@ -683,7 +683,7 @@ void StockPanel::DisplayAccountDetails(int64 accountID)
     m_account_id = accountID;
 
     if (m_account_id > -1){
-        AccountModel::Data* account = AccountModel::instance().cache_id(m_account_id);
+        AccountModel::Data* account = AccountModel::instance().get_id(m_account_id);
         m_currency = AccountModel::currency(account);
     }
 

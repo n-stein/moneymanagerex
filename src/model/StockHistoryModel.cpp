@@ -58,7 +58,7 @@ StockHistoryModel::Data* StockHistoryModel::cache_key(const wxString& symbol, co
 
     Data_Set items = this->find(SYMBOL(symbol), StockHistoryTable::DATE(date.FormatISODate()));
     if (!items.empty())
-        hist = this->cache_id(items[0].id());
+        hist = this->get_id(items[0].id());
     return hist;
 }
 

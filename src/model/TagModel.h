@@ -28,7 +28,7 @@ public:
     TagModel();
     ~TagModel();
 
-    using Model<TagTable>::cache_id;
+    using Model<TagTable>::get_id;
 
 public:
     /**

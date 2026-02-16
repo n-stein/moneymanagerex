@@ -64,7 +64,7 @@ TransactionShareModel::Data* TransactionShareModel::ShareEntry(const int64 check
     Data_Set list = TransactionShareModel::ShareList(checking_id);
     if (!list.empty())
     {
-        return TransactionShareModel::instance().cache_id(list.at(0).SHAREINFOID);
+        return TransactionShareModel::instance().get_id(list.at(0).SHAREINFOID);
     }
     return nullptr;
 }

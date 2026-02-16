@@ -52,16 +52,16 @@ const wxString mmExportTransaction::getTransactionCSV(const TransactionModel::Fu
     wxString notes = (full_tran.NOTES);
     wxString payee = full_tran.PAYEENAME;
 
-    const auto acc_in = AccountModel::instance().cache_id(full_tran.ACCOUNTID);
-    const auto curr_in = CurrencyModel::instance().cache_id(acc_in->CURRENCYID);
+    const auto acc_in = AccountModel::instance().get_id(full_tran.ACCOUNTID);
+    const auto curr_in = CurrencyModel::instance().get_id(acc_in->CURRENCYID);
     wxString account = acc_in->ACCOUNTNAME;
     wxString currency = curr_in->CURRENCY_SYMBOL;
 
     if (is_transfer)
     {
         account_id = reverce ? full_tran.ACCOUNTID : full_tran.TOACCOUNTID;
-        const auto acc_to = AccountModel::instance().cache_id(full_tran.TOACCOUNTID);
-        const auto curr_to = CurrencyModel::instance().cache_id(acc_to->CURRENCYID);
+        const auto acc_to = AccountModel::instance().get_id(full_tran.TOACCOUNTID);
+        const auto curr_to = CurrencyModel::instance().get_id(acc_to->CURRENCYID);
 
         payee = reverce ? acc_to->ACCOUNTNAME : acc_in->ACCOUNTNAME;
         account = reverce ? acc_in->ACCOUNTNAME : acc_to->ACCOUNTNAME;
@@ -142,10 +142,10 @@ const wxString mmExportTransaction::getTransactionQIF(const TransactionModel::Fu
 
     if (transfer)
     {
-        const auto acc_in = AccountModel::instance().cache_id(full_tran.ACCOUNTID);
-        const auto acc_to = AccountModel::instance().cache_id(full_tran.TOACCOUNTID);
-        const auto curr_in = CurrencyModel::instance().cache_id(acc_in->CURRENCYID);
-        const auto curr_to = CurrencyModel::instance().cache_id(acc_to->CURRENCYID);
+        const auto acc_in = AccountModel::instance().get_id(full_tran.ACCOUNTID);
+        const auto acc_to = AccountModel::instance().get_id(full_tran.TOACCOUNTID);
+        const auto curr_in = CurrencyModel::instance().get_id(acc_in->CURRENCYID);
+        const auto curr_to = CurrencyModel::instance().get_id(acc_to->CURRENCYID);
 
         categ = "[" + (reverce ? full_tran.ACCOUNTNAME : full_tran.TOACCOUNTNAME) + "]";
         payee = wxString::Format("%s %s %s -> %s %s %s"
@@ -164,7 +164,7 @@ const wxString mmExportTransaction::getTransactionQIF(const TransactionModel::Fu
         categ.Append("/");
         auto numTags = full_tran.m_tags.size();
         for (decltype(numTags) i = 0; i < numTags; i++)
-            categ.Append((i > 0 ? ":" : "") + TagModel::instance().cache_id(full_tran.m_tags[i].TAGID)->TAGNAME);
+            categ.Append((i > 0 ? ":" : "") + TagModel::instance().get_id(full_tran.m_tags[i].TAGID)->TAGNAME);
     }
 
     buffer << "D" << mmGetDateTimeForDisplay(full_tran.TRANSDATE, dateMask) << "\n";
@@ -202,7 +202,7 @@ const wxString mmExportTransaction::getTransactionQIF(const TransactionModel::Fu
             auto numTags = splitTags.size();
             for (decltype(numTags) i = 0; i < numTags; i++)
             {
-                split_categ.Append((i > 0 ? ":" : "") + TagModel::instance().cache_id(splitTags[i].TAGID)->TAGNAME);
+                split_categ.Append((i > 0 ? ":" : "") + TagModel::instance().get_id(splitTags[i].TAGID)->TAGNAME);
             }
         }
         buffer << "S" << split_categ << "\n"
@@ -224,11 +224,11 @@ const wxString mmExportTransaction::getAccountHeaderQIF(int64 accountID)
 {
     wxString buffer = "";
     wxString currency_symbol = CurrencyModel::GetBaseCurrency()->CURRENCY_SYMBOL;
-    AccountModel::Data *account = AccountModel::instance().cache_id(accountID);
+    AccountModel::Data *account = AccountModel::instance().get_id(accountID);
     if (account)
     {
         double dInitBalance = account->INITIALBAL;
-        CurrencyModel::Data *currency = CurrencyModel::instance().cache_id(account->CURRENCYID);
+        CurrencyModel::Data *currency = CurrencyModel::instance().get_id(account->CURRENCYID);
         if (currency)
         {
             currency_symbol = currency->CURRENCY_SYMBOL;
@@ -314,8 +314,8 @@ void mmExportTransaction::getAccountsJSON(PrettyWriter<StringBuffer>& json_write
     json_writer.StartArray();
     for (const auto &entry : allAccounts4Export)
     {
-        AccountModel::Data* a = AccountModel::instance().cache_id(entry.first);
-        const auto c = CurrencyModel::instance().cache_id(a->CURRENCYID);
+        AccountModel::Data* a = AccountModel::instance().get_id(entry.first);
+        const auto c = CurrencyModel::instance().get_id(a->CURRENCYID);
         json_writer.StartObject();
         json_writer.Key("ID");
         json_writer.Int64(a->ACCOUNTID.GetValue());
@@ -339,7 +339,7 @@ void mmExportTransaction::getPayeesJSON(PrettyWriter<StringBuffer>& json_writer,
         json_writer.Key("PAYEES");
         json_writer.StartArray();
         for (const auto& entry : allPayeess4Export) {
-            PayeeModel::Data* p = PayeeModel::instance().cache_id(entry);
+            PayeeModel::Data* p = PayeeModel::instance().get_id(entry);
             if (p) {
                 json_writer.StartObject();
                 json_writer.Key("ID");
@@ -377,7 +377,7 @@ void mmExportTransaction::getTagsJSON(PrettyWriter<StringBuffer>& json_writer, w
     json_writer.StartArray();
     for (const auto& tagID : allTags4Export)
     {
-        TagModel::Data* tag = TagModel::instance().cache_id(tagID);
+        TagModel::Data* tag = TagModel::instance().get_id(tagID);
         if (tag)
         {
             json_writer.StartObject();

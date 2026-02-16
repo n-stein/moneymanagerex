@@ -218,7 +218,7 @@ void htmlWidgetTop7Categories::getTopCategoryStats(
             continue;
 
         bool withdrawal = TransactionModel::type_id(trx) == TransactionModel::TYPE_ID_WITHDRAWAL;
-        double convRate = CurrencyHistoryModel::getDayRate(AccountModel::instance().cache_id(trx.ACCOUNTID)->CURRENCYID, trx.TRANSDATE);
+        double convRate = CurrencyHistoryModel::getDayRate(AccountModel::instance().get_id(trx.ACCOUNTID)->CURRENCYID, trx.TRANSDATE);
 
         if (const auto it = split.find(trx.TRANSID); it == split.end())
         {
@@ -312,19 +312,19 @@ const wxString htmlWidgetBillsAndDeposits::getHTMLText()
             daysRemainingStr = "*" + wxString::Format(wxPLURAL("%d day overdue", "%d days overdue", std::abs(daysOverdue)), std::abs(daysOverdue));
 
         wxString accountStr = "";
-        const auto *account = AccountModel::instance().cache_id(entry.ACCOUNTID);
+        const auto *account = AccountModel::instance().get_id(entry.ACCOUNTID);
         if (account) accountStr = account->ACCOUNTNAME;
 
         wxString payeeStr = "";
         if (ScheduledModel::type_id(entry) == TransactionModel::TYPE_ID_TRANSFER)
         {
-            const AccountModel::Data *to_account = AccountModel::instance().cache_id(entry.TOACCOUNTID);
+            const AccountModel::Data *to_account = AccountModel::instance().get_id(entry.TOACCOUNTID);
             if (to_account) payeeStr = to_account->ACCOUNTNAME;
             payeeStr += " &larr; " + accountStr;
         }
         else
         {
-            const PayeeModel::Data* payee = PayeeModel::instance().cache_id(entry.PAYEEID);
+            const PayeeModel::Data* payee = PayeeModel::instance().get_id(entry.PAYEEID);
             payeeStr = accountStr;
             payeeStr += (ScheduledModel::type_id(entry) == TransactionModel::TYPE_ID_WITHDRAWAL ? " &rarr; " : " &larr; ");
             if (payee) payeeStr += payee->PAYEENAME;
@@ -400,7 +400,7 @@ const wxString htmlWidgetIncomeVsExpenses::getHTMLText()
         if (TransactionModel::foreignTransactionAsTransfer(pBankTransaction) || !pBankTransaction.DELETEDTIME.IsEmpty())
             continue;
 
-        double convRate = CurrencyHistoryModel::getDayRate(AccountModel::instance().cache_id(pBankTransaction.ACCOUNTID)->CURRENCYID, pBankTransaction.TRANSDATE);
+        double convRate = CurrencyHistoryModel::getDayRate(AccountModel::instance().get_id(pBankTransaction.ACCOUNTID)->CURRENCYID, pBankTransaction.TRANSDATE);
 
         int64 idx = pBankTransaction.ACCOUNTID;
         if (TransactionModel::type_id(pBankTransaction) == TransactionModel::TYPE_ID_DEPOSIT)

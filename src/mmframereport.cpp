@@ -268,7 +268,7 @@ void mmGUIFrame::DoUpdateGRMNavigation(wxTreeItemId& parent_item)
             m_nav_tree_ctrl->SetItemData(group, new mmTreeItemData(new mmGeneralGroupReport(record.GROUPNAME), record.GROUPNAME));
             group_name = record.GROUPNAME;
         }
-        ReportModel::Data* r = ReportModel::instance().cache_id(record.REPORTID);
+        ReportModel::Data* r = ReportModel::instance().get_id(record.REPORTID);
         wxTreeItemId item = m_nav_tree_ctrl->AppendItem(no_group ? parent_item : group, wxGetTranslation(record.REPORTNAME), img::CUSTOMSQL_PNG, img::CUSTOMSQL_PNG);
         m_nav_tree_ctrl->SetItemData(item, new mmTreeItemData(new mmGeneralReport(r), r->REPORTNAME));
     }

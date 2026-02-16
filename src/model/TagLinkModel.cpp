@@ -58,7 +58,7 @@ TagLinkModel::Data* TagLinkModel::cache_key(const wxString& refType, int64 refId
 
     Data_Set items = this->find(REFTYPE(refType), REFID(refId), TAGID(tagId));
     if (!items.empty())
-        link = this->cache_id(items[0].TAGLINKID);
+        link = this->get_id(items[0].TAGLINKID);
     return link;
 }
 
@@ -66,7 +66,7 @@ std::map<wxString, int64> TagLinkModel::cache_ref(const wxString& refType, int64
 {
     std::map<wxString, int64> tags;
     for (const auto& link : instance().find(REFTYPE(refType), REFID(refId)))
-        tags[TagModel::instance().cache_id(link.TAGID)->TAGNAME] = link.TAGID;
+        tags[TagModel::instance().get_id(link.TAGID)->TAGNAME] = link.TAGID;
 
     return tags;
 }
@@ -127,7 +127,7 @@ int TagLinkModel::update(const Data_Set& rows, const wxString& refType, int64 re
         if (refType == TransactionModel::refTypeName)
             TransactionModel::instance().updateTimestamp(refId);
         else if (refType == TransactionSplitModel::refTypeName)
-            TransactionModel::instance().updateTimestamp(TransactionSplitModel::instance().cache_id(refId)->TRANSID);
+            TransactionModel::instance().updateTimestamp(TransactionSplitModel::instance().get_id(refId)->TRANSID);
     }
 
     TagLinkModel::instance().ReleaseSavepoint();

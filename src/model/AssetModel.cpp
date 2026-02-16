@@ -78,7 +78,7 @@ AssetModel& AssetModel::instance()
 
 wxString AssetModel::get_asset_name(int64 asset_id)
 {
-    Data* asset = instance().cache_id(asset_id);
+    Data* asset = instance().get_id(asset_id);
     if (asset)
         return asset->ASSETNAME;
     else
@@ -160,7 +160,7 @@ std::pair<double, double> AssetModel::valueAtDate(const Data* r, const wxDate& d
         TransactionModel::Data_Set trans;
         for (const auto& link : translink_records)
         {
-            const TransactionModel::Data* tran = TransactionModel::instance().cache_id(link.CHECKINGACCOUNTID);
+            const TransactionModel::Data* tran = TransactionModel::instance().get_id(link.CHECKINGACCOUNTID);
             if(tran && tran->DELETEDTIME.IsEmpty()) trans.push_back(*tran);
         }
 
@@ -185,9 +185,9 @@ std::pair<double, double> AssetModel::valueAtDate(const Data* r, const wxDate& d
 
             double accflow = TransactionModel::account_flow(tran, tran.ACCOUNTID);
             double amount = -1 * accflow *
-                CurrencyHistoryModel::getDayRate(AccountModel::instance().cache_id(tran.ACCOUNTID)->CURRENCYID, tranDate);
+                CurrencyHistoryModel::getDayRate(AccountModel::instance().get_id(tran.ACCOUNTID)->CURRENCYID, tranDate);
             //double amount = -1 * TransactionModel::account_flow(tran, tran.ACCOUNTID) *
-            //    CurrencyHistoryModel::getDayRate(AccountModel::instance().cache_id(tran.ACCOUNTID)->CURRENCYID, tranDate);
+            //    CurrencyHistoryModel::getDayRate(AccountModel::instance().get_id(tran.ACCOUNTID)->CURRENCYID, tranDate);
 
             if (amount >= 0)
             {

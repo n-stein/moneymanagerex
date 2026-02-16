@@ -44,8 +44,8 @@ public:
     bool save(Row* row);
     bool remove(const int64 id);
     bool remove(Row* row);
-    Row* cache_id(const int64 id);
     Row* get_id(const int64 id);
+    Row* get_record(const int64 id);
     const RowA get_all(const COL_ID = Col::PRIMARY_ID, const bool asc = true);
 
     template<typename... Args>

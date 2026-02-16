@@ -57,7 +57,7 @@ TagModel::Data* TagModel::cache_key(const wxString& name)
 
     Data_Set items = this->find(TAGNAME(name));
     if (!items.empty())
-        tag = this->cache_id(items[0].TAGID);
+        tag = this->get_id(items[0].TAGID);
     return tag;
 }
 
@@ -72,16 +72,16 @@ int TagModel::is_used(int64 id)
     {
         if (link.REFTYPE == TransactionModel::refTypeName)
         {
-            TransactionModel::Data* t = TransactionModel::instance().cache_id(link.REFID);
+            TransactionModel::Data* t = TransactionModel::instance().get_id(link.REFID);
             if (t && t->DELETEDTIME.IsEmpty())
                 return 1;
         }
         else if (link.REFTYPE == TransactionSplitModel::refTypeName)
         {
-            TransactionSplitModel::Data* s = TransactionSplitModel::instance().cache_id(link.REFID);
+            TransactionSplitModel::Data* s = TransactionSplitModel::instance().get_id(link.REFID);
             if (s)
             {
-                TransactionModel::Data* t = TransactionModel::instance().cache_id(s->TRANSID);
+                TransactionModel::Data* t = TransactionModel::instance().get_id(s->TRANSID);
                 if (t && t->DELETEDTIME.IsEmpty())
                     return 1;
             }

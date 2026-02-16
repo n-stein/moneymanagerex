@@ -128,7 +128,7 @@ wxString StocksReport::getHTMLText()
 
             for (const auto& acct : m_stocks)
             {
-                const AccountModel::Data* account = AccountModel::instance().cache_id(acct.id);
+                const AccountModel::Data* account = AccountModel::instance().get_id(acct.id);
                 const CurrencyModel::Data* currency = AccountModel::currency(account);
 
                 hb.startThead();
@@ -266,7 +266,7 @@ wxString mmReportChartStocks::getHTMLText()
     wxArrayString symbols;
     for (const auto& stock : StockModel::instance().get_all(StockCol::COL_ID_SYMBOL))
     {
-        AccountModel::Data* account = AccountModel::instance().cache_id(stock.HELDAT);
+        AccountModel::Data* account = AccountModel::instance().get_id(stock.HELDAT);
         if (AccountModel::status_id(account) != AccountModel::STATUS_ID_OPEN) continue;
         if (symbols.Index(stock.SYMBOL) != wxNOT_FOUND) continue;
 

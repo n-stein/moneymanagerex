@@ -151,7 +151,7 @@ bool TableFactory<RowType>::remove(typename TableFactory<RowType>::Row* row)
 // Search the memory table (Cache) for the data record.
 // If not found in memory, search the database and update the cache.
 template<typename RowType>
-typename TableFactory<RowType>::Row* TableFactory<RowType>::cache_id(const int64 id)
+typename TableFactory<RowType>::Row* TableFactory<RowType>::get_id(const int64 id)
 {
     if (id <= 0) {
         ++m_skip;
@@ -192,7 +192,7 @@ typename TableFactory<RowType>::Row* TableFactory<RowType>::cache_id(const int64
 
 // Search the database for the data record, bypassing the cache.
 template<typename RowType>
-typename TableFactory<RowType>::Row* TableFactory<RowType>::get_id(const int64 id)
+typename TableFactory<RowType>::Row* TableFactory<RowType>::get_record(const int64 id)
 {
     if (id <= 0) {
         ++m_skip;

@@ -234,7 +234,7 @@ void AttachmentDialog::AddAttachment(wxString FilePath)
 
 void AttachmentDialog::OpenAttachment()
 {
-    AttachmentModel::Data *attachments = AttachmentModel::instance().cache_id(m_attachment_id);
+    AttachmentModel::Data *attachments = AttachmentModel::instance().get_id(m_attachment_id);
     wxString attachmentFilePath = mmex::getPathAttachment(mmAttachmentManage::InfotablePathSetting())
         + attachments->REFTYPE + m_PathSep + attachments->FILENAME;
 
@@ -243,7 +243,7 @@ void AttachmentDialog::OpenAttachment()
 
 void AttachmentDialog::EditAttachment()
 {
-    AttachmentModel::Data *attachment = AttachmentModel::instance().cache_id(m_attachment_id);
+    AttachmentModel::Data *attachment = AttachmentModel::instance().get_id(m_attachment_id);
     if (attachment)
     {
         mmDialogComboBoxAutocomplete dlg(this, _t("Enter a new description for the attachment:"),
@@ -270,7 +270,7 @@ void AttachmentDialog::EditAttachment()
 
 void AttachmentDialog::DeleteAttachment()
 {
-    AttachmentModel::Data *attachment = AttachmentModel::instance().cache_id(m_attachment_id);
+    AttachmentModel::Data *attachment = AttachmentModel::instance().get_id(m_attachment_id);
     if (attachment)
     {
         int DeleteResponse = wxMessageBox(
@@ -317,7 +317,7 @@ void AttachmentDialog::OnListItemSelected(wxDataViewEvent& event)
 
 void AttachmentDialog::OnListItemActivated(wxDataViewEvent& WXUNUSED(event))
 {
-    AttachmentModel::Data *attachment = AttachmentModel::instance().cache_id(m_attachment_id);
+    AttachmentModel::Data *attachment = AttachmentModel::instance().get_id(m_attachment_id);
     const wxString attachmentFilePath = mmex::getPathAttachment(mmAttachmentManage::InfotablePathSetting())
         + attachment->REFTYPE + m_PathSep + attachment->FILENAME;
 
@@ -347,7 +347,7 @@ void AttachmentDialog::OnItemRightClick(wxDataViewEvent& event)
     wxCommandEvent evt(wxEVT_COMMAND_MENU_SELECTED, wxID_ANY) ;
     evt.SetEventObject( this );
 
-    AttachmentModel::Data* attachment = AttachmentModel::instance().cache_id(m_attachment_id);
+    AttachmentModel::Data* attachment = AttachmentModel::instance().get_id(m_attachment_id);
 
     wxMenu* mainMenu = new wxMenu;
     if (attachment) mainMenu->SetTitle(attachment->DESCRIPTION);

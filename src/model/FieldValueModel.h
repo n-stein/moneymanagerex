@@ -25,7 +25,7 @@
 class FieldValueModel : public Model<FieldValueTable>
 {
 public:
-    using Model<FieldValueTable>::cache_id;
+    using Model<FieldValueTable>::get_id;
 
 public:
     FieldValueModel();

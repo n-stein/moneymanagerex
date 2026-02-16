@@ -102,7 +102,7 @@ bool TransactionModel::remove(int64 id)
     //TransactionSplitModel::instance().remove(TransactionSplitModel::instance().find(TransactionSplitModel::TRANSID(id)));
     for (const auto& r : TransactionSplitModel::instance().find(TransactionSplitModel::TRANSID(id)))
         TransactionSplitModel::instance().remove(r.SPLITTRANSID);
-    if(foreignTransaction(*instance().cache_id(id))) TransactionLinkModel::RemoveTranslinkEntry(id);
+    if(foreignTransaction(*instance().get_id(id))) TransactionLinkModel::RemoveTranslinkEntry(id);
 
     const wxString& RefType = TransactionModel::refTypeName;
     // remove all attachments
@@ -115,7 +115,7 @@ bool TransactionModel::remove(int64 id)
 
 int64 TransactionModel::save_trx(Data* r)
 {
-    wxSharedPtr<Data> oldData(instance().get_id(r->TRANSID));
+    wxSharedPtr<Data> oldData(instance().get_record(r->TRANSID));
     if (!oldData || (!oldData->equals(r) && oldData->DELETEDTIME.IsEmpty() && r->DELETEDTIME.IsEmpty()))
         r->LASTUPDATEDTIME = wxDateTime::Now().ToUTC().FormatISOCombined();
     this->save(r);
@@ -281,7 +281,7 @@ double TransactionModel::account_recflow(const Data& r, int64 account_id)
 bool TransactionModel::is_locked(const Data* r)
 {
     bool val = false;
-    AccountModel::Data* acc = AccountModel::instance().cache_id(r->ACCOUNTID);
+    AccountModel::Data* acc = AccountModel::instance().get_id(r->ACCOUNTID);
 
     if (AccountModel::BoolOf(acc->STATEMENTLOCKED))
     {
@@ -391,7 +391,7 @@ void TransactionModel::Full_Data::fill_data()
     if (!m_tags.empty()) {
         wxArrayString tagnames;
         for (const auto& entry : m_tags)
-            tagnames.Add(TagModel::instance().cache_id(entry.TAGID)->TAGNAME);
+            tagnames.Add(TagModel::instance().get_id(entry.TAGID)->TAGNAME);
         // Sort TAGNAMES
         tagnames.Sort(CaseInsensitiveCmp);
         for (const auto& name : tagnames)
@@ -436,9 +436,9 @@ const wxString TransactionModel::Full_Data::get_currency_code(int64 account_id) 
         else
             account_id = this->TOACCOUNTID;
     }
-    AccountModel::Data* acc = AccountModel::instance().cache_id(account_id);
+    AccountModel::Data* acc = AccountModel::instance().get_id(account_id);
     int64 currency_id = acc ? acc->CURRENCYID: -1;
-    CurrencyModel::Data* curr = CurrencyModel::instance().cache_id(currency_id);
+    CurrencyModel::Data* curr = CurrencyModel::instance().get_id(currency_id);
 
     return curr ? curr->CURRENCY_SYMBOL : "";
 }
@@ -451,7 +451,7 @@ const wxString TransactionModel::Full_Data::cache_id_name(int64 account_id) cons
             return this->ACCOUNTNAME;
         }
         else {
-            AccountModel::Data* acc = AccountModel::instance().cache_id(TOACCOUNTID);
+            AccountModel::Data* acc = AccountModel::instance().get_id(TOACCOUNTID);
             return acc ? acc->ACCOUNTNAME : "";
         }
     }
@@ -673,7 +673,7 @@ bool TransactionModel::foreignTransactionAsTransfer(const Data& data)
 
 void TransactionModel::updateTimestamp(int64 id)
 {
-    Data* r = instance().cache_id(id);
+    Data* r = instance().get_id(id);
     if (r && r->TRANSID == id) {
         r->LASTUPDATEDTIME = wxDateTime::Now().ToUTC().FormatISOCombined();
         this->save(r);

@@ -51,7 +51,7 @@ void TransactionsReport::displayTotals(const std::map<int64, double>& total, std
     double grand_total = 0;
     for (const auto& [curr_id, curr_total]: total)
     {
-        const auto curr = CurrencyModel::instance().cache_id(curr_id);
+        const auto curr = CurrencyModel::instance().get_id(curr_id);
         const bool isBaseCurr = (curr->CURRENCY_SYMBOL == CurrencyModel::GetBaseCurrency()->CURRENCY_SYMBOL);
         grand_total += total_in_base_curr[curr_id];
         if (total.size() > 1 || !isBaseCurr)
@@ -92,7 +92,7 @@ wxString TransactionsReport::getHTMLText()
         accounts_label.clear();
         allAccounts = false;
         for (const auto& acc : selected_accounts) {
-            AccountModel::Data* a = AccountModel::instance().cache_id(acc);
+            AccountModel::Data* a = AccountModel::instance().get_id(acc);
             accounts_label += (accounts_label.empty() ? "" : ", ") + a->ACCOUNTNAME;
         }
     }
@@ -325,7 +325,7 @@ table {
                 }
 
                 AccountModel::Data* acc;
-                acc = AccountModel::instance().cache_id(transaction.ACCOUNTID);
+                acc = AccountModel::instance().get_id(transaction.ACCOUNTID);
 
                 if (acc)
                 {

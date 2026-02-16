@@ -291,7 +291,7 @@ void StockList::OnNewStocks(wxCommandEvent& /*event*/)
 {
     StockDialog dlg(this, nullptr, m_stock_panel->m_account_id);
     dlg.ShowModal();
-    if (StockModel::instance().cache_id(dlg.m_stock_id))
+    if (StockModel::instance().get_id(dlg.m_stock_id))
     {
         doRefreshItems(dlg.m_stock_id);
         m_stock_panel->m_frame->RefreshNavigationTree();
@@ -324,7 +324,7 @@ void StockList::OnMoveStocks(wxCommandEvent& /*event*/)
         AccountModel::ACCOUNTTYPE(NavigatorTypes::instance().getInvestmentAccountStr()));
     if (accounts.empty()) return;
 
-    const AccountModel::Data* from_account = AccountModel::instance().cache_id(m_stock_panel->m_account_id);
+    const AccountModel::Data* from_account = AccountModel::instance().get_id(m_stock_panel->m_account_id);
     wxString headerMsg = wxString::Format(_t("Moving Transaction from %s to"), from_account->ACCOUNTNAME);
     mmSingleChoiceDialog scd(this, _t("Select the destination Account "), headerMsg , accounts);
 
@@ -339,7 +339,7 @@ void StockList::OnMoveStocks(wxCommandEvent& /*event*/)
 
     if ( toAccountID != -1 )
     {
-        StockModel::Data* stock = StockModel::instance().cache_id(m_stocks[m_selected_row].STOCKID);
+        StockModel::Data* stock = StockModel::instance().get_id(m_stocks[m_selected_row].STOCKID);
         stock->HELDAT = toAccountID;
         StockModel::instance().save(stock);
 

@@ -48,7 +48,7 @@ StockModel& StockModel::instance(wxSQLite3Database* db)
 
 wxString StockModel::get_stock_name(int64 stock_id)
 {
-    Data* stock = instance().cache_id(stock_id);
+    Data* stock = instance().get_id(stock_id);
     if (stock)
         return stock->STOCKNAME;
     else
@@ -99,7 +99,7 @@ double StockModel::CurrentValue(const Data& r)
 */
 bool StockModel::remove(int64 id)
 {
-    StockModel::Data *data = this->cache_id(id);
+    StockModel::Data *data = this->get_id(id);
     const auto &stocks = StockModel::instance().find(StockModel::SYMBOL(data->SYMBOL));
     if (stocks.size() == 1)
     {
@@ -191,7 +191,7 @@ double StockModel::getDailyBalanceAt(const AccountModel::Data *account, const wx
         TransactionLinkModel::Data_Set linkrecords = TransactionLinkModel::TranslinkList<StockModel>(stock.STOCKID);
         for (const auto& linkrecord : linkrecords)
         {
-            TransactionModel::Data* txn = TransactionModel::instance().cache_id(linkrecord.CHECKINGACCOUNTID);
+            TransactionModel::Data* txn = TransactionModel::instance().get_id(linkrecord.CHECKINGACCOUNTID);
             if (txn->TRANSID > -1 && txn->DELETEDTIME.IsEmpty() && TransactionModel::getTransDateTime(txn).FormatISODate() <= strDate) {
                 numShares += TransactionShareModel::instance().ShareEntry(linkrecord.CHECKINGACCOUNTID)->SHARENUMBER;
             }
@@ -217,7 +217,7 @@ to base currency.
 */
 double StockModel::RealGainLoss(const Data* r, bool to_base_curr)
 {
-    CurrencyModel::Data* currency = AccountModel::currency(AccountModel::instance().cache_id(r->HELDAT));
+    CurrencyModel::Data* currency = AccountModel::currency(AccountModel::instance().get_id(r->HELDAT));
     TransactionLinkModel::Data_Set trans_list = TransactionLinkModel::TranslinkList<StockModel>(r->STOCKID);
     double real_gain_loss = 0;
     double total_shares = 0;
@@ -228,7 +228,7 @@ double StockModel::RealGainLoss(const Data* r, bool to_base_curr)
     TransactionModel::Data_Set checking_list;
     for (const auto &trans : trans_list)
     {
-        TransactionModel::Data* checking_entry = TransactionModel::instance().cache_id(trans.CHECKINGACCOUNTID);
+        TransactionModel::Data* checking_entry = TransactionModel::instance().get_id(trans.CHECKINGACCOUNTID);
         if (checking_entry->TRANSID > -1 && checking_entry->DELETEDTIME.IsEmpty()) checking_list.push_back(*checking_entry);
     }
     std::stable_sort(checking_list.begin(), checking_list.end(), TransactionRow::SorterByTRANSDATE());
@@ -287,7 +287,7 @@ double StockModel::UnrealGainLoss(const Data* r, bool to_base_curr)
         return CurrentValue(r) - InvestmentValue(r);
     else
     {
-        CurrencyModel::Data* currency = AccountModel::currency(AccountModel::instance().cache_id(r->HELDAT));
+        CurrencyModel::Data* currency = AccountModel::currency(AccountModel::instance().get_id(r->HELDAT));
         double conv_rate = CurrencyHistoryModel::getDayRate(currency->CURRENCYID);
         TransactionLinkModel::Data_Set trans_list = TransactionLinkModel::TranslinkList<StockModel>(r->STOCKID);
         if (!trans_list.empty())
@@ -299,7 +299,7 @@ double StockModel::UnrealGainLoss(const Data* r, bool to_base_curr)
             TransactionModel::Data_Set checking_list;
             for (const auto &trans : trans_list)
             {
-                TransactionModel::Data* checking_entry = TransactionModel::instance().cache_id(trans.CHECKINGACCOUNTID);
+                TransactionModel::Data* checking_entry = TransactionModel::instance().get_id(trans.CHECKINGACCOUNTID);
                 if (checking_entry->TRANSID > -1 && checking_entry->DELETEDTIME.IsEmpty()) checking_list.push_back(*checking_entry);
             }
             std::stable_sort(checking_list.begin(), checking_list.end(), TransactionRow::SorterByTRANSDATE());
@@ -346,7 +346,7 @@ void StockModel::UpdateCurrentPrice(const wxString& symbol, const double price)
     {
         StockModel::Data_Set stocks = StockModel::instance().find(StockModel::SYMBOL(symbol));
         for (auto& stock : stocks) {
-            StockModel::Data* stockRecord = StockModel::instance().cache_id(stock.STOCKID);
+            StockModel::Data* stockRecord = StockModel::instance().get_id(stock.STOCKID);
             stockRecord->CURRENTPRICE = current_price;
             StockModel::instance().save(stockRecord);
         }
@@ -364,7 +364,7 @@ void StockModel::UpdatePosition(StockModel::Data* stock_entry)
     TransactionModel::Data_Set checking_list;
     for (const auto &trans : trans_list)
     {
-        TransactionModel::Data* checking_entry = TransactionModel::instance().cache_id(trans.CHECKINGACCOUNTID);
+        TransactionModel::Data* checking_entry = TransactionModel::instance().get_id(trans.CHECKINGACCOUNTID);
         if (checking_entry->TRANSID > -1 && checking_entry->DELETEDTIME.IsEmpty() && TransactionModel::status_id(checking_entry->STATUS) != TransactionModel::STATUS_ID_VOID)
             checking_list.push_back(*checking_entry);
     }

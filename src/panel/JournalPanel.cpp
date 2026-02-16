@@ -106,7 +106,7 @@ JournalPanel::JournalPanel(
 {
     if (isAccount()) {
         m_account_id = m_checking_id;
-        m_account = AccountModel::instance().cache_id(m_account_id);
+        m_account = AccountModel::instance().get_id(m_account_id);
         m_currency = AccountModel::currency(m_account);
     }
     else if (isGroup()) {
@@ -159,7 +159,7 @@ void JournalPanel::loadAccount(int64 account_id)
     m_checking_id = account_id;
     m_account_id = account_id;
     m_group_ids = {};
-    m_account = AccountModel::instance().cache_id(m_account_id);
+    m_account = AccountModel::instance().get_id(m_account_id);
     m_currency = AccountModel::currency(m_account);
     m_use_account_specific_filter = PreferencesModel::instance().getUsePerAccountFilter();
 
@@ -996,7 +996,7 @@ void JournalPanel::updateExtraTransactionData(bool single, int repeat_num, bool 
             while (true) {
                 item = m_lc->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
                 if (item == -1) break;
-                CurrencyModel::Data* curr = AccountModel::currency(AccountModel::instance().cache_id(m_lc->m_trans[item].ACCOUNTID));
+                CurrencyModel::Data* curr = AccountModel::currency(AccountModel::instance().get_id(m_lc->m_trans[item].ACCOUNTID));
                 if ((m_account_id < 0) && TransactionModel::is_transfer(m_lc->m_trans[item].TRANSCODE)) continue;
                 double convrate = (curr != m_currency) ? CurrencyHistoryModel::getDayRate(curr->CURRENCYID, m_lc->m_trans[item].TRANSDATE) : 1.0;
                 flow += convrate * TransactionModel::account_flow(m_lc->m_trans[item], (m_account_id < 0) ? m_lc->m_trans[item].ACCOUNTID : m_account_id);
@@ -1411,8 +1411,8 @@ void JournalPanel::setSelectedTransaction(Journal::IdRepeat journal_id)
 void JournalPanel::displaySplitCategories(Journal::IdB journal_id)
 {
     Journal::Data journal = !journal_id.second ?
-        Journal::Data(*TransactionModel::instance().cache_id(journal_id.first)) :
-        Journal::Data(*ScheduledModel::instance().cache_id(journal_id.first));
+        Journal::Data(*TransactionModel::instance().get_id(journal_id.first)) :
+        Journal::Data(*ScheduledModel::instance().get_id(journal_id.first));
     std::vector<Split> splits;
     for (const auto& split : Journal::split(journal)) {
         Split s;

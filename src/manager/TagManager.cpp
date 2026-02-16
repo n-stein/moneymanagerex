@@ -315,7 +315,7 @@ void TagManager::OnDelete(wxCommandEvent& WXUNUSED(event))
                 if (link.REFTYPE == TransactionModel::refTypeName)
                     TransactionModel::instance().remove(link.REFID);
                 else if (link.REFTYPE == TransactionSplitModel::refTypeName)
-                    TransactionModel::instance().remove(TransactionSplitModel::instance().cache_id(link.REFID)->TRANSID);
+                    TransactionModel::instance().remove(TransactionSplitModel::instance().get_id(link.REFID)->TRANSID);
             TagModel::instance().remove(tag->TAGID);
             tagList_.Remove(selection);
             int index = selectedTags_.Index(selection);

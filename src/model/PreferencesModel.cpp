@@ -803,7 +803,7 @@ int PreferencesModel::AccountImageId(const int64 account_id, const bool def, con
     NavigatorTypes::TYPE_ID acctType = NavigatorTypes::TYPE_ID_CHECKING;
     int selectedImage = img::SAVINGS_ACC_NORMAL_PNG; //Default value
 
-    AccountModel::Data* account = AccountModel::instance().cache_id(account_id);
+    AccountModel::Data* account = AccountModel::instance().get_id(account_id);
     if (account)
     {
         acctType = AccountModel::type_id(account);

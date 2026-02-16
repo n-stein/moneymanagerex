@@ -149,7 +149,7 @@ void FieldManager::AddField()
 
 void FieldManager::EditField()
 {
-    FieldModel::Data *field = FieldModel::instance().cache_id(m_field_id);
+    FieldModel::Data *field = FieldModel::instance().get_id(m_field_id);
     if (field)
     {
         FieldDialog dlg(this, field);
@@ -161,7 +161,7 @@ void FieldManager::EditField()
 
 void FieldManager::DeleteField()
 {
-    FieldModel::Data *field = FieldModel::instance().cache_id(m_field_id);
+    FieldModel::Data *field = FieldModel::instance().get_id(m_field_id);
     if (field)
     {
         int DeleteResponse = wxMessageBox(
@@ -179,7 +179,7 @@ void FieldManager::DeleteField()
 
 void FieldManager::UpdateField()
 {
-    FieldModel::Data *field = FieldModel::instance().cache_id(m_field_id);
+    FieldModel::Data *field = FieldModel::instance().get_id(m_field_id);
     if (!field)
         return;
 
@@ -251,7 +251,7 @@ void FieldManager::OnItemRightClick(wxDataViewEvent& event)
     wxCommandEvent evt(wxEVT_COMMAND_MENU_SELECTED, wxID_ANY) ;
     evt.SetEventObject( this );
 
-    FieldModel::Data *field = FieldModel::instance().cache_id(m_field_id);
+    FieldModel::Data *field = FieldModel::instance().get_id(m_field_id);
 
     wxMenu* mainMenu = new wxMenu;
     if (field) mainMenu->SetTitle(field->DESCRIPTION);

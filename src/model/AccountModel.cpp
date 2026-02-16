@@ -104,7 +104,7 @@ AccountModel::Data* AccountModel::cache_key(const wxString& name)
 
     Data_Set items = this->find(ACCOUNTNAME(name));
     if (!items.empty())
-        account = this->cache_id(items[0].ACCOUNTID);
+        account = this->get_id(items[0].ACCOUNTID);
     return account;
 }
 
@@ -117,13 +117,13 @@ AccountModel::Data* AccountModel::cache_num(const wxString& num)
 
     Data_Set items = this->find(ACCOUNTNUM(num));
     if (!items.empty())
-        account = this->cache_id(items[0].ACCOUNTID);
+        account = this->get_id(items[0].ACCOUNTID);
     return account;
 }
 
 wxString AccountModel::cache_id_name(int64 account_id)
 {
-    Data* account = instance().cache_id(account_id);
+    Data* account = instance().get_id(account_id);
     if (account)
         return account->ACCOUNTNAME;
     else
@@ -159,7 +159,7 @@ bool AccountModel::remove(int64 id)
 
 CurrencyModel::Data* AccountModel::currency(const Data* r)
 {
-    CurrencyModel::Data * currency = CurrencyModel::instance().cache_id(r->CURRENCYID);
+    CurrencyModel::Data * currency = CurrencyModel::instance().get_id(r->CURRENCYID);
     if (currency)
         return currency;
     else

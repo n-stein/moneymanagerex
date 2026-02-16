@@ -73,7 +73,7 @@ AccountDialog::AccountDialog(AccountModel::Data* account, wxWindow* parent)
 {
     m_images = navtree_images_list();
     m_currencyID = m_account->CURRENCYID;
-    [[maybe_unused]] CurrencyModel::Data* currency = CurrencyModel::instance().cache_id(m_currencyID);
+    [[maybe_unused]] CurrencyModel::Data* currency = CurrencyModel::instance().get_id(m_currencyID);
     wxASSERT(currency);
 
     this->SetFont(parent->GetFont());
@@ -388,7 +388,7 @@ void AccountDialog::OnCurrency(wxCommandEvent& /*event*/)
 {
     if (CurrencyChoiceDialog::Execute(this, m_currencyID))
     {
-        CurrencyModel::Data* currency = CurrencyModel::instance().cache_id(m_currencyID);
+        CurrencyModel::Data* currency = CurrencyModel::instance().get_id(m_currencyID);
         wxButton* bn = static_cast<wxButton*>(FindWindow(ID_DIALOG_NEWACCT_BUTTON_CURRENCY));
         bn->SetLabelText(currency->CURRENCYNAME);
 
@@ -499,7 +499,7 @@ void AccountDialog::OnOk(wxCommandEvent& /*event*/)
             return mmErrorDialogs::MessageInvalid(this, _t("Account Name "));
     }
 
-    CurrencyModel::Data* currency = CurrencyModel::instance().cache_id(m_currencyID);
+    CurrencyModel::Data* currency = CurrencyModel::instance().get_id(m_currencyID);
     if (!currency)
         return mmErrorDialogs::MessageInvalid(this, _t("Currency"));
 

@@ -111,7 +111,7 @@ const wxArrayString CurrencyModel::all_currency_symbols()
 CurrencyModel::Data* CurrencyModel::GetBaseCurrency()
 {
     int64 currency_id = PreferencesModel::instance().getBaseCurrencyID();
-    CurrencyModel::Data* currency = CurrencyModel::instance().cache_id(currency_id);
+    CurrencyModel::Data* currency = CurrencyModel::instance().get_id(currency_id);
     return currency;
 }
 
@@ -143,7 +143,7 @@ CurrencyModel::Data* CurrencyModel::GetCurrencyRecord(const wxString& currency_s
     if (record) return record;
 
     CurrencyModel::Data_Set items = CurrencyModel::instance().find(CURRENCY_SYMBOL(currency_symbol));
-    if (items.empty()) record = this->cache_id(items[0].id());
+    if (items.empty()) record = this->get_id(items[0].id());
 
     return record;
 }
@@ -375,7 +375,7 @@ int CurrencyModel::precision(const Data& r)
 
 int CurrencyModel::precision(int64 account_id)
 {
-    const AccountModel::Data* trans_account = AccountModel::instance().cache_id(account_id);
+    const AccountModel::Data* trans_account = AccountModel::instance().get_id(account_id);
     if (account_id > 0)
     {
         return precision(AccountModel::currency(trans_account));

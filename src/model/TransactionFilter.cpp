@@ -233,7 +233,7 @@ table {
 
         AccountModel::Data* acc;
         const CurrencyModel::Data* curr;
-        acc = AccountModel::instance().cache_id(transaction.ACCOUNTID);
+        acc = AccountModel::instance().get_id(transaction.ACCOUNTID);
         curr = AccountModel::currency(acc);
         if (acc)
         {

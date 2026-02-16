@@ -54,7 +54,7 @@ wxString InExReport::getHTMLText()
         if (TransactionModel::foreignTransactionAsTransfer(transaction))
             continue;
 
-        AccountModel::Data *account = AccountModel::instance().cache_id(transaction.ACCOUNTID);
+        AccountModel::Data *account = AccountModel::instance().get_id(transaction.ACCOUNTID);
         if (m_account_a) {
             if (!account || wxNOT_FOUND == m_account_a->Index(account->ACCOUNTNAME))
                 continue;
@@ -158,7 +158,7 @@ wxString mmReportIncomeExpensesMonthly::getHTMLText()
         if (TransactionModel::foreignTransactionAsTransfer(transaction))
             continue;
 
-        AccountModel::Data *account = AccountModel::instance().cache_id(transaction.ACCOUNTID);
+        AccountModel::Data *account = AccountModel::instance().get_id(transaction.ACCOUNTID);
         if (m_account_a) {
             if (!account || wxNOT_FOUND == m_account_a->Index(account->ACCOUNTNAME))
                 continue;

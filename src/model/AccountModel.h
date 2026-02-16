@@ -37,7 +37,7 @@ class AccountModel : public Model<AccountTable>
 {
 public:
     using Model<AccountTable>::remove;
-    using Model<AccountTable>::cache_id;
+    using Model<AccountTable>::get_id;
 
     enum STATUS_ID
     {

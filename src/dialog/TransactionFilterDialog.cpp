@@ -390,7 +390,7 @@ void TransactionFilterDialog::mmDoDataToControls(const wxString& json)
             if (j_tags[i].IsInt64())
             {
                 // Retrieve TAGNAME from TAGID
-                TagModel::Data* tag = TagModel::instance().cache_id(int64(j_tags[i].GetInt64()));
+                TagModel::Data* tag = TagModel::instance().get_id(int64(j_tags[i].GetInt64()));
                 if (tag)
                 {
                     s_tag.Append(tag->TAGNAME + " ");
@@ -546,7 +546,7 @@ void TransactionFilterDialog::mmDoInitSettingNameChoice(wxString sel) const
     }
     else
     {
-        AccountModel::Data* acc = AccountModel::instance().cache_id(accountID_);
+        AccountModel::Data* acc = AccountModel::instance().get_id(accountID_);
         wxString account_name = acc ? acc->ACCOUNTNAME : "";
         m_setting_name->Append(account_name, new wxStringClientData(account_name));
         sel = "";
@@ -1376,7 +1376,7 @@ void TransactionFilterDialog::OnButtonClearClick(wxCommandEvent& /*event*/)
 
 bool TransactionFilterDialog::mmIsPayeeMatches(int64 payeeID)
 {
-    const PayeeModel::Data* payee = PayeeModel::instance().cache_id(payeeID);
+    const PayeeModel::Data* payee = PayeeModel::instance().get_id(payeeID);
     if (payee)
     {
         const wxString value = cbPayee_->mmGetPattern();
@@ -1424,12 +1424,12 @@ bool TransactionFilterDialog::mmIsTagMatches(const wxString& refType, int64 refI
     if (refType == TransactionSplitModel::refTypeName)
         txnTagnames = TagLinkModel::instance().cache_ref(
             TransactionModel::refTypeName,
-            TransactionSplitModel::instance().cache_id(refId)->TRANSID
+            TransactionSplitModel::instance().get_id(refId)->TRANSID
         );
     else if (refType == ScheduledSplitModel::refTypeName)
         txnTagnames = TagLinkModel::instance().cache_ref(
             ScheduledModel::refTypeName,
-            ScheduledSplitModel::instance().cache_id(refId)->TRANSID
+            ScheduledSplitModel::instance().get_id(refId)->TRANSID
         );
 
     if (mergeSplitTags)
@@ -1661,7 +1661,7 @@ const wxString TransactionFilterDialog::mmGetDescriptionToolTip() const
                 {
                     if (wxGetTranslation("Tags").IsSameAs(wxString::FromUTF8(itr->name.GetString())))
                     {
-                        value += (value.empty() ? "" : " ") + TagModel::instance().cache_id(int64(valArray[i].GetInt64()))->TAGNAME;
+                        value += (value.empty() ? "" : " ") + TagModel::instance().get_id(int64(valArray[i].GetInt64()))->TAGNAME;
                         // don't add a newline between tag operators
                         if (valArray.Size() > 1 && i < valArray.Size() - 2 && valArray[i + 1].GetType() == kStringType)
                             continue;
@@ -1765,7 +1765,7 @@ void TransactionFilterDialog::mmGetDescription(mmHTMLBuilder& hb)
                     // wxLogDebug("%s", wxString::FromUTF8(itr->name.GetString()));
                     if (wxGetTranslation("Tags").IsSameAs(name))
                     {
-                        temp += (temp.empty() ? "" : (appendOperator ? " & " : " ")) + TagModel::instance().cache_id(int64(a.GetInt64()))->TAGNAME;
+                        temp += (temp.empty() ? "" : (appendOperator ? " & " : " ")) + TagModel::instance().get_id(int64(a.GetInt64()))->TAGNAME;
                         appendOperator = true;
                     }
                     else if (wxGetTranslation("Hide Columns").IsSameAs(name) &&
@@ -1838,7 +1838,7 @@ const wxString TransactionFilterDialog::mmGetJsonSettings(bool i18n) const
         json_writer.StartArray();
         for (const auto& acc : m_selected_accounts_id)
         {
-            AccountModel::Data* a = AccountModel::instance().cache_id(acc);
+            AccountModel::Data* a = AccountModel::instance().get_id(acc);
             json_writer.String(a->ACCOUNTNAME.utf8_str());
         }
         json_writer.EndArray();
@@ -2007,7 +2007,7 @@ const wxString TransactionFilterDialog::mmGetJsonSettings(bool i18n) const
         {
             if (!i.second.empty())
             {
-                const auto field = FieldModel::instance().cache_id(i.first);
+                const auto field = FieldModel::instance().get_id(i.first);
                 json_writer.Key(wxString::Format("CUSTOM%lld", field->FIELDID).utf8_str());
                 json_writer.String(i.second.utf8_str());
             }
@@ -2075,7 +2075,7 @@ void TransactionFilterDialog::OnCategoryChange(wxEvent& event)
                 {
                     m_selected_categories_id.push_back(category.second);
                     if (mmIsCategorySubCatChecked())
-                        for (const auto& subcat : CategoryModel::instance().sub_tree(CategoryModel::instance().cache_id(category.second)))
+                        for (const auto& subcat : CategoryModel::instance().sub_tree(CategoryModel::instance().get_id(category.second)))
                             m_selected_categories_id.push_back(subcat.CATEGID);
                 }
     }
@@ -2311,7 +2311,7 @@ void TransactionFilterDialog::OnAccountsButton(wxCommandEvent& WXUNUSED(event))
 
     for (const auto& acc : m_selected_accounts_id)
     {
-        AccountModel::Data* a = AccountModel::instance().cache_id(acc);
+        AccountModel::Data* a = AccountModel::instance().get_id(acc);
         if (a && m_accounts_name.Index(a->ACCOUNTNAME) != wxNOT_FOUND)
             selected_items.Add(m_accounts_name.Index(a->ACCOUNTNAME));
     }
@@ -2342,7 +2342,7 @@ void TransactionFilterDialog::OnAccountsButton(wxCommandEvent& WXUNUSED(event))
     }
     else if (m_selected_accounts_id.size() == 1)
     {
-        const AccountModel::Data* account = AccountModel::instance().cache_id(*m_selected_accounts_id.begin());
+        const AccountModel::Data* account = AccountModel::instance().get_id(*m_selected_accounts_id.begin());
         if (account)
             bSelectedAccounts_->SetLabelText(account->ACCOUNTNAME);
     }
@@ -2422,7 +2422,7 @@ void TransactionFilterDialog::OnComboKey(wxKeyEvent& event)
                 if (dlg.getRefreshRequested())
                     cbPayee_->mmDoReInitialize();
                 int64 payee_id = dlg.getPayeeId();
-                PayeeModel::Data* payee = PayeeModel::instance().cache_id(payee_id);
+                PayeeModel::Data* payee = PayeeModel::instance().get_id(payee_id);
                 if (payee)
                 {
                     cbPayee_->ChangeValue(payee->PAYEENAME);

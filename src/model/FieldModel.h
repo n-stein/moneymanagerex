@@ -26,7 +26,7 @@
 class FieldModel : public Model<FieldTable>
 {
 public:
-    using Model<FieldTable>::cache_id;
+    using Model<FieldTable>::get_id;
 
     enum TYPE_ID
     {

@@ -52,7 +52,7 @@ mmReconcileDialog::mmReconcileDialog(wxWindow* parent, AccountModel::Data* accou
     m_account = account;
     m_checkingPanel = cp;
     m_reconciledBalance = cp->GetTodayReconciledBalance();
-    m_currency = CurrencyModel::instance().cache_id(account->CURRENCYID);
+    m_currency = CurrencyModel::instance().get_id(account->CURRENCYID);
     m_ignore  = false;
     this->SetFont(parent->GetFont());
 
@@ -578,7 +578,7 @@ void mmReconcileDialog::newTransaction()
         if (i != wxID_CANCEL) {
             m_checkingPanel->refreshList();
             int64 transid = dlg.GetTransactionID();
-            const TransactionModel::Data* trx = TransactionModel::instance().cache_id(transid);
+            const TransactionModel::Data* trx = TransactionModel::instance().get_id(transid);
             addTransaction2List(trx);
         }
     } while (i == wxID_NEW);
@@ -618,7 +618,7 @@ void mmReconcileDialog::editTransaction(wxListCtrl* list, long item)
     TransactionDialog dlg(this, transid, {transid, false});
     if (dlg.ShowModal() == wxID_OK) {
         m_checkingPanel->refreshList();
-        const TransactionModel::Data* trx = TransactionModel::instance().cache_id(transid);
+        const TransactionModel::Data* trx = TransactionModel::instance().get_id(transid);
         setListItemData(trx, list, item);
         long idx = getListIndexByDate(trx, list);
         if (idx != item) {
@@ -633,7 +633,7 @@ long mmReconcileDialog::getListIndexByDate(const TransactionModel::Data* trx, wx
     long idx = -1;
     for (long i = 0; i < list->GetItemCount(); ++i) {
         id = m_itemDataMap[list->GetItemData(i)];
-        TransactionModel::Data* trl = TransactionModel::instance().cache_id(id);
+        TransactionModel::Data* trl = TransactionModel::instance().get_id(id);
         if (trx->TRANSDATE.Left(10) < trl->TRANSDATE.Left(10)) {
             idx = i;
             break;
@@ -774,7 +774,7 @@ void mmReconcileDialog::applyColumnSettings()
 void mmReconcileDialog::OnClose(wxCommandEvent& event)
 {
     auto saveItem = [](int64 id, bool state, bool final) {
-        TransactionModel::Data* trx = TransactionModel::instance().cache_id(id);
+        TransactionModel::Data* trx = TransactionModel::instance().get_id(id);
         if (state) {
             trx->STATUS = final ? "R" : "F";
         }

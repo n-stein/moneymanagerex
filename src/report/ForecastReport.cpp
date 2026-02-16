@@ -57,7 +57,7 @@ wxString ForecastReport::getHTMLText()
         if (TransactionModel::type_id(trx) == TransactionModel::TYPE_ID_TRANSFER || TransactionModel::foreignTransactionAsTransfer(trx))
             continue;
         const double convRate = CurrencyHistoryModel::getDayRate(
-            AccountModel::instance().cache_id(trx.ACCOUNTID)->CURRENCYID,
+            AccountModel::instance().get_id(trx.ACCOUNTID)->CURRENCYID,
             trx.TRANSDATE
         );
         amount_by_day[trx.TRANSDATE].first += TransactionModel::account_outflow(trx, trx.ACCOUNTID) * convRate;

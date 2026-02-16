@@ -300,7 +300,7 @@ void mmQIFExportDialog::OnAccountsButton(wxCommandEvent& WXUNUSED(event))
     else if (selected_accounts_id_.size() == 1)
     {
         int64 account_id = accounts_id_[selected_items[0]];
-        const AccountModel::Data* account = AccountModel::instance().cache_id(account_id);
+        const AccountModel::Data* account = AccountModel::instance().get_id(account_id);
         if (account) bSelectedAccounts_->SetLabelText(account->ACCOUNTNAME);
     }
     else if (selected_accounts_id_.size() > 1)

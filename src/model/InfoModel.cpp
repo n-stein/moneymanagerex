@@ -71,7 +71,7 @@ void InfoModel::setRaw(const wxString& key, const wxString& newValue)
         // not found in cache; search in db
         Data_Set items = find(INFONAME(key));
         if (!items.empty())
-            info = cache_id(items[0].INFOID);
+            info = get_id(items[0].INFOID);
         if (!info) {
             // not found; create
             info = create();
@@ -313,7 +313,7 @@ void InfoModel::prependArrayItem(const wxString& key, const wxString& value, int
     if (!info) { // not cached
         Data_Set items = find(INFONAME(key));
         if (!items.empty())
-            info = cache_id(items[0].INFOID);
+            info = get_id(items[0].INFOID);
         if (!info) {
             info = create();
             info->INFONAME = key;

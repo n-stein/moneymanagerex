@@ -132,7 +132,7 @@ void GeneralPreferences::Create()
     m_currencyStaticBoxSizer->Add(currencyBaseSizer, wxSizerFlags(g_flagsV).Border(wxLEFT, 0));
     currencyBaseSizer->Add(new wxStaticText(currencyStaticBox, wxID_STATIC, _t("Base Currency")), g_flagsH);
 
-    CurrencyModel::Data* currency = CurrencyModel::instance().cache_id(PreferencesModel::instance().getBaseCurrencyID());
+    CurrencyModel::Data* currency = CurrencyModel::instance().get_id(PreferencesModel::instance().getBaseCurrencyID());
     wxString currName = currency ? currency->CURRENCYNAME : _t("Set Currency");
     m_currency_id = currency ? currency->CURRENCYID : -1;
     baseCurrencyComboBox_ = new mmComboBoxCurrency(currencyStaticBox, ID_DIALOG_OPTIONS_BUTTON_CURRENCY);

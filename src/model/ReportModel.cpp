@@ -428,6 +428,6 @@ ReportModel::Data* ReportModel::cache_key(const wxString& name)
 
     Data_Set items = this->find(REPORTNAME(name));
     if (!items.empty())
-        report = this->cache_id(items[0].id());
+        report = this->get_id(items[0].id());
     return report;
 }

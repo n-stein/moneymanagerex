@@ -48,7 +48,7 @@ double FlowReport::trueAmount(const TransactionModel::Data& trx)
     bool isToAccountFound = std::find(m_account_id.begin(), m_account_id.end(), trx.TOACCOUNTID) != m_account_id.end();
     if (!(isAccountFound && isToAccountFound))
     {
-        const double convRate = CurrencyHistoryModel::getDayRate(AccountModel::instance().cache_id(trx.ACCOUNTID)->CURRENCYID, trx.TRANSDATE);
+        const double convRate = CurrencyHistoryModel::getDayRate(AccountModel::instance().get_id(trx.ACCOUNTID)->CURRENCYID, trx.TRANSDATE);
         switch (TransactionModel::type_id(trx.TRANSCODE)) {
         case TransactionModel::TYPE_ID_WITHDRAWAL:
             amount = -trx.TRANSAMOUNT * convRate;
@@ -61,7 +61,7 @@ double FlowReport::trueAmount(const TransactionModel::Data& trx)
                 amount = -trx.TRANSAMOUNT * convRate;
             else
             {
-                const double toConvRate = CurrencyHistoryModel::getDayRate(AccountModel::instance().cache_id(trx.TOACCOUNTID)->CURRENCYID, trx.TRANSDATE);
+                const double toConvRate = CurrencyHistoryModel::getDayRate(AccountModel::instance().get_id(trx.TOACCOUNTID)->CURRENCYID, trx.TRANSDATE);
                 amount = +trx.TOTRANSAMOUNT * toConvRate;
             }
         }
@@ -118,7 +118,7 @@ void FlowReport::getTransactions()
         if (!isAccountFound && !isToAccountFound)
             continue; // skip account
         if (TransactionModel::is_split(trx)) {
-            TransactionModel::Data *transaction = TransactionModel::instance().cache_id(trx.TRANSID);
+            TransactionModel::Data *transaction = TransactionModel::instance().get_id(trx.TRANSID);
             for (const auto& split_item : TransactionModel::split(transaction)) {
                 trx.CATEGID = split_item.CATEGID;
                 trx.TRANSAMOUNT = split_item.SPLITTRANSAMOUNT;

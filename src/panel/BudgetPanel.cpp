@@ -330,7 +330,7 @@ bool BudgetPanel::DisplayEntryAllowed(int64 categoryID, int64 subcategoryID)
 
     if (categoryID > 0) {
         displayDetails_[categoryID].second = result;
-        for (const auto& subcat : CategoryModel::sub_tree(CategoryModel::instance().cache_id(categoryID))) {
+        for (const auto& subcat : CategoryModel::sub_tree(CategoryModel::instance().get_id(categoryID))) {
             result = result || DisplayEntryAllowed(subcat.CATEGID, -1);
         }
     }
@@ -564,7 +564,7 @@ wxString BudgetPanel::getItem(long item, int col_id)
     case BudgetList::LIST_ID_ICON:
         return " ";
     case BudgetList::LIST_ID_CATEGORY: {
-        CategoryModel::Data* category = CategoryModel::instance().cache_id(
+        CategoryModel::Data* category = CategoryModel::instance().get_id(
             budget_[item].first > 0 ? budget_[item].first : budget_[item].second
         );
         if (category) {

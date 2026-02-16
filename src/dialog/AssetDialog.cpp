@@ -73,7 +73,7 @@ AssetDialog::AssetDialog(wxWindow* parent, TransactionLinkModel::Data* transfer_
     if (transfer_entry)
     {
         m_dialog_heading = _t("Edit Asset Transaction");
-        m_asset = AssetModel::instance().cache_id(transfer_entry->LINKRECORDID);
+        m_asset = AssetModel::instance().get_id(transfer_entry->LINKRECORDID);
     }
 
     Create(parent, wxID_ANY, m_dialog_heading);

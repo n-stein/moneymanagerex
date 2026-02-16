@@ -28,7 +28,7 @@ class PayeeModel : public Model<PayeeTable>
 {
 public:
     using Model<PayeeTable>::remove;
-    using Model<PayeeTable>::cache_id;
+    using Model<PayeeTable>::get_id;
 
 public:
     PayeeModel();

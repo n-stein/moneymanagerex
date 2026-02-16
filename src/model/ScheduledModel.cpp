@@ -103,7 +103,7 @@ TransactionModel::STATUS_ID ScheduledModel::status_id(const Data& r)
 */
 bool ScheduledModel::remove(int64 id)
 {
-    for (auto &item : ScheduledModel::split(cache_id(id)))
+    for (auto &item : ScheduledModel::split(get_id(id)))
         ScheduledSplitModel::instance().remove(item.SPLITTRANSID);
     // Delete tags for the scheduled transaction
     TagLinkModel::instance().DeleteAllTags(this->refTypeName, id);
@@ -190,7 +190,7 @@ bool ScheduledModel::AllowTransaction(const Data& r)
         return true;
 
     const int64 acct_id = r.ACCOUNTID;
-    AccountModel::Data* account = AccountModel::instance().cache_id(acct_id);
+    AccountModel::Data* account = AccountModel::instance().get_id(acct_id);
 
     if (account->MINIMUMBALANCE == 0 && account->CREDITLIMIT == 0)
         return true;
@@ -233,7 +233,7 @@ bool ScheduledModel::AllowTransaction(const Data& r)
 
 void ScheduledModel::completeBDInSeries(int64 bdID)
 {
-    Data* bill = cache_id(bdID);
+    Data* bill = get_id(bdID);
     if (!bill) return;
 
     int repeats = bill->REPEATS.GetValue() % BD_REPEATS_MULTIPLEX_BASE; // DeMultiplex the Auto Executable fields.
@@ -375,7 +375,7 @@ ScheduledModel::Full_Data::Full_Data(const Data& r) :
     if (!m_tags.empty()) {
         wxArrayString tagnames;
         for (const auto& entry : m_tags)
-            tagnames.Add(TagModel::instance().cache_id(entry.TAGID)->TAGNAME);
+            tagnames.Add(TagModel::instance().get_id(entry.TAGID)->TAGNAME);
         // Sort TAGNAMES
         tagnames.Sort();
         for (const auto& name : tagnames)

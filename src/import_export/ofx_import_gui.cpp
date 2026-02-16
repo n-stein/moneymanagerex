@@ -499,7 +499,7 @@ void mmPayeeSelectionDialog::LoadRegexPatterns(wxInt64ClientData* payeeIdData)
     wxLogDebug("LoadRegexPatterns: Cleared to %d rows", regexGrid_->GetNumberRows());
 
     int64_t payeeId = payeeIdData ? payeeIdData->GetValue() : -1;
-    PayeeModel::Data* payee = (payeeId >= 0) ? PayeeModel::instance().cache_id(payeeId) : nullptr;
+    PayeeModel::Data* payee = (payeeId >= 0) ? PayeeModel::instance().get_id(payeeId) : nullptr;
     if (payee && !payee->PATTERN.IsEmpty())
     {
         rapidjson::Document j_doc;
@@ -846,7 +846,7 @@ void mmPayeeSelectionDialog::OnPayeeChoice(wxCommandEvent& event)
     }
 
     int64_t payeeId = clientData->GetValue();
-    PayeeModel::Data* payee = PayeeModel::instance().cache_id(payeeId);
+    PayeeModel::Data* payee = PayeeModel::instance().get_id(payeeId);
     if (payee)
     {
         // Always update the category to the payee's default, regardless of manual changes
@@ -1095,7 +1095,7 @@ void mmOFXImportDialog::OnBrowse(wxCommandEvent& /*event*/)
                 long long tempAccountId;
                 if (data->GetData().ToLongLong(&tempAccountId))
                 {
-                    AccountModel::Data* account = AccountModel::instance().cache_id(tempAccountId);
+                    AccountModel::Data* account = AccountModel::instance().get_id(tempAccountId);
                     if (account)
                     {
                         wxString accountNum = account->ACCOUNTNUM;
@@ -1156,7 +1156,7 @@ void mmOFXImportDialog::OnImport(wxCommandEvent& /*event*/)
     }
     account_id_ = tempAccountId;
 
-    AccountModel::Data* account = AccountModel::instance().cache_id(static_cast<int>(account_id_.GetValue()));
+    AccountModel::Data* account = AccountModel::instance().get_id(static_cast<int>(account_id_.GetValue()));
     if (!account)
     {
         wxMessageBox(wxString::Format(_("Account ID %s does not exist."), account_id_.ToString()), _("Error"), wxOK | wxICON_ERROR);
@@ -1399,7 +1399,7 @@ wxString mmOFXImportDialog::getPayeeName(const wxString& memo, bool& usedRegex, 
                    matchMethod, matchConfidence);
 
         // Validate the PayeeID and check if it's a true exact match
-        PayeeModel::Data* payee = PayeeModel::instance().cache_id(candidatePayeeID);
+        PayeeModel::Data* payee = PayeeModel::instance().get_id(candidatePayeeID);
         if (payee && payee->PAYEEID.GetValue() == candidatePayeeID)
         {
             wxString dbPayeeName = payee->PAYEENAME;
@@ -1477,7 +1477,7 @@ bool mmOFXImportDialog::ImportTransactions(wxXmlNode* banktranlist, wxLongLong a
     if (!banktranlist)
         return false;
 
-    AccountModel::Data* account = AccountModel::instance().cache_id(accountID);
+    AccountModel::Data* account = AccountModel::instance().get_id(accountID);
     if (!account)
         return false;
 
@@ -1671,7 +1671,7 @@ bool mmOFXImportDialog::ImportTransactions(wxXmlNode* banktranlist, wxLongLong a
                                 TransactionModel::instance().save_trx(&existing);
                                 result.imported = true;
                                 result.transType = "Transfer";
-                                result.importedPayee = AccountModel::instance().cache_id(existing.ACCOUNTID)->ACCOUNTNAME;
+                                result.importedPayee = AccountModel::instance().get_id(existing.ACCOUNTID)->ACCOUNTNAME;
                                 result.category = "Transfer";
                                 result.matchMode = "Transfer";
                                 stats.autoImportedCount++;
@@ -1756,7 +1756,7 @@ bool mmOFXImportDialog::ImportTransactions(wxXmlNode* banktranlist, wxLongLong a
                         }
                     }
                     transaction->CATEGID = payeeDlg.GetSelectedCategoryID();
-                    CategoryModel::Data* category = CategoryModel::instance().cache_id(transaction->CATEGID);
+                    CategoryModel::Data* category = CategoryModel::instance().get_id(transaction->CATEGID);
                     result.category = category ? category->CATEGNAME : "Uncategorized";
                     if (payeeDlg.ShouldUpdateRegex() && payee)
                     {
@@ -1787,7 +1787,7 @@ bool mmOFXImportDialog::ImportTransactions(wxXmlNode* banktranlist, wxLongLong a
                     transaction->PAYEEID = payee->PAYEEID;
                     transaction->CATEGID = payee->CATEGID;
                     transaction->STATUS = (matchMethod == "Fuzzy" && markFuzzyFollowUp) ? "F" : "";
-                    CategoryModel::Data* category = CategoryModel::instance().cache_id(transaction->CATEGID);
+                    CategoryModel::Data* category = CategoryModel::instance().get_id(transaction->CATEGID);
                     result.category = category ? category->CATEGNAME : "Uncategorized";
                     stats.autoImportedCount++;
                     result.imported = true;

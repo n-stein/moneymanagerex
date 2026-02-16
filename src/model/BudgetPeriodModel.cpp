@@ -58,7 +58,7 @@ bool BudgetPeriodModel::remove(int64 id)
 // Setter
 void BudgetPeriodModel::Set(int64 year_id, const wxString& value)
 {
-    Data* info = this->cache_id(year_id);
+    Data* info = this->get_id(year_id);
     if (info) {
         info->BUDGETYEARNAME = value;
         save(info);
@@ -86,7 +86,7 @@ int64 BudgetPeriodModel::Add(const wxString& value)
 // Getter
 wxString BudgetPeriodModel::Get(int64 year_id)
 {
-    Data* e = this->cache_id(year_id);
+    Data* e = this->get_id(year_id);
     if (e) return e->BUDGETYEARNAME;
 
     return "";
@@ -104,7 +104,7 @@ int64 BudgetPeriodModel::Get(const wxString& year_name)
 
 bool BudgetPeriodModel::Exists(int64 year_id)
 {
-    Data* e = this->cache_id(year_id);
+    Data* e = this->get_id(year_id);
     if (e) return true;
 
     return false;

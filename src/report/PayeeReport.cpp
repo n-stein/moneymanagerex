@@ -86,7 +86,7 @@ void PayeeReport::loadData()
         auto [it, new_payee] = m_id_data.try_emplace(trx.PAYEEID, Data{});
         Data& data = it->second;
         if (new_payee) {
-            PayeeModel::Data* payee = PayeeModel::instance().cache_id(payee_id);
+            PayeeModel::Data* payee = PayeeModel::instance().get_id(payee_id);
             data.payee_name = payee ? payee->PAYEENAME : "";
             data.flow_pos = 0.0;
             data.flow_neg = 0.0;
@@ -96,7 +96,7 @@ void PayeeReport::loadData()
         // NOTE: call to getDayRate() in every transaction is slow
         // if "Use historical currency" is enabled in settings
         const double convRate = CurrencyHistoryModel::getDayRate(
-            AccountModel::instance().cache_id(trx.ACCOUNTID)->CURRENCYID,
+            AccountModel::instance().get_id(trx.ACCOUNTID)->CURRENCYID,
             trx.TRANSDATE
         );
 

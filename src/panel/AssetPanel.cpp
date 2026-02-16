@@ -861,7 +861,7 @@ void AssetPanel::LoadAssetTransactions(wxListCtrl* listCtrl, int64 assetId)
     int row = 0;
     for (const auto& assetEntry : assetList)
     {
-        auto* assetTrans = TransactionModel::instance().cache_id(assetEntry.CHECKINGACCOUNTID);
+        auto* assetTrans = TransactionModel::instance().get_id(assetEntry.CHECKINGACCOUNTID);
         if (!assetTrans) continue;
 
         long index = listCtrl->InsertItem(row++, "");
@@ -883,7 +883,7 @@ void AssetPanel::BindAssetListEvents(wxListCtrl* listCtrl)
 {
     listCtrl->Bind(wxEVT_LIST_ITEM_ACTIVATED, [listCtrl, this](wxListEvent& event) {
         long index = event.GetIndex();
-        auto* txn = TransactionModel::instance().cache_id(event.GetData());
+        auto* txn = TransactionModel::instance().get_id(event.GetData());
         if (!txn) return;
 
         auto link = TransactionLinkModel::TranslinkRecord(txn->TRANSID);
@@ -893,8 +893,8 @@ void AssetPanel::BindAssetListEvents(wxListCtrl* listCtrl)
         this->FillAssetListRow(listCtrl, index, *txn);
 
         listCtrl->SortItems([](wxIntPtr item1, wxIntPtr item2, wxIntPtr) -> int {
-            auto date1 = TransactionModel::getTransDateTime(TransactionModel::instance().cache_id(item1));
-            auto date2 = TransactionModel::getTransDateTime(TransactionModel::instance().cache_id(item2));
+            auto date1 = TransactionModel::getTransDateTime(TransactionModel::instance().get_id(item1));
+            auto date2 = TransactionModel::getTransDateTime(TransactionModel::instance().get_id(item2));
             return date1.IsEarlierThan(date2) ? -1 : (date1.IsLaterThan(date2) ? 1 : 0);
         }, 0);
     });
@@ -945,10 +945,10 @@ void AssetPanel::GotoAssetAccount(const int selected_index)
         TransactionLinkModel::Data_Set asset_list = TransactionLinkModel::TranslinkList<AssetModel>(asset->ASSETID);
         for (const auto &asset_entry : asset_list)
         {
-            TransactionModel::Data* asset_trans = TransactionModel::instance().cache_id(asset_entry.CHECKINGACCOUNTID);
+            TransactionModel::Data* asset_trans = TransactionModel::instance().get_id(asset_entry.CHECKINGACCOUNTID);
             if (asset_trans)
             {
-                account = AccountModel::instance().cache_id(asset_trans->ACCOUNTID);
+                account = AccountModel::instance().get_id(asset_trans->ACCOUNTID);
                 SetAccountParameters(account);
             }
         }

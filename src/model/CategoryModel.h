@@ -29,7 +29,7 @@ class mmDateRange;
 class CategoryModel : public Model<CategoryTable>
 {
 public:
-    using Model<CategoryTable>::cache_id;
+    using Model<CategoryTable>::get_id;
     struct SorterByFULLNAME
     {
         template<class DATA>

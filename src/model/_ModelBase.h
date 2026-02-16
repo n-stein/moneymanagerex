@@ -109,8 +109,8 @@ public:
     using Data_Set = TableType::RowA;
     using TableType::save;
     using TableType::remove;
-    using TableType::cache_id;
     using TableType::get_id;
+    using TableType::get_record;
     using TableType::get_all;
 
     template<typename... Args>
@@ -145,9 +145,9 @@ public:
         return this->find_by(false, args...);
     }
 
-    Data* cache_id(wxLongLong_t id)
+    Data* get_id(wxLongLong_t id)
     {
-        return this->cache_id(int64(id));
+        return this->get_id(int64(id));
     }
 
     // Save all Data record memory instances contained
@@ -182,7 +182,7 @@ public:
     {
         int i = 0;
         for (const auto & item : get_all()) {
-            cache_id(item.id());
+            get_id(item.id());
             if (++i >= max_num) break;
         }
     }

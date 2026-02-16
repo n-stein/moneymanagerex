@@ -62,7 +62,7 @@ CurrencyHistoryModel::Data* CurrencyHistoryModel::cache_key(const int64& currenc
         CurrencyHistoryTable::CURRDATE(date.FormatISODate())
     );
     if (!items.empty())
-        hist = this->cache_id(items[0].id());
+        hist = this->get_id(items[0].id());
     return hist;
 }
 
@@ -95,7 +95,7 @@ int64 CurrencyHistoryModel::addUpdate(const int64 currencyID, const wxDate& date
 double CurrencyHistoryModel::getDayRate(int64 currencyID, const wxString& DateISO)
 {
     if (!PreferencesModel::instance().getUseCurrencyHistory()) {
-        auto c = CurrencyModel::instance().cache_id(currencyID);
+        auto c = CurrencyModel::instance().get_id(currencyID);
         return c ? c->BASECONVRATE : 1.0;
     }
     wxDate Date;
@@ -114,7 +114,7 @@ double CurrencyHistoryModel::getDayRate(int64 currencyID, const wxDate& Date)
         return 1;
 
     if (!PreferencesModel::instance().getUseCurrencyHistory())
-        return CurrencyModel::instance().cache_id(currencyID)->BASECONVRATE;
+        return CurrencyModel::instance().get_id(currencyID)->BASECONVRATE;
 
     CurrencyHistoryModel::Data_Set Data = CurrencyHistoryModel::instance().find(
         CurrencyHistoryModel::CURRENCYID(OP_EQ, currencyID),
@@ -154,14 +154,14 @@ double CurrencyHistoryModel::getDayRate(int64 currencyID, const wxDate& Date)
         }
     }
 
-    return CurrencyModel::instance().cache_id(currencyID)->BASECONVRATE;
+    return CurrencyModel::instance().get_id(currencyID)->BASECONVRATE;
 }
 
 /** Return the last rate for specified currency */
 double CurrencyHistoryModel::getLastRate(const int64& currencyID)
 {
     if (!PreferencesModel::instance().getUseCurrencyHistory())
-        return CurrencyModel::instance().cache_id(currencyID)->BASECONVRATE;
+        return CurrencyModel::instance().get_id(currencyID)->BASECONVRATE;
 
     CurrencyHistoryModel::Data_Set histData = CurrencyHistoryModel::instance().find(CurrencyHistoryModel::CURRENCYID(currencyID));
     std::stable_sort(histData.begin(), histData.end(), CurrencyHistoryRow::SorterByCURRDATE());
@@ -170,7 +170,7 @@ double CurrencyHistoryModel::getLastRate(const int64& currencyID)
         return histData.back().CURRVALUE;
     else
     {
-        CurrencyModel::Data* Currency = CurrencyModel::instance().cache_id(currencyID);
+        CurrencyModel::Data* Currency = CurrencyModel::instance().get_id(currencyID);
         return Currency->BASECONVRATE;
     }
 }

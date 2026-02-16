@@ -164,7 +164,7 @@ SplitDialog::SplitDialog(wxWindow* parent
     , row_num_(static_cast<int>(split.size()))
     , is_view_only_(is_view_only)
 {
-    AccountModel::Data* account = AccountModel::instance().cache_id(accountID);
+    AccountModel::Data* account = AccountModel::instance().get_id(accountID);
     m_currency = account ? AccountModel::currency(account) : CurrencyModel::GetBaseCurrency();
     m_splits = m_orig_splits;
     this->SetFont(parent->GetFont());

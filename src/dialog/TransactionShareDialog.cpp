@@ -76,7 +76,7 @@ TransactionShareDialog::TransactionShareDialog(wxWindow* parent, TransactionLink
 {
     if (m_translink_entry)
     {
-        m_stock = StockModel::instance().cache_id(m_translink_entry->LINKRECORDID);
+        m_stock = StockModel::instance().get_id(m_translink_entry->LINKRECORDID);
         if (m_translink_entry->LINKTYPE == StockModel::refTypeName)
         {
             m_share_entry = TransactionShareModel::ShareEntry(m_translink_entry->CHECKINGACCOUNTID);
@@ -167,7 +167,7 @@ void TransactionShareDialog::DataToControls()
 
             if (m_translink_entry)
             {
-                TransactionModel::Data* checking_entry = TransactionModel::instance().cache_id(m_translink_entry->CHECKINGACCOUNTID);
+                TransactionModel::Data* checking_entry = TransactionModel::instance().get_id(m_translink_entry->CHECKINGACCOUNTID);
                 if (checking_entry)
                 {
                     m_transaction_panel->TransactionDate(TransactionModel::getTransDateTime(checking_entry));

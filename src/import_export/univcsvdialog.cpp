@@ -779,7 +779,7 @@ void mmUnivCSVDialog::SetSettings(const wxString &json_data)
         m_choice_preset_name->SetSelection(-1);
         if (m_account_id > 0)
         {
-            const AccountModel::Data* account = AccountModel::instance().cache_id(m_account_id);
+            const AccountModel::Data* account = AccountModel::instance().get_id(m_account_id);
             if (account)
                 m_choice_account_->SetStringSelection(account->ACCOUNTNAME);
         }
@@ -825,7 +825,7 @@ void mmUnivCSVDialog::SetSettings(const wxString &json_data)
     wxString an;
     if (m_account_id > -1)
     {
-        const AccountModel::Data* account = AccountModel::instance().cache_id(m_account_id);
+        const AccountModel::Data* account = AccountModel::instance().get_id(m_account_id);
         if (account)
             an = account->ACCOUNTNAME;
         else
@@ -1347,7 +1347,7 @@ bool mmUnivCSVDialog::validateData(tran_holder & holder, wxString& message)
         for (auto& cfdata : holder.customFieldData)
             is_valid &= validateCustomFieldData(cfdata.first, cfdata.second, message);
 
-    PayeeModel::Data* payee = PayeeModel::instance().cache_id(holder.PayeeID);
+    PayeeModel::Data* payee = PayeeModel::instance().get_id(holder.PayeeID);
     if (!payee)
     {
         PayeeModel::Data* u = PayeeModel::instance().cache_key(_t("Unknown"));
@@ -1509,8 +1509,8 @@ void mmUnivCSVDialog::OnImport(wxCommandEvent& WXUNUSED(event))
         }
 
         wxString trxDate = holder.Date.FormatISOCombined();
-        AccountModel::Data* account2 = AccountModel::instance().cache_id(accountID_);
-        const AccountModel::Data* toAccount = AccountModel::instance().cache_id(holder.ToAccountID);
+        AccountModel::Data* account2 = AccountModel::instance().get_id(accountID_);
+        const AccountModel::Data* toAccount = AccountModel::instance().get_id(holder.ToAccountID);
         if ((trxDate < account2->INITIALDATE) ||
             (toAccount && (trxDate < toAccount->INITIALDATE)))
         {
@@ -1738,7 +1738,7 @@ void mmUnivCSVDialog::OnExport(wxCommandEvent& WXUNUSED(event))
                 {
                     pTxFile->AddNewLine();
 
-                    CategoryModel::Data* category = CategoryModel::instance().cache_id(splt.CATEGID);
+                    CategoryModel::Data* category = CategoryModel::instance().get_id(splt.CATEGID);
 
                     double amt = splt.SPLITTRANSAMOUNT;
                     if (TransactionModel::type_id(pBankTransaction) == TransactionModel::TYPE_ID_WITHDRAWAL
@@ -1826,7 +1826,7 @@ void mmUnivCSVDialog::OnExport(wxCommandEvent& WXUNUSED(event))
                                 if (data)
                                 {
                                     // format date fields
-                                    if (FieldModel::type_id(FieldModel::instance().cache_id(data->FIELDID)) == FieldModel::TYPE_ID_DATE)
+                                    if (FieldModel::type_id(FieldModel::instance().get_id(data->FIELDID)) == FieldModel::TYPE_ID_DATE)
                                         entry = mmGetDateTimeForDisplay(data->CONTENT, date_format_);
                                     else
                                         entry = data->CONTENT;
@@ -1850,7 +1850,7 @@ void mmUnivCSVDialog::OnExport(wxCommandEvent& WXUNUSED(event))
         std::sort(txns.begin(), txns.end());
         std::stable_sort(txns.begin(), txns.end(), StockRow::SorterBySTOCKID());
 
-        AccountModel::Data* account = AccountModel::instance().cache_id(fromAccountID);
+        AccountModel::Data* account = AccountModel::instance().get_id(fromAccountID);
         for (const auto& pStockTrancsaction : txns)
         {
             //If the transaction happened between the dates that the user selected or if the user selected to export all the transactions regardless of date then the row is added to the preview
@@ -2135,7 +2135,7 @@ void mmUnivCSVDialog::update_preview()
                             buf.Printf("%d", row + 1);
                             m_list_ctrl_->SetItem(itemIndex, col, buf);
                             m_list_ctrl_->SetItemData(itemIndex, row);
-                            CategoryModel::Data* category = CategoryModel::instance().cache_id(splt.CATEGID);
+                            CategoryModel::Data* category = CategoryModel::instance().get_id(splt.CATEGID);
 
                             CurrencyModel::Data* currency = AccountModel::currency(from_account);
 
@@ -2220,7 +2220,7 @@ void mmUnivCSVDialog::update_preview()
                                         if (data)
                                         {
                                             // Format date fields
-                                            if (FieldModel::type_id(FieldModel::instance().cache_id(data->FIELDID)) == FieldModel::TYPE_ID_DATE)
+                                            if (FieldModel::type_id(FieldModel::instance().get_id(data->FIELDID)) == FieldModel::TYPE_ID_DATE)
                                                 text << inQuotes(mmGetDateTimeForDisplay(data->CONTENT, date_format_), delimit);
                                             else
                                                 text << inQuotes(data->CONTENT, delimit);
@@ -2260,7 +2260,7 @@ void mmUnivCSVDialog::update_preview()
                 std::sort(txns.begin(), txns.end());
                 std::stable_sort(txns.begin(), txns.end(), StockRow::SorterBySTOCKID());
 
-                AccountModel::Data* account = AccountModel::instance().cache_id(fromAccountID);
+                AccountModel::Data* account = AccountModel::instance().get_id(fromAccountID);
                 for (const auto& pStockTrancsaction : txns)
                 {
                     // If the transaction happened between the dates that the user selected or if the user selected to export all the transactions regardless of date then the row is added to the preview
@@ -3134,7 +3134,7 @@ bool mmUnivCSVDialog::validateCustomFieldData(int64 fieldId, wxString& value, wx
 
     if (!value.IsEmpty())
     {
-        const FieldModel::Data* data = FieldModel::instance().cache_id(fieldId);
+        const FieldModel::Data* data = FieldModel::instance().get_id(fieldId);
         wxString type_string = FieldModel::type_name(FieldModel::type_id(data));
         switch (FieldModel::type_id(data))
         {

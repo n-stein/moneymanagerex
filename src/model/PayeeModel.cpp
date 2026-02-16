@@ -73,13 +73,13 @@ PayeeModel::Data* PayeeModel::cache_key(const wxString& name)
 
     Data_Set items = this->find(PAYEENAME(name));
     if (!items.empty())
-        payee = this->cache_id(items[0].PAYEEID);
+        payee = this->get_id(items[0].PAYEEID);
     return payee;
 }
 
 wxString PayeeModel::get_payee_name(int64 payee_id)
 {
-    Data* payee = instance().cache_id(payee_id);
+    Data* payee = instance().get_id(payee_id);
     if (payee)
         return payee->PAYEENAME;
     else
@@ -137,7 +137,7 @@ const std::map<wxString, int64> PayeeModel::used_payee()
 
 bool PayeeModel::is_hidden(int64 id)
 {
-    const auto payee = PayeeModel::instance().cache_id(id);
+    const auto payee = PayeeModel::instance().get_id(id);
     if (payee && payee->ACTIVE == 0)
         return true;
 

@@ -26,7 +26,7 @@
 class AttachmentModel : public Model<AttachmentTable>
 {
 public:
-    using Model<AttachmentTable>::cache_id;
+    using Model<AttachmentTable>::get_id;
 
 public:
     AttachmentModel();

@@ -226,7 +226,7 @@ bool mmWebApp::WebApp_UpdatePayee()
     wxString def_category_name, def_subcategory_name;
     for (const auto &payee : PayeeModel::instance().get_all(PayeeCol::COL_ID_PAYEENAME))
     {
-        const CategoryModel::Data* def_category = CategoryModel::instance().cache_id(payee.CATEGID);
+        const CategoryModel::Data* def_category = CategoryModel::instance().get_id(payee.CATEGID);
         if (def_category != nullptr)
         {
             if (def_category->PARENTID == -1)
@@ -236,7 +236,7 @@ bool mmWebApp::WebApp_UpdatePayee()
             }
             else
             {
-                CategoryModel::Data* parent_category = CategoryModel::instance().cache_id(def_category->PARENTID);
+                CategoryModel::Data* parent_category = CategoryModel::instance().get_id(def_category->PARENTID);
                 if (parent_category != nullptr && parent_category->PARENTID == -1) {
                     def_category_name = parent_category->CATEGNAME;
                     def_subcategory_name = def_category->CATEGNAME;

@@ -69,7 +69,7 @@ mmQIFImportDialog::mmQIFImportDialog(wxWindow* parent, int64 account_id, const w
 {
     decimal_ = CurrencyModel::GetBaseCurrency()->DECIMAL_POINT;
     payeeIsNotes_ = false;
-    const auto& acc = AccountModel::instance().cache_id(account_id);
+    const auto& acc = AccountModel::instance().get_id(account_id);
     if (acc)
         m_accountNameStr = acc->ACCOUNTNAME;
 
@@ -814,7 +814,7 @@ void mmQIFImportDialog::refreshTabs(int tabs)
 
             if (account)
             {
-                CurrencyModel::Data *curr = CurrencyModel::instance().cache_id(account->CURRENCYID);
+                CurrencyModel::Data *curr = CurrencyModel::instance().get_id(account->CURRENCYID);
                 if (curr && curr->CURRENCY_SYMBOL == currencySymbol)
                     status = _t("OK");
                 else
@@ -1162,8 +1162,8 @@ void mmQIFImportDialog::OnOk(wxCommandEvent& WXUNUSED(event))
                 if (dateToCheckBox_->IsChecked() && strDate > end_date)
                     continue;
 
-                AccountModel::Data* account = AccountModel::instance().cache_id(trx->ACCOUNTID);
-                AccountModel::Data* toAccount = AccountModel::instance().cache_id(trx->TOACCOUNTID);
+                AccountModel::Data* account = AccountModel::instance().get_id(trx->ACCOUNTID);
+                AccountModel::Data* toAccount = AccountModel::instance().get_id(trx->TOACCOUNTID);
 
                 if ((trx->TRANSDATE < account->STATEMENTDATE && account->STATEMENTLOCKED.GetValue()) ||
                     (toAccount && (trx->TRANSDATE < toAccount->STATEMENTDATE && toAccount->STATEMENTLOCKED.GetValue())))
@@ -1585,7 +1585,7 @@ bool mmQIFImportDialog::completeTransaction(/*in*/ const std::unordered_map <int
         wxString categStr = (t.find(Category) != t.end() ? t.at(Category).BeforeFirst('/') : "");
         if (categStr.empty())
         {
-            PayeeModel::Data* payee = PayeeModel::instance().cache_id(trx->PAYEEID);
+            PayeeModel::Data* payee = PayeeModel::instance().get_id(trx->PAYEEID);
             if (payee)
             {
                 trx->CATEGID = payee->CATEGID;

@@ -25,7 +25,7 @@
 class ReportModel : public Model<ReportTable>
 {
 public:
-    using Model<ReportTable>::cache_id;
+    using Model<ReportTable>::get_id;
 
 public:
     ReportModel(); 
