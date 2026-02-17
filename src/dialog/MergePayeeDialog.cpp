@@ -47,7 +47,7 @@ MergePayeeDialog::MergePayeeDialog( )
 
 MergePayeeDialog::~MergePayeeDialog()
 {
-    InfotableModel::instance().setSize("RELOCATEPAYEE_DIALOG_SIZE", GetSize());
+    InfoModel::instance().setSize("RELOCATEPAYEE_DIALOG_SIZE", GetSize());
 }
 
 MergePayeeDialog::MergePayeeDialog(wxWindow* parent, int64 source_payee_id)
@@ -166,7 +166,7 @@ void MergePayeeDialog::OnOk(wxCommandEvent& WXUNUSED(event))
         for (auto &entry : transactions) {
             entry.PAYEEID = destPayeeID_;
         }
-        m_changed_records += TransactionModel::instance().save(transactions);
+        m_changed_records += TransactionModel::instance().save_trx(transactions);
         TransactionModel::instance().ReleaseSavepoint();
 
         ScheduledModel::instance().Savepoint();
