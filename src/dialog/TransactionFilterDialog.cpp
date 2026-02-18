@@ -724,7 +724,7 @@ void TransactionFilterDialog::mmDoCreateControls()
         _tu("The asterisk (*) matches any number of characters, for example \"s*d\" finds both \"sad\" and \"started\".") + "\n" +
         _t("Use regex: to match using regular expressions.")
     );
-
+    itemPanelSizer->Add(notesEdit_, g_flagsExpand);
 
     // Colour
     colorCheckBox_ = new wxCheckBox(itemPanel, wxID_ANY, _t("Color"), wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
