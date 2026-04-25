@@ -349,7 +349,7 @@ int mmNavigatorList::getAccountTypeIdx(int account_type)
 wxString mmNavigatorList::getAccountDbTypeFromChoice(const wxString& choiceName)
 {
     for (mmNavigatorItem* entry : m_navigator_entries) {
-        if (entry->choice == choiceName) {
+        if (entry->choice == choiceName || GetTranslatedSelection(entry) == choiceName) {
             return entry->dbaccid;
         }
     }
@@ -441,7 +441,7 @@ int mmNavigatorList::getTypeIdFromDBName(const wxString& dbname, int default_id)
 int mmNavigatorList::getTypeIdFromChoice(const wxString& choice, int default_id)
 {
     for (mmNavigatorItem* entry : m_navigator_entries) {
-        if (entry->choice == choice) {
+        if (entry->choice == choice || GetTranslatedSelection(entry) == choice) {
             return entry->type;
         }
     }
