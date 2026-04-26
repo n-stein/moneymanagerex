@@ -171,7 +171,10 @@ const std::pair<double, double> AssetModel::get_data_value_date(
             trx_a.push_back(*trx_n);
         }
     }
-    std::stable_sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateTime());
+    if (PrefModel::instance().getUseTransDateTime())
+        std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateTimeId());
+    else
+        std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateId());
 
     if (!tl_a.empty()) {
         mmDateN last_n = mmDateN();

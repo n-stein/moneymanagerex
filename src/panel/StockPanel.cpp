@@ -351,7 +351,10 @@ void StockPanel::loadStockTransactions(wxListCtrl* listCtrl, wxString symbol, in
             trx_a.push_back(*trx_n);
         }
     }
-    std::stable_sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateTime());
+    if (PrefModel::instance().getUseTransDateTime())
+        std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateTimeId());
+    else
+        std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateId());
 
     int row = 0;
     for (const auto& trx_d : trx_a) {

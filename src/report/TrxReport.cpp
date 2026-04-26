@@ -624,8 +624,11 @@ void TrxReport::Run(wxSharedPtr<TrxFilterDialog>& dlg)
         else if (dlg.get()->mmIsRecordMatches<TrxModel>(trx_d))
             trx_xa.push_back(trx_dx);
     }
+    if (PrefModel::instance().getUseTransDateTime())
+        std::sort(trx_xa.begin(), trx_xa.end(), TrxData::SorterByDateTimeId());
+    else
+        std::sort(trx_xa.begin(), trx_xa.end(), TrxData::SorterByDateId());
 
-    std::stable_sort(trx_xa.begin(), trx_xa.end(), TrxData::SorterByDateTime());
     switch (dlg.get()->mmGetGroupBy())
     {
     case TrxFilterDialog::GROUPBY_ACCOUNT:
@@ -641,13 +644,12 @@ void TrxReport::Run(wxSharedPtr<TrxFilterDialog>& dlg)
         std::stable_sort(trx_xa.begin(), trx_xa.end(), TrxData::SorterByType());
         break;
     case TrxFilterDialog::GROUPBY_DAY:
-        std::stable_sort(trx_xa.begin(), trx_xa.end(), TrxData::SorterByDateTime());
-        break;
     case TrxFilterDialog::GROUPBY_MONTH:
-        std::stable_sort(trx_xa.begin(), trx_xa.end(), TrxData::SorterByDateTime());
-        break;
     case TrxFilterDialog::GROUPBY_YEAR:
-        std::stable_sort(trx_xa.begin(), trx_xa.end(), TrxData::SorterByDateTime());
+        if (PrefModel::instance().getUseTransDateTime())
+            std::sort(trx_xa.begin(), trx_xa.end(), TrxData::SorterByDateTimeId());
+        else
+            std::sort(trx_xa.begin(), trx_xa.end(), TrxData::SorterByDateId());
         break;
     }
 }

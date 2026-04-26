@@ -350,7 +350,7 @@ void StockDialog::updateControls()
             m_stock_n->current_value()
         ));
     }
-    else {
+    else if (m_stock_n) {
         w_value_label->SetLabelText(wxString::Format(wxT("%.2f"),
             m_stock_n->m_current_price * m_stock_n->m_num_shares
         ));
@@ -364,7 +364,7 @@ void StockDialog::updateControls()
     static_cast<wxBitmapButton*>(FindWindow(wxID_ADD))->Enable(!is_new);
 
     bool initial_shares = (TrxLinkModel::instance().find_stock_id_c(
-        m_stock_n->m_id
+        stock_id()
     ) == 0);
     w_num_text->Enable(is_new || initial_shares);
     w_purchase_date_picker->Enable(is_new || initial_shares);
