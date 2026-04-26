@@ -220,7 +220,6 @@ bool JournalPanel::create(
 void JournalPanel::createControls()
 {
     wxBoxSizer* sizerV = new wxBoxSizer(wxVERTICAL);
-    //this->SetSizer(sizerV);
 
     /* ---------------------- */
 
@@ -296,10 +295,8 @@ void JournalPanel::createControls()
     w_header_sortOrder = new wxStaticText(this, wxID_STATIC, "");
     sizerHCtrl->Add(w_header_sortOrder, g_flagsH);
 
+    sizerHCtrl->AddStretchSpacer(1);
     if (isAccount()) {
-        sizerHCtrl->AddStretchSpacer(1);
-        sizerHCtrl->AddSpacer(100);
-
         wxBitmapButton* btn = new wxBitmapButton(this, wxID_ANY,
             mmImage::bitmapBundle(mmImage::png::TRXNUM, mmImage::bitmapButtonSize)
         );
@@ -308,7 +305,7 @@ void JournalPanel::createControls()
         sizerHCtrl->Add(btn, 0, wxALIGN_CENTER_VERTICAL, 5);
     }
 
-    sizerV->Add(sizerHCtrl, 0, wxEXPAND | wxALL, 10);
+    sizerV->Add(sizerHCtrl, 0, wxEXPAND | wxALL, 15);
 
     w_range_btn->Connect(wxEVT_RIGHT_DOWN,
         wxMouseEventHandler(JournalPanel::onButtonRightDown),
