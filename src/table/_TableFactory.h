@@ -104,7 +104,7 @@ public:
     // Records fully owned by id are ignored (they can be deleted together with id).
     // If ignore_deleted is true, deleted transactions are also also ignored.
     // The complete list of table dependencies can be found in _dependencies.txt
-    virtual auto find_id_isUsed(int64 id, bool ignore_deleted = false) -> bool {
+    virtual auto find_id_isUsed([[maybe_unused]] int64 id, [[maybe_unused]] bool ignore_deleted = false) -> bool {
         return false;
     }
 
