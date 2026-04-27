@@ -238,7 +238,10 @@ double StockModel::calculate_realized_gain(const Data& stock_d, bool to_base_cur
         )
             trx_a.push_back(*trx_n);
     }
-    std::stable_sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateTime());
+    if (PrefModel::instance().getUseTransDateTime())
+        std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateTimeId());
+    else
+        std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateId());
 
     for (const TrxData& trx_d : trx_a) {
         const TrxShareData* ts_n = TrxShareModel::instance().get_trxId_data_n(
@@ -317,9 +320,10 @@ double StockModel::calculate_unrealiazed_gain(const Data& stock_d, bool to_base_
             )
                 trx_a.push_back(*trx_d);
         }
-        std::stable_sort(trx_a.begin(), trx_a.end(),
-            TrxData::SorterByDateTime()
-        );
+        if (PrefModel::instance().getUseTransDateTime())
+            std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateTimeId());
+        else
+            std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateId());
 
         for (const auto& trx_d : trx_a) {
             const TrxShareData* ts_d = TrxShareModel::instance().get_trxId_data_n(
@@ -401,7 +405,11 @@ void StockModel::update_data_position(StockData* stock_n)
             trx_a.push_back(*trx_n);
         }
     }
-    std::stable_sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateTime());
+    if (PrefModel::instance().getUseTransDateTime())
+        std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateTimeId());
+    else
+        std::sort(trx_a.begin(), trx_a.end(), TrxData::SorterByDateId());
+
     for (const auto& trx_d : trx_a) {
         const TrxShareData* ts_n = TrxShareModel::instance().get_trxId_data_n(
             trx_d.m_id

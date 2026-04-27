@@ -350,12 +350,10 @@ void StockDialog::updateControls()
             m_stock_n->current_value()
         ));
     }
-    else {
-        if (m_stock_n) {
-            w_value_label->SetLabelText(wxString::Format(wxT("%.2f"),
-                m_stock_n->m_current_price * m_stock_n->m_num_shares
-            ));
-        }
+    else if (m_stock_n) {
+        w_value_label->SetLabelText(wxString::Format(wxT("%.2f"),
+            m_stock_n->m_current_price * m_stock_n->m_num_shares
+        ));
     }
 
     // Disable history buttons on new stocks
@@ -365,9 +363,9 @@ void StockDialog::updateControls()
     static_cast<wxBitmapButton*>(FindWindow(wxID_DELETE))->Enable(!is_new);
     static_cast<wxBitmapButton*>(FindWindow(wxID_ADD))->Enable(!is_new);
 
-    bool initial_shares = m_stock_n ? (TrxLinkModel::instance().find_stock_id_c(
-        m_stock_n->m_id
-    ) == 0) : false;
+    bool initial_shares = (TrxLinkModel::instance().find_stock_id_c(
+        stock_id()
+    ) == 0);
     w_num_text->Enable(is_new || initial_shares);
     w_purchase_date_picker->Enable(is_new || initial_shares);
     w_purchase_price_text->Enable(is_new || initial_shares);
