@@ -165,7 +165,10 @@ wxString TrxFilter::getHTML()
             m_trx_xa.push_back(full_tran);
     }
 
-    std::stable_sort(m_trx_xa.begin(), m_trx_xa.end(), TrxData::SorterByDateTime());
+    if (PrefModel::instance().getUseTransDateTime())
+        std::sort(m_trx_xa.begin(), m_trx_xa.end(), TrxData::SorterByDateTimeId());
+    else
+        std::sort(m_trx_xa.begin(), m_trx_xa.end(), TrxData::SorterByDateId());
 
     const wxString extra_style = R"(
 table {
