@@ -1085,7 +1085,7 @@ void mmFrame::DoRecreateNavTreeControl(bool home_page)
                     if (PrefModel::instance().getShowNavigatorCashLedger()) {
                         wxTreeItemId stockItem = m_nav_tree_ctrl->AppendItem(
                             accountItem,
-                            _n("Cash Ledger"),
+                            _t("Cash Ledger"),
                             accountImg, accountImg
                         );
                         m_nav_tree_ctrl->SetItemData(
